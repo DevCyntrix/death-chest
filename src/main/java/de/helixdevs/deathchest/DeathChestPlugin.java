@@ -23,7 +23,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener {
     private final Set<DeathChest> deathChests = new HashSet<>();
 
     private DeathChestConfig deathChestConfig;
-    private ProtectionQuery protectionQuery;
+    private BuildPredicate checkBuild;
 
     @Override
     public void onDisable() {
@@ -38,7 +38,12 @@ public class DeathChestPlugin extends JavaPlugin implements Listener {
         reloadConfig();
 
         this.deathChestConfig = DeathChestConfig.load(getConfig());
-        this.protectionQuery = WorldGuardPlugin.inst().createProtectionQuery();
+        this.checkBuild = (player, location, material) -> true;
+
+        if (getServer().getPluginManager().isPluginEnabled("WorldGuard")) {
+            ProtectionQuery protectionQuery = WorldGuardPlugin.inst().createProtectionQuery();
+            this.checkBuild = protectionQuery::testBlockPlace;
+        }
 
         getServer().getPluginManager().registerEvents(this, this);
     }
@@ -61,7 +66,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener {
         Location deathLocation = player.getLocation();
 
         // Check protection
-        boolean build = this.protectionQuery.testBlockPlace(player, deathLocation, Material.CHEST);
+        boolean build = checkBuild.test(player, deathLocation, Material.CHEST);
         if (!build)
             return;
 
@@ -89,8 +94,8 @@ public class DeathChestPlugin extends JavaPlugin implements Listener {
         return deathChestConfig;
     }
 
-    public ProtectionQuery getProtectionQuery() {
-        return protectionQuery;
+    public void registerChest(DeathChest chest) {
+        this.deathChests.add(chest);
     }
 
     public void unregisterChest(DeathChest chest) {

@@ -40,7 +40,6 @@ tasks {
     assemble {
         dependsOn(reobfJar)
     }
-
     compileJava {
         options.encoding = Charsets.UTF_8.name()
         options.release.set(17)
@@ -51,14 +50,13 @@ tasks {
     processResources {
         filteringCharset = Charsets.UTF_8.name()
     }
-    jar {
-        archiveFileName.set("death-chest.jar")
-    }
 }
 
 bukkit {
+    name = "DeathChest"
     main = "de.helixdevs.deathchest.DeathChestPlugin"
     apiVersion = "1.18"
     authors = listOf("CyntrixAlgorithm")
-    depend = listOf("WorldGuard", "HolographicDisplays")
+    depend = listOf("HolographicDisplays")
+    softDepend = listOf("WorldGuard")
 }
