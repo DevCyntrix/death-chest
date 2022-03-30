@@ -50,7 +50,6 @@ public class DeathChest implements Listener, Closeable {
         this.hologram = HologramsAPI.createHologram(plugin, location.clone().add(0.5, 1.5, 0.5));
         this.expireAt = createdAt + expiration.toMillis();
 
-
         long duration = expireAt - System.currentTimeMillis();
         String format = DurationFormatUtils.formatDuration(duration, config.getDurationFormat());
         TextLine textLine = this.hologram.appendTextLine(format);
