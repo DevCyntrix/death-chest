@@ -51,6 +51,9 @@ tasks {
     processResources {
         filteringCharset = Charsets.UTF_8.name()
     }
+    jar {
+        archiveFileName.set("death-chest.jar")
+    }
 }
 
 bukkit {
