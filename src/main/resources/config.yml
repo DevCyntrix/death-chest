@@ -1,0 +1,9 @@
+format: 'mm:ss'
+# the expiration of the chest in seconds
+expiration: 600
+inventory-title: 'Death Chest'
+# notification on death
+notify:
+  enabled: true
+  message: |-
+    &7Du bist gestorben. Es wurde eine Kiste mit deinem Inventar platziert, diese verschwindet in &c10 Minuten&7!
