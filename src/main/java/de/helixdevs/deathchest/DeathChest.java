@@ -18,6 +18,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
@@ -187,11 +188,33 @@ public class DeathChest implements Listener, Closeable {
         }
     }
 
+    /**
+     * Cancels that a hopper can move items into the chest inventory
+     *
+     * @param event the event from the Bukkit API
+     */
     @EventHandler
     public void onHopperMoveItem(InventoryMoveItemEvent event) {
         if (!chest.getBlockInventory().equals(event.getDestination()))
             return;
         event.setCancelled(true);
+    }
+
+    /**
+     * Drops the item from the death chest when the player breaks the chest.
+     *
+     * @param event the event from the Bukkit API
+     */
+    @EventHandler
+    public void onBlockBreak(BlockBreakEvent event) {
+        if (!event.getBlock().getLocation().equals(location))
+            return;
+        for (ItemStack content : this.inventory.getContents()) {
+            if (content == null)
+                continue;
+            location.getWorld().dropItemNaturally(location, content);
+        }
+        close();
     }
 
     /**
