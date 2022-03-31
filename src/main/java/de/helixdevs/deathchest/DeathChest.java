@@ -1,5 +1,10 @@
 package de.helixdevs.deathchest;
 
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
+import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.wrappers.BlockPosition;
 import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
 import com.gmail.filoghost.holographicdisplays.api.line.TextLine;
@@ -16,6 +21,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -23,11 +29,14 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.io.Closeable;
+import java.lang.reflect.InvocationTargetException;
 import java.time.Duration;
+import java.util.Collection;
 
 public class DeathChest implements Listener, Closeable {
 
     private final DeathChestPlugin plugin;
+    private final Chest chest;
     private final Location location;
     private final Inventory inventory;
     private final long createdAt = System.currentTimeMillis();
@@ -37,6 +46,7 @@ public class DeathChest implements Listener, Closeable {
 
     public DeathChest(DeathChestPlugin plugin, Chest chest, Duration expiration, ItemStack... stacks) {
         this.plugin = plugin;
+        this.chest = chest;
         this.location = chest.getLocation();
 
         DeathChestConfig config = plugin.getDeathChestConfig();
@@ -66,6 +76,24 @@ public class DeathChest implements Listener, Closeable {
                 if (duration < 0) {
                     close();
                     return;
+                }
+
+                if (Bukkit.getPluginManager().isPluginEnabled("ProtocolLib")) {
+                    ProtocolManager manager = ProtocolLibrary.getProtocolManager();
+                    PacketContainer packet = manager.createPacket(PacketType.Play.Server.BLOCK_BREAK_ANIMATION);
+                    packet.getIntegers().write(0, 0);
+                    packet.getBlockPositionModifier().write(0, new BlockPosition(location.toVector()));
+                    double process = (double) (System.currentTimeMillis() - createdAt) / (expireAt - createdAt);
+                    packet.getIntegers().write(1, (int) (9 * process));
+
+                    Collection<Player> nearbyPlayers = location.getWorld().getNearbyPlayers(location, 20);
+                    for (Player nearbyPlayer : nearbyPlayers) {
+                        try {
+                            manager.sendServerPacket(nearbyPlayer, packet);
+                        } catch (InvocationTargetException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
 
                 if (textLine != null) {
@@ -120,8 +148,10 @@ public class DeathChest implements Listener, Closeable {
         if (!(block.getState() instanceof Chest chest))
             return;
 
-        event.setCancelled(true);
         Player player = event.getPlayer();
+        if (event.isBlockInHand() && player.isSneaking()) // That maintains the natural minecraft feeling
+            return;
+        event.setCancelled(true);
         if (this.inventory.getViewers().isEmpty()) {
             chest.open();
         }
@@ -157,11 +187,20 @@ public class DeathChest implements Listener, Closeable {
         }
     }
 
+    @EventHandler
+    public void onHopperMoveItem(InventoryMoveItemEvent event) {
+        if (!chest.getBlockInventory().equals(event.getDestination()))
+            return;
+        event.setCancelled(true);
+    }
+
     /**
      * Destroys the chest, deletes the hologram, cancels the update scheduler and unregister all events for the death chest.
      */
     @Override
     public void close() {
+        this.inventory.close();
+
         World world = this.location.getWorld();
         Block block = this.location.getBlock();
         world.spawnParticle(Particle.BLOCK_CRACK, this.location.clone().add(0.5, 0.5, 0.5), 10, block.getBlockData());

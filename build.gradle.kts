@@ -20,11 +20,15 @@ repositories {
     maven {
         url = uri("https://repo.codemc.io/repository/maven-public/")
     }
+    maven {
+        url = uri("https://repo.dmulloy2.net/repository/public/")
+    }
 }
 
 dependencies {
     api("com.gmail.filoghost.holographicdisplays:holographicdisplays-api:2.4.9")
     api("com.sk89q.worldguard:worldguard-bukkit:7.0.7")
+    api("com.comphenix.protocol:ProtocolLib:4.7.0")
 
     paperDevBundle("1.18.2-R0.1-SNAPSHOT")
 
@@ -57,7 +61,7 @@ bukkit {
     main = "de.helixdevs.deathchest.DeathChestPlugin"
     apiVersion = "1.18"
     authors = listOf("CyntrixAlgorithm")
-    softDepend = listOf("WorldGuard", "HolographicDisplays")
+    softDepend = listOf("WorldGuard", "HolographicDisplays", "ProtocolLib")
     commands {
         register("deathchest") {
             description = "The admin command for reloading the plugin's configuration"
