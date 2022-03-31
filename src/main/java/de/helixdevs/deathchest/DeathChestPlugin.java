@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.StringUtil;
@@ -26,10 +27,14 @@ import java.util.*;
  */
 public class DeathChestPlugin extends JavaPlugin implements Listener {
 
+    public static final int RESOURCE_ID = 101066;
+
     private final Set<DeathChest> deathChests = new HashSet<>();
 
     private DeathChestConfig deathChestConfig;
     private BuildPredicate checkBuild;
+
+    private String newerVersion;
 
     @Override
     public void onDisable() {
@@ -56,6 +61,17 @@ public class DeathChestPlugin extends JavaPlugin implements Listener {
         if (deathChestCommand != null) {
             deathChestCommand.setExecutor(this);
             deathChestCommand.setTabCompleter(this);
+        }
+
+        if (deathChestConfig.hasUpdateCheck()) {
+            UpdateChecker checker = new UpdateChecker(this, RESOURCE_ID);
+            checker.getVersion(version -> {
+                if (getDescription().getVersion().equals(version))
+                    return;
+                this.newerVersion = version;
+                getLogger().warning("New version " + version + " is out. You are still running " + getDescription().getVersion());
+                getLogger().warning("Update the plugin at https://www.spigotmc.org/resources/death-chest.101066/");
+            });
         }
     }
 
@@ -131,6 +147,17 @@ public class DeathChestPlugin extends JavaPlugin implements Listener {
 
         // Clears the drops
         event.getDrops().clear();
+    }
+
+    @EventHandler
+    public void onNotifyUpdate(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        if (newerVersion == null)
+            return;
+        if (!player.hasPermission("deathchest.admin"))
+            return;
+        player.sendMessage("§8[§cDeath Chest§8] §cA new version " + newerVersion + " is out.");
+        player.sendMessage("§8[§cDeath Chest§8] §cPlease update the plugin at https://www.spigotmc.org/resources/death-chest.101066/");
     }
 
     public DeathChestConfig getDeathChestConfig() {

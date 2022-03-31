@@ -8,6 +8,7 @@ import java.time.Duration;
 
 public class DeathChestConfig {
 
+    private final boolean updateCheck;
     private final String durationFormat;
     private final Duration expiration;
     private final String inventoryTitle;
@@ -15,6 +16,7 @@ public class DeathChestConfig {
     private final String[] notificationMessage;
 
     public static DeathChestConfig load(FileConfiguration config) {
+        boolean updateCheck = config.getBoolean("update-check", true);
         String format = config.getString("format", "mm:ss");
         int expirationInSeconds = config.getInt("expiration", 60 * 10);
 
@@ -31,15 +33,20 @@ public class DeathChestConfig {
             }
         }
 
-        return new DeathChestConfig(format, Duration.ofSeconds(expirationInSeconds), inventoryTitle, hologram, message);
+        return new DeathChestConfig(updateCheck, format, Duration.ofSeconds(expirationInSeconds), inventoryTitle, hologram, message);
     }
 
-    public DeathChestConfig(String durationFormat, Duration expiration, String inventoryTitle, boolean hologram, String[] notificationMessage) {
+    public DeathChestConfig(boolean updateCheck, String durationFormat, Duration expiration, String inventoryTitle, boolean hologram, String[] notificationMessage) {
+        this.updateCheck = updateCheck;
         this.durationFormat = durationFormat;
         this.expiration = expiration;
         this.inventoryTitle = inventoryTitle;
         this.hologram = hologram;
         this.notificationMessage = notificationMessage;
+    }
+
+    public boolean hasUpdateCheck() {
+        return updateCheck;
     }
 
     public String getDurationFormat() {

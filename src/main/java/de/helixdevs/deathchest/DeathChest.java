@@ -42,8 +42,8 @@ public class DeathChest implements Listener, Closeable {
     private final Inventory inventory;
     private final long createdAt = System.currentTimeMillis();
     private final long expireAt;
-    private Hologram hologram;
     private final BukkitTask task;
+    private Hologram hologram;
 
     public DeathChest(DeathChestPlugin plugin, Chest chest, Duration expiration, ItemStack... stacks) {
         this.plugin = plugin;

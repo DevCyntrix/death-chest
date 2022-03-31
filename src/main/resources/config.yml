@@ -1,3 +1,4 @@
+update-check: true
 format: 'mm:ss'
 # the expiration of the chest in seconds
 expiration: 600
