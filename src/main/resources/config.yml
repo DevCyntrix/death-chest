@@ -2,6 +2,7 @@ format: 'mm:ss'
 # the expiration of the chest in seconds
 expiration: 600
 inventory-title: 'Death Chest'
+spawn-hologram: true
 # notification on death
 notify:
   enabled: true

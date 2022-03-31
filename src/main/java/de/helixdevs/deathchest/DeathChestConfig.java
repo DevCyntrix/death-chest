@@ -1,5 +1,6 @@
 package de.helixdevs.deathchest;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -10,6 +11,7 @@ public class DeathChestConfig {
     private final String durationFormat;
     private final Duration expiration;
     private final String inventoryTitle;
+    private final boolean hologram;
     private final String[] notificationMessage;
 
     public static DeathChestConfig load(FileConfiguration config) {
@@ -17,6 +19,8 @@ public class DeathChestConfig {
         int expirationInSeconds = config.getInt("expiration", 60 * 10);
 
         String inventoryTitle = ChatColor.translateAlternateColorCodes('&', config.getString("inventory-title", "Death Chest"));
+
+        boolean hologram = Bukkit.getPluginManager().isPluginEnabled("HolographicDisplays") && config.getBoolean("spawn-hologram", true);
 
         boolean notify = config.getBoolean("notify.enabled");
         String[] message = null;
@@ -27,13 +31,14 @@ public class DeathChestConfig {
             }
         }
 
-        return new DeathChestConfig(format, Duration.ofSeconds(expirationInSeconds), inventoryTitle, message);
+        return new DeathChestConfig(format, Duration.ofSeconds(expirationInSeconds), inventoryTitle, hologram, message);
     }
 
-    public DeathChestConfig(String durationFormat, Duration expiration, String inventoryTitle, String[] notificationMessage) {
+    public DeathChestConfig(String durationFormat, Duration expiration, String inventoryTitle, boolean hologram, String[] notificationMessage) {
         this.durationFormat = durationFormat;
         this.expiration = expiration;
         this.inventoryTitle = inventoryTitle;
+        this.hologram = hologram;
         this.notificationMessage = notificationMessage;
     }
 
@@ -47,6 +52,10 @@ public class DeathChestConfig {
 
     public String getInventoryTitle() {
         return inventoryTitle;
+    }
+
+    public boolean hasHologram() {
+        return hologram;
     }
 
     public String[] getNotificationMessage() {

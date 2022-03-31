@@ -32,7 +32,7 @@ public class DeathChest implements Listener, Closeable {
     private final Inventory inventory;
     private final long createdAt = System.currentTimeMillis();
     private final long expireAt;
-    private final Hologram hologram;
+    private Hologram hologram;
     private final BukkitTask task;
 
     public DeathChest(DeathChestPlugin plugin, Chest chest, Duration expiration, ItemStack... stacks) {
@@ -47,14 +47,18 @@ public class DeathChest implements Listener, Closeable {
         this.inventory.addItem(stacks);
 
         // Creates hologram
-        this.hologram = HologramsAPI.createHologram(plugin, location.clone().add(0.5, 1.5, 0.5));
         this.expireAt = createdAt + expiration.toMillis();
+        TextLine textLine;
+        if (config.hasHologram()) {
+            this.hologram = HologramsAPI.createHologram(plugin, location.clone().add(0.5, 1.5, 0.5));
+            long duration = expireAt - System.currentTimeMillis();
+            String format = DurationFormatUtils.formatDuration(duration, config.getDurationFormat());
+            textLine = this.hologram.appendTextLine(format);
+        } else {
+            textLine = null;
+        }
 
-        long duration = expireAt - System.currentTimeMillis();
-        String format = DurationFormatUtils.formatDuration(duration, config.getDurationFormat());
-        TextLine textLine = this.hologram.appendTextLine(format);
-
-        // Runs hologram update scheduler
+        // Runs a check and update scheduler
         this.task = new BukkitRunnable() {
             @Override
             public void run() {
@@ -64,8 +68,10 @@ public class DeathChest implements Listener, Closeable {
                     return;
                 }
 
-                String format = DurationFormatUtils.formatDuration(duration, config.getDurationFormat());
-                textLine.setText(format);
+                if (textLine != null) {
+                    String format = DurationFormatUtils.formatDuration(duration, config.getDurationFormat());
+                    textLine.setText(format);
+                }
             }
         }.runTaskTimer(plugin, 20, 20);
     }
@@ -160,7 +166,9 @@ public class DeathChest implements Listener, Closeable {
         Block block = this.location.getBlock();
         world.spawnParticle(Particle.BLOCK_CRACK, this.location.clone().add(0.5, 0.5, 0.5), 10, block.getBlockData());
         block.setType(Material.AIR);
-        this.hologram.delete();
+        if (this.hologram != null)
+            this.hologram.delete();
+
         this.task.cancel();
         HandlerList.unregisterAll(this);
         this.plugin.unregisterChest(this);

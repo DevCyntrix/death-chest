@@ -57,6 +57,5 @@ bukkit {
     main = "de.helixdevs.deathchest.DeathChestPlugin"
     apiVersion = "1.18"
     authors = listOf("CyntrixAlgorithm")
-    depend = listOf("HolographicDisplays")
-    softDepend = listOf("WorldGuard")
+    softDepend = listOf("WorldGuard", "HolographicDisplays")
 }
