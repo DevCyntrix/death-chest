@@ -1,19 +1,25 @@
 package de.helixdevs.deathchest;
 
+import com.google.common.collect.ImmutableList;
 import com.sk89q.worldguard.bukkit.ProtectionQuery;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Chest;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.StringUtil;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This plugin will create chests on death and will destroy them in after a specific time.
@@ -46,6 +52,43 @@ public class DeathChestPlugin extends JavaPlugin implements Listener {
         }
 
         getServer().getPluginManager().registerEvents(this, this);
+        PluginCommand deathChestCommand = getCommand("deathchest");
+        if (deathChestCommand != null) {
+            deathChestCommand.setExecutor(this);
+            deathChestCommand.setTabCompleter(this);
+        }
+    }
+
+    /**
+     * Reloads the configuration file of the plugin
+     */
+    public void reload() {
+        reloadConfig();
+        this.deathChestConfig = DeathChestConfig.load(getConfig());
+    }
+
+    @Override
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        if (args.length == 0)
+            return false;
+        if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
+            reload();
+            return true;
+        }
+        return false;
+    }
+
+    private final ImmutableList<String> commandNames = ImmutableList.of("reload");
+
+    @Override
+    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
+        if (args.length == 0) {
+            return commandNames;
+        }
+        if (args.length == 1) {
+            return StringUtil.copyPartialMatches(args[0], commandNames, new LinkedList<>());
+        }
+        return Collections.emptyList();
     }
 
     /**

@@ -58,4 +58,12 @@ bukkit {
     apiVersion = "1.18"
     authors = listOf("CyntrixAlgorithm")
     softDepend = listOf("WorldGuard", "HolographicDisplays")
+    commands {
+        register("deathchest") {
+            description = "The admin command for reloading the plugin's configuration"
+            permission = "deathchest.admin"
+            usage = "§c/<command> <reload>"
+        }
+
+    }
 }
