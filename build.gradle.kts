@@ -56,6 +56,9 @@ tasks {
     processResources {
         filteringCharset = Charsets.UTF_8.name()
     }
+    runServer {
+        minecraftVersion("1.18.2")
+    }
 }
 
 bukkit {
