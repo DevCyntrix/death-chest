@@ -1,8 +1,10 @@
 package de.helixdevs.deathchest;
 
 import com.google.common.collect.ImmutableList;
-import com.sk89q.worldguard.bukkit.ProtectionQuery;
-import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import de.helixdevs.deathchest.api.animation.IAnimationService;
+import de.helixdevs.deathchest.api.hologram.IHologramService;
+import de.helixdevs.deathchest.api.protection.IProtectionService;
+import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Chest;
@@ -25,6 +27,7 @@ import java.util.*;
 /**
  * This plugin will create chests on death and will destroy them in after a specific time.
  */
+@Getter
 public class DeathChestPlugin extends JavaPlugin implements Listener {
 
     public static final int RESOURCE_ID = 101066;
@@ -32,7 +35,10 @@ public class DeathChestPlugin extends JavaPlugin implements Listener {
     private final Set<DeathChest> deathChests = new HashSet<>();
 
     private DeathChestConfig deathChestConfig;
-    private BuildPredicate checkBuild;
+
+    private IHologramService hologramService;
+    private IAnimationService animationService;
+    private IProtectionService protectionService;
 
     private String newerVersion;
 
@@ -49,12 +55,13 @@ public class DeathChestPlugin extends JavaPlugin implements Listener {
         reloadConfig();
 
         this.deathChestConfig = DeathChestConfig.load(getConfig());
-        this.checkBuild = (player, location, material) -> true;
 
-        if (getServer().getPluginManager().isPluginEnabled("WorldGuard")) {
-            ProtectionQuery protectionQuery = WorldGuardPlugin.inst().createProtectionQuery();
-            this.checkBuild = protectionQuery::testBlockPlace;
-        }
+        this.hologramService = SupportServices.getHologramService(this, deathChestConfig.getPreferredHologramService());
+        this.animationService = SupportServices.getAnimationService(this, deathChestConfig.getPreferredAnimationService());
+        this.protectionService = SupportServices.getProtectionService(this, deathChestConfig.getPreferredProtectionService());
+        // Standard protection service: No service
+        if (protectionService == null)
+            this.protectionService = (player, location, material) -> true;
 
         getServer().getPluginManager().registerEvents(this, this);
         PluginCommand deathChestCommand = getCommand("deathchest");
@@ -63,7 +70,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener {
             deathChestCommand.setTabCompleter(this);
         }
 
-        if (deathChestConfig.hasUpdateCheck()) {
+        if (deathChestConfig.isUpdateCheck()) {
             UpdateChecker checker = new UpdateChecker(this, RESOURCE_ID);
             checker.getVersion(version -> {
                 if (getDescription().getVersion().equals(version))
@@ -94,15 +101,13 @@ public class DeathChestPlugin extends JavaPlugin implements Listener {
         return false;
     }
 
-    private final ImmutableList<String> commandNames = ImmutableList.of("reload");
-
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
         if (args.length == 0) {
-            return commandNames;
+            return ImmutableList.of("reload");
         }
         if (args.length == 1) {
-            return StringUtil.copyPartialMatches(args[0], commandNames, new LinkedList<>());
+            return StringUtil.copyPartialMatches(args[0], ImmutableList.of("reload"), new LinkedList<>());
         }
         return Collections.emptyList();
     }
@@ -125,7 +130,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener {
         Location deathLocation = player.getLocation();
 
         // Check protection
-        boolean build = checkBuild.test(player, deathLocation, Material.CHEST);
+        boolean build = protectionService.isAllowedToBuild(player, deathLocation, Material.CHEST);
         if (!build)
             return;
 
@@ -158,10 +163,6 @@ public class DeathChestPlugin extends JavaPlugin implements Listener {
             return;
         player.sendMessage("§8[§cDeath Chest§8] §cA new version " + newerVersion + " is out.");
         player.sendMessage("§8[§cDeath Chest§8] §cPlease update the plugin at https://www.spigotmc.org/resources/death-chest.101066/");
-    }
-
-    public DeathChestConfig getDeathChestConfig() {
-        return deathChestConfig;
     }
 
     public void registerChest(DeathChest chest) {
