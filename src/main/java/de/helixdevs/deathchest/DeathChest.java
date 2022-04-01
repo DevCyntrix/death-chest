@@ -9,10 +9,13 @@ import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
 import com.gmail.filoghost.holographicdisplays.api.line.TextLine;
 import com.google.common.base.Objects;
-import org.apache.commons.lang3.time.DurationFormatUtils;
+import org.apache.commons.lang.time.DurationFormatUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -53,7 +56,6 @@ public class DeathChest implements Listener, Closeable {
         DeathChestConfig config = plugin.getDeathChestConfig();
 
         // Creates inventory
-        //noinspection deprecation
         this.inventory = Bukkit.createInventory(new DeathChestHolder(chest), 9 * 5, config.getInventoryTitle());
         this.inventory.addItem(stacks);
 
@@ -87,12 +89,18 @@ public class DeathChest implements Listener, Closeable {
                     double process = (double) (System.currentTimeMillis() - createdAt) / (expireAt - createdAt);
                     packet.getIntegers().write(1, (int) (9 * process));
 
-                    Collection<Player> nearbyPlayers = location.getWorld().getNearbyPlayers(location, 20);
-                    for (Player nearbyPlayer : nearbyPlayers) {
-                        try {
-                            manager.sendServerPacket(nearbyPlayer, packet);
-                        } catch (InvocationTargetException e) {
-                            e.printStackTrace();
+                    World world = location.getWorld();
+                    if (world != null) {
+                        Collection<Entity> nearbyPlayers = world.
+                                getNearbyEntities(location, 20, 20, 20, entity -> entity.getType() == EntityType.PLAYER);
+                        for (Entity nearbyPlayer : nearbyPlayers) {
+                            if (nearbyPlayer.getType() != EntityType.PLAYER)
+                                continue;
+                            try {
+                                manager.sendServerPacket((Player) nearbyPlayer, packet);
+                            } catch (InvocationTargetException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 }
@@ -212,7 +220,9 @@ public class DeathChest implements Listener, Closeable {
         for (ItemStack content : this.inventory.getContents()) {
             if (content == null)
                 continue;
-            location.getWorld().dropItemNaturally(location, content);
+            World world = location.getWorld();
+            if (world != null)
+                world.dropItemNaturally(location, content);
         }
         close();
     }
@@ -223,12 +233,15 @@ public class DeathChest implements Listener, Closeable {
     @Override
     public void close() {
         if (this.inventory != null)
-            Bukkit.getScheduler().runTask(this.plugin, this.inventory::close);
+            Bukkit.getScheduler().runTask(this.plugin, () -> inventory.getViewers().forEach(HumanEntity::closeInventory));
 
         World world = this.location.getWorld();
-        Block block = this.location.getBlock();
-        world.spawnParticle(Particle.BLOCK_CRACK, this.location.clone().add(0.5, 0.5, 0.5), 10, block.getBlockData());
-        block.setType(Material.AIR);
+        if (world != null) {
+            Block block = this.location.getBlock();
+            world.spawnParticle(Particle.BLOCK_CRACK, this.location.clone().add(0.5, 0.5, 0.5), 10, block.getBlockData());
+            block.setType(Material.AIR);
+        }
+
         if (this.hologram != null)
             this.hologram.delete();
 

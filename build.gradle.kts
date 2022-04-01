@@ -1,6 +1,5 @@
 plugins {
     `java-library`
-    id("io.papermc.paperweight.userdev") version "1.3.5"
     id("xyz.jpenilla.run-paper") version "1.0.6"
     id("net.minecrell.plugin-yml.bukkit") version "0.5.1"
 }
@@ -15,6 +14,9 @@ java {
 repositories {
     mavenCentral()
     maven {
+        url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
+    }
+    maven {
         url = uri("https://maven.enginehub.org/repo/")
     }
     maven {
@@ -26,11 +28,12 @@ repositories {
 }
 
 dependencies {
+    api("org.spigotmc:spigot-api:1.18.2-R0.1-SNAPSHOT")
     api("com.gmail.filoghost.holographicdisplays:holographicdisplays-api:2.4.9")
     api("com.sk89q.worldguard:worldguard-bukkit:7.0.7")
     api("com.comphenix.protocol:ProtocolLib:4.7.0")
 
-    paperDevBundle("1.18.2-R0.1-SNAPSHOT")
+    implementation("org.jetbrains:annotations:20.1.0")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
@@ -41,9 +44,6 @@ tasks.getByName<Test>("test") {
 }
 
 tasks {
-    assemble {
-        dependsOn(reobfJar)
-    }
     compileJava {
         options.encoding = Charsets.UTF_8.name()
         options.release.set(17)
