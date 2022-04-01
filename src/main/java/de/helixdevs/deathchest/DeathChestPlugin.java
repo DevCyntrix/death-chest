@@ -126,7 +126,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener {
         if (event.getDrops().isEmpty())
             return;
 
-        Player player = event.getPlayer();
+        Player player = event.getEntity();
         Location deathLocation = player.getLocation();
 
         // Check protection
