@@ -13,7 +13,7 @@ public class WorldGuardProtection implements IProtectionService {
     private final ProtectionQuery protectionQuery = WorldGuardPlugin.inst().createProtectionQuery();
 
     @Override
-    public boolean isAllowedToBuild(@NotNull Player player, @NotNull Location location, @NotNull Material material) {
+    public boolean canBuild(@NotNull Player player, @NotNull Location location, @NotNull Material material) {
         return protectionQuery.testBlockPlace(player, location, material);
     }
 }

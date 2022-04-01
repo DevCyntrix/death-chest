@@ -7,6 +7,6 @@ import org.jetbrains.annotations.NotNull;
 
 public interface IProtectionService {
 
-    boolean isAllowedToBuild(@NotNull Player player, @NotNull Location location, @NotNull Material material);
+    boolean canBuild(@NotNull Player player, @NotNull Location location, @NotNull Material material);
 
 }

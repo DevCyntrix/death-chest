@@ -36,8 +36,13 @@ public final class SupportServices {
         return getService(animationServiceMap, plugin, preferred);
     }
 
-    public static @Nullable IProtectionService getProtectionService(@NotNull Plugin plugin, @Nullable String preferred) {
-        return getService(protectionServiceMap, plugin, preferred);
+    public static @Nullable IProtectionService getProtectionService(@NotNull Plugin plugin) {
+        IProtectionService[] services = protectionServiceMap.entrySet().stream()
+                .filter(entry -> Bukkit.getPluginManager().isPluginEnabled(entry.getKey()))
+                .map(Map.Entry::getValue)
+                .map(f -> f.apply(plugin))
+                .toArray(IProtectionService[]::new);
+        return new CombinedProtectionService(services);
     }
 
     private static <T> @Nullable T getService(@NotNull Map<String, Function<Plugin, T>> map, @NotNull Plugin plugin, @Nullable String preferred) {

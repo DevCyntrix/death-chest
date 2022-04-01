@@ -58,7 +58,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener {
 
         this.hologramService = SupportServices.getHologramService(this, deathChestConfig.getPreferredHologramService());
         this.animationService = SupportServices.getAnimationService(this, deathChestConfig.getPreferredAnimationService());
-        this.protectionService = SupportServices.getProtectionService(this, deathChestConfig.getPreferredProtectionService());
+        this.protectionService = SupportServices.getProtectionService(this);
         // Standard protection service: No service
         if (protectionService == null)
             this.protectionService = (player, location, material) -> true;
@@ -130,7 +130,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener {
         Location deathLocation = player.getLocation();
 
         // Check protection
-        boolean build = protectionService.isAllowedToBuild(player, deathLocation, Material.CHEST);
+        boolean build = protectionService.canBuild(player, deathLocation, Material.CHEST);
         if (!build)
             return;
 

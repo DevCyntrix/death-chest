@@ -20,7 +20,6 @@ public class DeathChestConfig {
 
     private final String preferredHologramService;
     private final String preferredAnimationService;
-    private final String preferredProtectionService;
 
     public static DeathChestConfig load(FileConfiguration config) {
         boolean updateCheck = config.getBoolean("update-check", true);
@@ -42,8 +41,7 @@ public class DeathChestConfig {
 
         String preferredHologramService = config.getString("preferred-hologram-service");
         String preferredAnimationService = config.getString("preferred-animation-service");
-        String preferredProtectionService = config.getString("preferred-protection-service");
 
-        return new DeathChestConfig(updateCheck, format, Duration.ofSeconds(expirationInSeconds), inventoryTitle, hologram, message, preferredHologramService, preferredAnimationService, preferredProtectionService);
+        return new DeathChestConfig(updateCheck, format, Duration.ofSeconds(expirationInSeconds), inventoryTitle, hologram, message, preferredHologramService, preferredAnimationService);
     }
 }
