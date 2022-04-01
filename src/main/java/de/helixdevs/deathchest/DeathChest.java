@@ -222,7 +222,8 @@ public class DeathChest implements Listener, Closeable {
      */
     @Override
     public void close() {
-        this.inventory.close();
+        if (this.inventory != null)
+            Bukkit.getScheduler().runTask(this.plugin, this.inventory::close);
 
         World world = this.location.getWorld();
         Block block = this.location.getBlock();
