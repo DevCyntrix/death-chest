@@ -34,6 +34,8 @@ dependencies {
     api("com.comphenix.protocol:ProtocolLib:4.7.0")
 
     implementation("org.jetbrains:annotations:20.1.0")
+    compileOnly("org.projectlombok:lombok:1.18.22")
+    annotationProcessor("org.projectlombok:lombok:1.18.22")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")

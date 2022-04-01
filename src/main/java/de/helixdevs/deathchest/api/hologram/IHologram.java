@@ -11,4 +11,5 @@ public interface IHologram {
 
     IHologramTextLine appendLine(@NotNull String line);
 
+    void delete();
 }

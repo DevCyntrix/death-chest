@@ -1,11 +1,14 @@
 package de.helixdevs.deathchest;
 
-import org.bukkit.Bukkit;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.time.Duration;
 
+@Getter
+@RequiredArgsConstructor
 public class DeathChestConfig {
 
     private final boolean updateCheck;
@@ -15,6 +18,10 @@ public class DeathChestConfig {
     private final boolean hologram;
     private final String[] notificationMessage;
 
+    private final String preferredHologramService;
+    private final String preferredAnimationService;
+    private final String preferredProtectionService;
+
     public static DeathChestConfig load(FileConfiguration config) {
         boolean updateCheck = config.getBoolean("update-check", true);
         String format = config.getString("format", "mm:ss");
@@ -22,7 +29,7 @@ public class DeathChestConfig {
 
         String inventoryTitle = ChatColor.translateAlternateColorCodes('&', config.getString("inventory-title", "Death Chest"));
 
-        boolean hologram = Bukkit.getPluginManager().isPluginEnabled("HolographicDisplays") && config.getBoolean("spawn-hologram", true);
+        boolean hologram = config.getBoolean("spawn-hologram", true);
 
         boolean notify = config.getBoolean("notify.enabled");
         String[] message = null;
@@ -33,39 +40,10 @@ public class DeathChestConfig {
             }
         }
 
-        return new DeathChestConfig(updateCheck, format, Duration.ofSeconds(expirationInSeconds), inventoryTitle, hologram, message);
-    }
+        String preferredHologramService = config.getString("preferred-hologram-service");
+        String preferredAnimationService = config.getString("preferred-animation-service");
+        String preferredProtectionService = config.getString("preferred-protection-service");
 
-    public DeathChestConfig(boolean updateCheck, String durationFormat, Duration expiration, String inventoryTitle, boolean hologram, String[] notificationMessage) {
-        this.updateCheck = updateCheck;
-        this.durationFormat = durationFormat;
-        this.expiration = expiration;
-        this.inventoryTitle = inventoryTitle;
-        this.hologram = hologram;
-        this.notificationMessage = notificationMessage;
-    }
-
-    public boolean hasUpdateCheck() {
-        return updateCheck;
-    }
-
-    public String getDurationFormat() {
-        return durationFormat;
-    }
-
-    public Duration getExpiration() {
-        return expiration;
-    }
-
-    public String getInventoryTitle() {
-        return inventoryTitle;
-    }
-
-    public boolean hasHologram() {
-        return hologram;
-    }
-
-    public String[] getNotificationMessage() {
-        return notificationMessage;
+        return new DeathChestConfig(updateCheck, format, Duration.ofSeconds(expirationInSeconds), inventoryTitle, hologram, message, preferredHologramService, preferredAnimationService, preferredProtectionService);
     }
 }

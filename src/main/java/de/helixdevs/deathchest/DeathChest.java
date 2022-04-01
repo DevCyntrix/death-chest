@@ -1,13 +1,5 @@
 package de.helixdevs.deathchest;
 
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.ProtocolManager;
-import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.wrappers.BlockPosition;
-import com.gmail.filoghost.holographicdisplays.api.Hologram;
-import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
-import com.gmail.filoghost.holographicdisplays.api.line.TextLine;
 import com.google.common.base.Objects;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.bukkit.*;
@@ -36,6 +28,8 @@ import java.io.Closeable;
 import java.lang.reflect.InvocationTargetException;
 import java.time.Duration;
 import java.util.Collection;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class DeathChest implements Listener, Closeable {
 
@@ -46,7 +40,7 @@ public class DeathChest implements Listener, Closeable {
     private final long createdAt = System.currentTimeMillis();
     private final long expireAt;
     private final BukkitTask task;
-    private Hologram hologram;
+    private IHologram hologram;
 
     public DeathChest(DeathChestPlugin plugin, Chest chest, Duration expiration, ItemStack... stacks) {
         this.plugin = plugin;
@@ -61,12 +55,13 @@ public class DeathChest implements Listener, Closeable {
 
         // Creates hologram
         this.expireAt = createdAt + expiration.toMillis();
-        TextLine textLine;
-        if (config.hasHologram()) {
-            this.hologram = HologramsAPI.createHologram(plugin, location.clone().add(0.5, 1.5, 0.5));
+        IHologramTextLine textLine;
+        IHologramService service = plugin.getHologramService();
+        if (config.isHologram() && service != null) {
+            this.hologram = service.spawnHologram(location.clone().add(0.5, 1.5, 0.5));
             long duration = expireAt - System.currentTimeMillis();
             String format = DurationFormatUtils.formatDuration(duration, config.getDurationFormat());
-            textLine = this.hologram.appendTextLine(format);
+            textLine = this.hologram.appendLine(format);
         } else {
             textLine = null;
         }
@@ -81,33 +76,22 @@ public class DeathChest implements Listener, Closeable {
                     return;
                 }
 
-                if (Bukkit.getPluginManager().isPluginEnabled("ProtocolLib")) {
-                    ProtocolManager manager = ProtocolLibrary.getProtocolManager();
-                    PacketContainer packet = manager.createPacket(PacketType.Play.Server.BLOCK_BREAK_ANIMATION);
-                    packet.getIntegers().write(0, 0);
-                    packet.getBlockPositionModifier().write(0, new BlockPosition(location.toVector()));
+                IAnimationService animationService = plugin.getAnimationService();
+                if (animationService != null) {
                     double process = (double) (System.currentTimeMillis() - createdAt) / (expireAt - createdAt);
-                    packet.getIntegers().write(1, (int) (9 * process));
 
                     World world = location.getWorld();
                     if (world != null) {
-                        Collection<Entity> nearbyPlayers = world.
-                                getNearbyEntities(location, 20, 20, 20, entity -> entity.getType() == EntityType.PLAYER);
-                        for (Entity nearbyPlayer : nearbyPlayers) {
-                            if (nearbyPlayer.getType() != EntityType.PLAYER)
-                                continue;
-                            try {
-                                manager.sendServerPacket((Player) nearbyPlayer, packet);
-                            } catch (InvocationTargetException e) {
-                                e.printStackTrace();
-                            }
-                        }
+                        Stream<Player> nearbyPlayers = world.
+                                getNearbyEntities(location, 20, 20, 20, entity -> entity.getType() == EntityType.PLAYER).stream()
+                                .map(entity -> (Player) entity);
+                        animationService.spawnBlockBreakAnimation(location.toVector(), (byte) (9 * process), nearbyPlayers.collect(Collectors.toList()));
                     }
                 }
 
                 if (textLine != null) {
                     String format = DurationFormatUtils.formatDuration(duration, config.getDurationFormat());
-                    textLine.setText(format);
+                    textLine.rename(format);
                 }
             }
         }.runTaskTimer(plugin, 20, 20);

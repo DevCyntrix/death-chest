@@ -33,4 +33,9 @@ public class HDHologram implements IHologram {
         TextLine textLine = hologram.appendTextLine(line);
         return new HDTextLine(textLine);
     }
+
+    @Override
+    public void delete() {
+        hologram.delete();
+    }
 }
