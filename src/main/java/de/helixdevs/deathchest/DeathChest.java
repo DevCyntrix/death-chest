@@ -1,11 +1,14 @@
 package de.helixdevs.deathchest;
 
 import com.google.common.base.Objects;
+import de.helixdevs.deathchest.api.animation.IAnimationService;
+import de.helixdevs.deathchest.api.hologram.IHologram;
+import de.helixdevs.deathchest.api.hologram.IHologramService;
+import de.helixdevs.deathchest.api.hologram.IHologramTextLine;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -25,9 +28,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.io.Closeable;
-import java.lang.reflect.InvocationTargetException;
 import java.time.Duration;
-import java.util.Collection;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
