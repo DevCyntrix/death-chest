@@ -25,6 +25,9 @@ repositories {
     maven {
         url = uri("https://repo.dmulloy2.net/repository/public/")
     }
+    maven {
+        url = uri("https://jitpack.io")
+    }
 }
 
 dependencies {
@@ -32,6 +35,8 @@ dependencies {
     api("com.gmail.filoghost.holographicdisplays:holographicdisplays-api:2.4.9")
     api("com.sk89q.worldguard:worldguard-bukkit:7.0.7")
     api("com.comphenix.protocol:ProtocolLib:4.7.0")
+    api("com.github.sainttx.Holograms:holograms-api:0f5b027")
+    api("com.github.decentsoftware-eu:decentholograms:2.3.1")
 
     implementation("org.jetbrains:annotations:23.0.0")
     compileOnly("org.projectlombok:lombok:1.18.22")
@@ -64,15 +69,14 @@ tasks {
 bukkit {
     name = "DeathChest"
     main = "de.helixdevs.deathchest.DeathChestPlugin"
-    apiVersion = "1.18"
+    apiVersion = "1.15"
     authors = listOf("CyntrixAlgorithm")
-    softDepend = listOf("WorldGuard", "HolographicDisplays", "ProtocolLib")
+    softDepend = listOf("WorldGuard", "HolographicDisplays", "ProtocolLib", "DecentHolograms")
     commands {
         register("deathchest") {
             description = "The admin command for reloading the plugin's configuration"
             permission = "deathchest.admin"
             usage = "§c/<command> <reload>"
         }
-
     }
 }
