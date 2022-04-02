@@ -5,6 +5,7 @@ import de.helixdevs.deathchest.api.animation.IAnimationService;
 import de.helixdevs.deathchest.api.hologram.IHologramService;
 import de.helixdevs.deathchest.api.protection.IProtectionService;
 import de.helixdevs.deathchest.holographicdisplays.HDService;
+import de.helixdevs.deathchest.protection.CombinedProtectionService;
 import de.helixdevs.deathchest.protection.WorldGuardProtection;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;

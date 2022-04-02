@@ -5,6 +5,7 @@ import de.helixdevs.deathchest.api.animation.IAnimationService;
 import de.helixdevs.deathchest.api.hologram.IHologram;
 import de.helixdevs.deathchest.api.hologram.IHologramService;
 import de.helixdevs.deathchest.api.hologram.IHologramTextLine;
+import lombok.Getter;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -35,6 +36,7 @@ import java.time.Duration;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Getter
 public class DeathChest implements Listener, Closeable {
 
     private final DeathChestPlugin plugin;
@@ -215,6 +217,11 @@ public class DeathChest implements Listener, Closeable {
         close();
     }
 
+    /**
+     * Drops the items when the chest was destroyed by a block explosion
+     *
+     * @param event the event from the Bukkit API
+     */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onBlockExplode(BlockExplodeEvent event) {
         if (event.blockList().stream().noneMatch(block -> block.getLocation().equals(location)))
@@ -229,6 +236,11 @@ public class DeathChest implements Listener, Closeable {
         close();
     }
 
+    /**
+     * Drops the items when the chest was destroyed by an entity explosion
+     *
+     * @param event the event from the Bukkit API
+     */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onBlockExplode(EntityExplodeEvent event) {
         if (event.blockList().stream().noneMatch(block -> block.getLocation().equals(location)))

@@ -1,4 +1,4 @@
-package de.helixdevs.deathchest;
+package de.helixdevs.deathchest.protection;
 
 import de.helixdevs.deathchest.api.protection.IProtectionService;
 import org.bukkit.Location;
