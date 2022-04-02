@@ -8,6 +8,9 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * https://dev.bukkit.org/projects/worldguard
+ */
 public class WorldGuardProtection implements IProtectionService {
 
     private final ProtectionQuery protectionQuery = WorldGuardPlugin.inst().createProtectionQuery();

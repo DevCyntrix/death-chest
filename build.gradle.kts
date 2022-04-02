@@ -32,11 +32,19 @@ repositories {
 
 dependencies {
     api("org.spigotmc:spigot-api:1.18.2-R0.1-SNAPSHOT")
-    api("com.gmail.filoghost.holographicdisplays:holographicdisplays-api:2.4.9")
+
+    // Protection Support
     api("com.sk89q.worldguard:worldguard-bukkit:7.0.7")
+    api("com.plotsquared:PlotSquared-Core:6.6.1")
+    api("com.plotsquared:PlotSquared-Bukkit:6.6.1") { isTransitive = false }
+
+    // Animation Support
     api("com.comphenix.protocol:ProtocolLib:4.7.0")
+
+    // Hologram Support
     api("com.github.sainttx.Holograms:holograms-api:0f5b027")
     api("com.github.decentsoftware-eu:decentholograms:2.3.1")
+    api("com.gmail.filoghost.holographicdisplays:holographicdisplays-api:2.4.9")
 
     implementation("org.jetbrains:annotations:23.0.0")
     compileOnly("org.projectlombok:lombok:1.18.22")
