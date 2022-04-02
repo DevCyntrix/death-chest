@@ -129,6 +129,10 @@ public class DeathChestPlugin extends JavaPlugin implements Listener {
         Player player = event.getEntity();
         Location deathLocation = player.getLocation();
 
+        // fell into void
+        if (deathLocation.getBlockY() <= player.getWorld().getMinHeight())
+            return;
+
         // Check protection
         boolean build = protectionService.canBuild(player, deathLocation, Material.CHEST);
         if (!build)
@@ -165,11 +169,11 @@ public class DeathChestPlugin extends JavaPlugin implements Listener {
         player.sendMessage("§8[§cDeath Chest§8] §cPlease update the plugin at https://www.spigotmc.org/resources/death-chest.101066/");
     }
 
-    public void registerChest(DeathChest chest) {
+    public void addChest(DeathChest chest) {
         this.deathChests.add(chest);
     }
 
-    public void unregisterChest(DeathChest chest) {
+    public void removeChest(DeathChest chest) {
         this.deathChests.remove(chest);
     }
 }

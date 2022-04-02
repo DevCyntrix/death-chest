@@ -13,10 +13,13 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
@@ -186,7 +189,7 @@ public class DeathChest implements Listener, Closeable {
      *
      * @param event the event from the Bukkit API
      */
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onHopperMoveItem(InventoryMoveItemEvent event) {
         if (!chest.getBlockInventory().equals(event.getDestination()))
             return;
@@ -198,7 +201,7 @@ public class DeathChest implements Listener, Closeable {
      *
      * @param event the event from the Bukkit API
      */
-    @EventHandler
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onBlockBreak(BlockBreakEvent event) {
         if (!event.getBlock().getLocation().equals(location))
             return;
@@ -211,6 +214,35 @@ public class DeathChest implements Listener, Closeable {
         }
         close();
     }
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
+    public void onBlockExplode(BlockExplodeEvent event) {
+        if (event.blockList().stream().noneMatch(block -> block.getLocation().equals(location)))
+            return;
+        for (ItemStack content : this.inventory.getContents()) {
+            if (content == null)
+                continue;
+            World world = location.getWorld();
+            if (world != null)
+                world.dropItemNaturally(location, content);
+        }
+        close();
+    }
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
+    public void onBlockExplode(EntityExplodeEvent event) {
+        if (event.blockList().stream().noneMatch(block -> block.getLocation().equals(location)))
+            return;
+        for (ItemStack content : this.inventory.getContents()) {
+            if (content == null)
+                continue;
+            World world = location.getWorld();
+            if (world != null)
+                world.dropItemNaturally(location, content);
+        }
+        close();
+    }
+
 
     /**
      * Destroys the chest, deletes the hologram, cancels the update scheduler and unregister all events for the death chest.
@@ -232,7 +264,7 @@ public class DeathChest implements Listener, Closeable {
 
         this.task.cancel();
         HandlerList.unregisterAll(this);
-        this.plugin.unregisterChest(this);
+        this.plugin.removeChest(this);
     }
 
     @Override
