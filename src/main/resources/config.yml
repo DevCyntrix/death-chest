@@ -1,9 +1,45 @@
-update-check: true
-format: 'mm:ss'
+#
+# The Configuration file of Death Chest
+#    In this file you can customize the plugin.
+#
+config-version: 1
+
+update-checker: true
+duration-format: 'mm:ss'
 # the expiration of the chest in seconds
 expiration: 600
-inventory-title: 'Death Chest'
-spawn-hologram: true
+
+inventory:
+  title: 'Death Chest'
+  # constant or flexible
+  size: flexible
+
+hologram:
+  enabled: true
+  # Support for {player_name}: Name
+  #             {player_displayname}: Displayname
+  #             {duration}: Time left
+  height: 2.3
+  lines:
+    - '&7&lR.I.P'
+    - '{player}'
+    - '&3-&7-&3-&7-&3-&7-&3-'
+    - '{duration}'
+
+particle:
+  enabled: true
+  options:
+    radius: 1
+    count: 16
+    # Floating number allowed and maximum is 20
+    speed: 20
+    # view distance in blocks
+    view-distance: 20
+
+break-effect:
+  enabled: true
+  view-distance: 20
+
 # notification on death
 notify:
   enabled: true

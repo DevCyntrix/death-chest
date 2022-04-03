@@ -5,6 +5,7 @@ import de.helixdevs.deathchest.api.animation.IAnimationService;
 import de.helixdevs.deathchest.api.hologram.IHologram;
 import de.helixdevs.deathchest.api.hologram.IHologramService;
 import de.helixdevs.deathchest.api.hologram.IHologramTextLine;
+import de.helixdevs.deathchest.config.DeathChestConfig;
 import lombok.Getter;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.bukkit.*;
@@ -46,9 +47,10 @@ public class DeathChest implements Listener, Closeable {
     private final long createdAt = System.currentTimeMillis();
     private final long expireAt;
     private final BukkitTask task;
+    private final BukkitTask particleTask;
     private IHologram hologram;
 
-    public DeathChest(DeathChestPlugin plugin, Chest chest, Duration expiration, ItemStack... stacks) {
+    public DeathChest(DeathChestPlugin plugin, Chest chest, Duration expiration, String title, ItemStack... stacks) {
         this.plugin = plugin;
         this.chest = chest;
         this.location = chest.getLocation();
@@ -64,9 +66,12 @@ public class DeathChest implements Listener, Closeable {
         IHologramTextLine textLine;
         IHologramService service = plugin.getHologramService();
         if (config.isHologram() && service != null) {
-            this.hologram = service.spawnHologram(location.clone().add(0.5, 1.5, 0.5));
+            this.hologram = service.spawnHologram(location.clone().add(0.5, 2.3, 0.5));
             long duration = expireAt - System.currentTimeMillis();
             String format = DurationFormatUtils.formatDuration(duration, config.getDurationFormat());
+            this.hologram.appendLine("§7§lR.I.P.");
+            this.hologram.appendLine(title);
+            this.hologram.appendLine("§3-§6-§3-§6-§3-§6-§3-");
             textLine = this.hologram.appendLine(format);
         } else {
             textLine = null;
@@ -74,6 +79,7 @@ public class DeathChest implements Listener, Closeable {
 
         // Runs a check and update scheduler
         this.task = new BukkitRunnable() {
+
             @Override
             public void run() {
                 long duration = expireAt - System.currentTimeMillis();
@@ -83,10 +89,11 @@ public class DeathChest implements Listener, Closeable {
                 }
 
                 IAnimationService animationService = plugin.getAnimationService();
+                World world = null;
                 if (animationService != null) {
                     double process = (double) (System.currentTimeMillis() - createdAt) / (expireAt - createdAt);
 
-                    World world = location.getWorld();
+                    world = location.getWorld();
                     if (world != null) {
                         Stream<Player> nearbyPlayers = world.
                                 getNearbyEntities(location, 20, 20, 20, entity -> entity.getType() == EntityType.PLAYER).stream()
@@ -101,6 +108,17 @@ public class DeathChest implements Listener, Closeable {
                 }
             }
         }.runTaskTimer(plugin, 20, 20);
+        World world = location.getWorld();
+        this.particleTask = new ParticleScheduler(location, 32, 1, location1 -> {
+//            Particle.DustOptions options = new Particle.DustOptions(Color.LIME, 0.75f);
+//            world.spawnParticle(Particle.REDSTONE, location1.clone().add(0.5, 0.5, 0.5), 1, options);
+//            Particle.DustOptions options1 = new Particle.DustOptions(Color.WHITE, 0.75f);
+//            world.spawnParticle(Particle.REDSTONE, location1.clone().add(0.5, 0.5, 0.5), 1, options1);
+            Particle.DustOptions options = new Particle.DustOptions(Color.ORANGE, 0.75f);
+            world.spawnParticle(Particle.REDSTONE, location1.clone().add(0.5, 0.5, 0.5), 1, options);
+            Particle.DustOptions options1 = new Particle.DustOptions(Color.AQUA, 0.75f);
+            world.spawnParticle(Particle.REDSTONE, location1.clone().add(0.5, 0.4, 0.5), 1, options1);
+        }).runTaskTimerAsynchronously(this.plugin, 1, 1);
     }
 
     /**
@@ -275,6 +293,7 @@ public class DeathChest implements Listener, Closeable {
             this.hologram.delete();
 
         this.task.cancel();
+        this.particleTask.cancel();
         HandlerList.unregisterAll(this);
         this.plugin.removeChest(this);
     }

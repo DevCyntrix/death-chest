@@ -1,4 +1,4 @@
-package de.helixdevs.deathchest;
+package de.helixdevs.deathchest.config;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

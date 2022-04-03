@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import de.helixdevs.deathchest.api.animation.IAnimationService;
 import de.helixdevs.deathchest.api.hologram.IHologramService;
 import de.helixdevs.deathchest.api.protection.IProtectionService;
+import de.helixdevs.deathchest.config.DeathChestConfig;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -11,6 +12,7 @@ import org.bukkit.block.Chest;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -21,6 +23,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.yaml.snakeyaml.TypeDescription;
+import org.yaml.snakeyaml.constructor.Constructor;
 
 import java.util.*;
 
@@ -53,6 +57,11 @@ public class DeathChestPlugin extends JavaPlugin implements Listener {
     public void onEnable() {
         saveDefaultConfig();
         reloadConfig();
+
+        new YamlConfiguration()
+
+        Constructor constructor = new Constructor(DeathChestConfig.class);
+        constructor.addTypeDescription(new TypeDescription());
 
         this.deathChestConfig = DeathChestConfig.load(getConfig());
 
@@ -145,6 +154,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener {
                 this,
                 chest,
                 deathChestConfig.getExpiration(),
+                player.getDisplayName(),
                 event.getDrops().toArray(new ItemStack[0]));
         getServer().getPluginManager().registerEvents(deathChest, this);
         this.deathChests.add(deathChest);
