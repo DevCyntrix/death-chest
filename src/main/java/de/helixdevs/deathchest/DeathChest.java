@@ -79,14 +79,14 @@ public class DeathChest implements Listener, Closeable {
 
         this.durationSupplier = () -> {
             if (!isExpiring())
-                return DurationFormatUtils.formatDuration(0, config.getDurationFormat());
+                return DurationFormatUtils.formatDuration(0, config.durationFormat());
             long duration = expireAt - System.currentTimeMillis();
-            return DurationFormatUtils.formatDuration(duration, config.getDurationFormat());
+            return DurationFormatUtils.formatDuration(duration, config.durationFormat());
         };
 
 
         // Creates inventory
-        InventoryOptions inventoryOptions = config.getInventoryOptions();
+        InventoryOptions inventoryOptions = config.inventoryOptions();
         this.inventory = Bukkit.createInventory(new DeathChestHolder(chest), inventoryOptions.size().getSize(stacks.length), inventoryOptions.title());
         this.inventory.addItem(stacks);
 
@@ -94,7 +94,7 @@ public class DeathChest implements Listener, Closeable {
         Map<String, IHologramTextLine> map = new LinkedHashMap<>();
         IHologramService service = plugin.getHologramService();
 
-        HologramOptions hologramOptions = config.getHologramOptions();
+        HologramOptions hologramOptions = config.hologramOptions();
         if (service != null && hologramOptions != null && hologramOptions.enabled()) {
             this.hologram = service.spawnHologram(location.clone().add(0.5, hologramOptions.height(), 0.5));
 
@@ -150,7 +150,7 @@ public class DeathChest implements Listener, Closeable {
         }.runTaskTimerAsynchronously(plugin, 20, 20);
         World world = location.getWorld();
 
-        ParticleOptions particleOptions = config.getParticleOptions();
+        ParticleOptions particleOptions = config.particleOptions();
         if (particleOptions != null && particleOptions.enabled() && world != null) {
             this.particleTask = new ParticleScheduler(location, particleOptions.count(), particleOptions.radius(), particleLocation -> {
                 Particle.DustOptions options = new Particle.DustOptions(Color.ORANGE, 0.75f);

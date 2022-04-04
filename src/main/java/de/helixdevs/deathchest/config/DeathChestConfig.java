@@ -1,51 +1,28 @@
 package de.helixdevs.deathchest.config;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 
-@Getter
-@RequiredArgsConstructor
-@ToString
-public class DeathChestConfig {
+public record DeathChestConfig(int configVersion,
+                               boolean updateChecker,
+                               @NotNull String durationFormat,
+                               @Nullable Duration expiration,
+                               @NotNull InventoryOptions inventoryOptions,
+                               @Nullable HologramOptions hologramOptions,
+                               @Nullable ParticleOptions particleOptions,
+                               @Nullable BreakEffectOptions breakEffectOptions,
+                               @Nullable NotificationOptions notificationOptions,
+                               @Nullable String preferredHologramService,
+                               @Nullable String preferredAnimationService) {
 
     public static final int CONFIG_VERSION = 1;
 
-    private final int configVersion;
-    private final boolean updateCheck;
-    @NotNull
-    private final String durationFormat;
-    @Nullable
-    private final Duration expiration;
-
-    @NotNull
-    private final InventoryOptions inventoryOptions;
-
-    @Nullable
-    private final HologramOptions hologramOptions;
-
-    @Nullable
-    private final ParticleOptions particleOptions;
-
-    @Nullable
-    private final BreakEffectOptions breakEffectOptions;
-
-    @Nullable
-    private final NotificationOptions notificationOptions;
-
-    @Nullable
-    private final String preferredHologramService;
-    @Nullable
-    private final String preferredAnimationService;
-
     public static DeathChestConfig load(FileConfiguration config) {
         int configVersion = config.getInt("config-version");
-        boolean updateCheck = config.getBoolean("update-check", true);
+        boolean updateCheck = config.getBoolean("update-checker", true);
         String durationFormat = config.getString("duration-format", "mm:ss");
 
         Duration expiration = null;

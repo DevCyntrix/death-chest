@@ -72,8 +72,8 @@ public class DeathChestPlugin extends JavaPlugin implements Listener {
 
         this.deathChestConfig = DeathChestConfig.load(getConfig());
 
-        this.hologramService = SupportServices.getHologramService(this, this.deathChestConfig.getPreferredHologramService());
-        this.animationService = SupportServices.getAnimationService(this, this.deathChestConfig.getPreferredAnimationService());
+        this.hologramService = SupportServices.getHologramService(this, this.deathChestConfig.preferredHologramService());
+        this.animationService = SupportServices.getAnimationService(this, this.deathChestConfig.preferredAnimationService());
         this.protectionService = SupportServices.getProtectionService(this);
         // Standard protection service: No service
         if (protectionService == null)
@@ -86,7 +86,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener {
             deathChestCommand.setTabCompleter(this);
         }
 
-        if (this.deathChestConfig.isUpdateCheck()) {
+        if (this.deathChestConfig.updateChecker()) {
             UpdateChecker checker = new UpdateChecker(this, RESOURCE_ID);
             checker.getVersion(version -> {
                 if (getDescription().getVersion().equals(version))
@@ -160,13 +160,13 @@ public class DeathChestPlugin extends JavaPlugin implements Listener {
         DeathChest deathChest = new DeathChest(
                 this,
                 chest,
-                deathChestConfig.getExpiration(),
+                deathChestConfig.expiration(),
                 player,
                 event.getDrops().toArray(new ItemStack[0]));
         getServer().getPluginManager().registerEvents(deathChest, this);
         this.deathChests.add(deathChest);
 
-        NotificationOptions notificationOptions = deathChestConfig.getNotificationOptions();
+        NotificationOptions notificationOptions = deathChestConfig.notificationOptions();
 
         if (notificationOptions != null && notificationOptions.enabled() && notificationOptions.messages() != null) {
             player.sendMessage(notificationOptions.messages());
