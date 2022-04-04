@@ -4,6 +4,8 @@ import com.google.common.collect.ImmutableList;
 import de.helixdevs.deathchest.api.animation.IAnimationService;
 import de.helixdevs.deathchest.api.hologram.IHologramService;
 import de.helixdevs.deathchest.api.protection.IProtectionService;
+import de.helixdevs.deathchest.config.DeathChestConfig;
+import de.helixdevs.deathchest.config.NotificationOptions;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -22,6 +24,7 @@ import org.bukkit.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.util.*;
 
 /**
@@ -51,13 +54,26 @@ public class DeathChestPlugin extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
+        // Recreate config when the config is too old.
+        System.out.println(getConfig().getInt("config-version"));
+        if (getConfig().getInt("config-version", 0) != DeathChestConfig.CONFIG_VERSION) {
+            File configFile = new File(getDataFolder(), "config.yml");
+            if (configFile.isFile()) {
+                File oldConfigFile = new File(getDataFolder(), "config.yml.old");
+                boolean b = configFile.renameTo(oldConfigFile);
+                if (!b) {
+                    throw new IllegalStateException("Failed to rename the configuration file to old.");
+                }
+            }
+        }
+
         saveDefaultConfig();
         reloadConfig();
 
         this.deathChestConfig = DeathChestConfig.load(getConfig());
 
-        this.hologramService = SupportServices.getHologramService(this, deathChestConfig.getPreferredHologramService());
-        this.animationService = SupportServices.getAnimationService(this, deathChestConfig.getPreferredAnimationService());
+        this.hologramService = SupportServices.getHologramService(this, this.deathChestConfig.getPreferredHologramService());
+        this.animationService = SupportServices.getAnimationService(this, this.deathChestConfig.getPreferredAnimationService());
         this.protectionService = SupportServices.getProtectionService(this);
         // Standard protection service: No service
         if (protectionService == null)
@@ -70,7 +86,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener {
             deathChestCommand.setTabCompleter(this);
         }
 
-        if (deathChestConfig.isUpdateCheck()) {
+        if (this.deathChestConfig.isUpdateCheck()) {
             UpdateChecker checker = new UpdateChecker(this, RESOURCE_ID);
             checker.getVersion(version -> {
                 if (getDescription().getVersion().equals(version))
@@ -145,13 +161,15 @@ public class DeathChestPlugin extends JavaPlugin implements Listener {
                 this,
                 chest,
                 deathChestConfig.getExpiration(),
+                player,
                 event.getDrops().toArray(new ItemStack[0]));
         getServer().getPluginManager().registerEvents(deathChest, this);
         this.deathChests.add(deathChest);
 
-        String[] notificationMessage = deathChestConfig.getNotificationMessage();
-        if (notificationMessage != null) {
-            player.sendMessage(notificationMessage);
+        NotificationOptions notificationOptions = deathChestConfig.getNotificationOptions();
+
+        if (notificationOptions != null && notificationOptions.enabled() && notificationOptions.messages() != null) {
+            player.sendMessage(notificationOptions.messages());
         }
 
         // Clears the drops

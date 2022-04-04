@@ -5,7 +5,12 @@ import de.helixdevs.deathchest.api.animation.IAnimationService;
 import de.helixdevs.deathchest.api.hologram.IHologram;
 import de.helixdevs.deathchest.api.hologram.IHologramService;
 import de.helixdevs.deathchest.api.hologram.IHologramTextLine;
+import de.helixdevs.deathchest.config.DeathChestConfig;
+import de.helixdevs.deathchest.config.HologramOptions;
+import de.helixdevs.deathchest.config.InventoryOptions;
+import de.helixdevs.deathchest.config.ParticleOptions;
 import lombok.Getter;
+import org.apache.commons.lang.text.StrSubstitutor;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -30,10 +35,17 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Closeable;
 import java.time.Duration;
-import java.util.stream.Collectors;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 @Getter
@@ -45,62 +57,112 @@ public class DeathChest implements Listener, Closeable {
     private final Inventory inventory;
     private final long createdAt = System.currentTimeMillis();
     private final long expireAt;
-    private final BukkitTask task;
-    private IHologram hologram;
+    private final Supplier<String> durationSupplier;
 
-    public DeathChest(DeathChestPlugin plugin, Chest chest, Duration expiration, ItemStack... stacks) {
+    private final BukkitTask task;
+    private BukkitTask particleTask;
+
+    private IHologram hologram;
+    private StrSubstitutor substitutor;
+
+    public DeathChest(@NotNull DeathChestPlugin plugin, @NotNull Chest chest, @Nullable Duration expiration, @NotNull OfflinePlayer player, ItemStack... stacks) {
         this.plugin = plugin;
         this.chest = chest;
         this.location = chest.getLocation();
 
+        if (expiration != null && !expiration.isNegative() && !expiration.isZero())
+            this.expireAt = createdAt + expiration.toMillis();
+        else
+            this.expireAt = -1; // Permanent
+
         DeathChestConfig config = plugin.getDeathChestConfig();
 
+        this.durationSupplier = () -> {
+            if (!isExpiring())
+                return DurationFormatUtils.formatDuration(0, config.getDurationFormat());
+            long duration = expireAt - System.currentTimeMillis();
+            return DurationFormatUtils.formatDuration(duration, config.getDurationFormat());
+        };
+
+
         // Creates inventory
-        this.inventory = Bukkit.createInventory(new DeathChestHolder(chest), 9 * 5, config.getInventoryTitle());
+        InventoryOptions inventoryOptions = config.getInventoryOptions();
+        this.inventory = Bukkit.createInventory(new DeathChestHolder(chest), inventoryOptions.size().getSize(stacks.length), inventoryOptions.title());
         this.inventory.addItem(stacks);
 
         // Creates hologram
-        this.expireAt = createdAt + expiration.toMillis();
-        IHologramTextLine textLine;
+        Map<String, IHologramTextLine> map = new LinkedHashMap<>();
         IHologramService service = plugin.getHologramService();
-        if (config.isHologram() && service != null) {
-            this.hologram = service.spawnHologram(location.clone().add(0.5, 1.5, 0.5));
-            long duration = expireAt - System.currentTimeMillis();
-            String format = DurationFormatUtils.formatDuration(duration, config.getDurationFormat());
-            textLine = this.hologram.appendLine(format);
-        } else {
-            textLine = null;
+
+        HologramOptions hologramOptions = config.getHologramOptions();
+        if (service != null && hologramOptions != null && hologramOptions.enabled()) {
+            this.hologram = service.spawnHologram(location.clone().add(0.5, hologramOptions.height(), 0.5));
+
+            substitutor = new StrSubstitutor(new PlayerStrLookup(player, durationSupplier));
+            hologramOptions.lines()
+                    .forEach(line -> map.put(line, hologram.appendLine(substitutor.replace(line))));
         }
 
         // Runs a check and update scheduler
         this.task = new BukkitRunnable() {
+
             @Override
             public void run() {
-                long duration = expireAt - System.currentTimeMillis();
-                if (duration < 0) {
-                    close();
-                    return;
-                }
-
-                IAnimationService animationService = plugin.getAnimationService();
-                if (animationService != null) {
-                    double process = (double) (System.currentTimeMillis() - createdAt) / (expireAt - createdAt);
-
-                    World world = location.getWorld();
-                    if (world != null) {
-                        Stream<Player> nearbyPlayers = world.
-                                getNearbyEntities(location, 20, 20, 20, entity -> entity.getType() == EntityType.PLAYER).stream()
-                                .map(entity -> (Player) entity);
-                        animationService.spawnBlockBreakAnimation(location.toVector(), (byte) (9 * process), nearbyPlayers.collect(Collectors.toList()));
+                // Stops the scheduler when the chest expired
+                if (isExpiring()) {
+                    long duration = expireAt - System.currentTimeMillis();
+                    if (duration < 0) {
+                        close();
+                        return;
                     }
                 }
 
-                if (textLine != null) {
-                    String format = DurationFormatUtils.formatDuration(duration, config.getDurationFormat());
-                    textLine.rename(format);
+                IAnimationService animationService = plugin.getAnimationService();
+                World world;
+                // Spawns the block break animation
+                if (animationService != null && isExpiring()) {
+                    double process = (double) (System.currentTimeMillis() - createdAt) / (expireAt - createdAt);
+
+                    world = location.getWorld();
+                    if (world != null) {
+                        try {
+                            Stream<Player> playerStream = Bukkit.getScheduler().callSyncMethod(plugin, () -> world.
+                                    getNearbyEntities(location, 20, 20, 20, entity -> entity.getType() == EntityType.PLAYER).stream()
+                                    .map(entity -> (Player) entity)).get(1, TimeUnit.SECONDS);
+                            animationService.spawnBlockBreakAnimation(location.toVector(), (byte) (9 * process), playerStream);
+                        } catch (InterruptedException | ExecutionException e) {
+                            e.printStackTrace();
+                        } catch (TimeoutException e) {
+                            plugin.getLogger().info("Warning get nearby entities takes longer than 1 second.");
+                        }
+                    }
+                }
+
+                // Updates the hologram lines
+                if (!map.isEmpty()) {
+                    map.forEach((s, line) -> {
+                        if (substitutor != null)
+                            s = substitutor.replace(s);
+                        line.rename(s);
+                    });
                 }
             }
-        }.runTaskTimer(plugin, 20, 20);
+        }.runTaskTimerAsynchronously(plugin, 20, 20);
+        World world = location.getWorld();
+
+        ParticleOptions particleOptions = config.getParticleOptions();
+        if (particleOptions != null && particleOptions.enabled() && world != null) {
+            this.particleTask = new ParticleScheduler(location, particleOptions.count(), particleOptions.radius(), particleLocation -> {
+                Particle.DustOptions options = new Particle.DustOptions(Color.ORANGE, 0.75f);
+                world.spawnParticle(
+                        Particle.REDSTONE,
+                        particleLocation.clone().add(0.5, 0.5, 0.5), // Centred particle location
+                        1,
+                        options);
+                Particle.DustOptions options1 = new Particle.DustOptions(Color.AQUA, 0.75f);
+                world.spawnParticle(Particle.REDSTONE, particleLocation.clone().add(0.5, 0.4, 0.5), 1, options1);
+            }).runTaskTimerAsynchronously(this.plugin, 0, (long) (20 / particleOptions.speed()));
+        }
     }
 
     /**
@@ -275,6 +337,10 @@ public class DeathChest implements Listener, Closeable {
             this.hologram.delete();
 
         this.task.cancel();
+
+        if (this.particleTask != null)
+            this.particleTask.cancel();
+
         HandlerList.unregisterAll(this);
         this.plugin.removeChest(this);
     }
@@ -293,5 +359,9 @@ public class DeathChest implements Listener, Closeable {
 
     public long getCreatedAt() {
         return createdAt;
+    }
+
+    public boolean isExpiring() {
+        return this.expireAt > 0;
     }
 }
