@@ -6,7 +6,7 @@
 # Do not touch this!
 config-version: 1
 
-# I recommend keep this on true to get a notification when I have some performance improvements.
+# I recommend leaving this on true to receive notification when I have performance improvements.
 update-checker: true
 duration-format: 'mm:ss'
 # The expiration of the chest in seconds.
