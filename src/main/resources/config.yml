@@ -2,45 +2,63 @@
 # The Configuration file of Death Chest
 #    In this file you can customize the plugin.
 #
+
+# Do not touch this!
 config-version: 1
 
+# I recommend keep this on true to get a notification when I have some performance improvements.
 update-checker: true
 duration-format: 'mm:ss'
-# the expiration of the chest in seconds
+# The expiration of the chest in seconds.
+# You can deactivate the expiration by setting the value to -1,
+#  but warning: The chest will still disappear after a server reload/restart
 expiration: 600
 
+# Here you can modify the inventory which opens when you right-click the death chest. You can use color codes with '&'
+# in the title and change the inventory size by changing the size value.
 inventory:
   title: 'Death Chest'
-  # constant or flexible
+  # Possible values are: constant and flexible
+  # constant: the size of the inventory is always 45 slots large
+  # flexible: the size of the inventory depends on the items which had the player in the inventory.
   size: flexible
 
+# This section is for handling the hologram function in this plugin. You can remove this section to disable the feature,
+# or you set the 'enabled' option to false
+# This feature is only available if you have a supported hologram plugin installed.
 hologram:
   enabled: true
+  # If you add lines you have to increase this value. This values depends on the hologram
+  # plugin and the distance between the plugin
+  height: 2.3
   # Support for {player_name}: Name
   #             {player_displayname}: Displayname
   #             {duration}: Time left
-  height: 2.3
   lines:
     - '&7&lR.I.P'
-    - '{player}'
-    - '&3-&7-&3-&7-&3-&7-&3-'
-    - '{duration}'
+    - '${player_name}'
+    - '&3-&6-&3-&6-&3-&6-&3-'
+    - '${duration}'
 
+# This section is for handling the particle function in this plugin. You can remove this section to disable the feature,
+# or you set the 'enabled' option to false
 particle:
   enabled: true
-  options:
-    radius: 1
-    count: 16
-    # Floating number allowed and maximum is 20
-    speed: 20
-    # view distance in blocks
-    view-distance: 20
+  radius: 1.0
+  count: 32
+  # Maximum is 20
+  speed: 20.0
 
+# This section is for handling the block breaking function in this plugin. You can remove this section to disable the feature,
+# or you set the 'enabled' option to false
+# This feature is only available if you have ProtocolLib installed.
 break-effect:
   enabled: true
-  view-distance: 20
+  view-distance: 20.0
 
-# notification on death
+# This section is for handling the notification function in this plugin. You can remove this section to disable the feature,
+# or you set the 'enabled' option to false.
+# This feature sends a message to the dead player. Here you can inform the player about the chest and their expiration.
 notify:
   enabled: true
   message: |-

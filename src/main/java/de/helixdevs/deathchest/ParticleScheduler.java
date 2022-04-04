@@ -9,11 +9,11 @@ public class ParticleScheduler extends BukkitRunnable {
 
     private final Location center;
     private final int segments;
-    private final int radius;
+    private final double radius;
 
     private final Consumer<Location> consumer;
 
-    public ParticleScheduler(Location center, int segments, int radius, Consumer<Location> consumer) {
+    public ParticleScheduler(Location center, int segments, double radius, Consumer<Location> consumer) {
         this.center = center;
         this.segments = segments;
         this.radius = radius;

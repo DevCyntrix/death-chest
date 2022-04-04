@@ -2,46 +2,92 @@ package de.helixdevs.deathchest.config;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.ChatColor;
+import lombok.ToString;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 
 @Getter
 @RequiredArgsConstructor
+@ToString
 public class DeathChestConfig {
 
-    private final boolean updateCheck;
-    private final String durationFormat;
-    private final Duration expiration;
-    private final String inventoryTitle;
-    private final boolean hologram;
-    private final String[] notificationMessage;
+    public static final int CONFIG_VERSION = 1;
 
+    private final int configVersion;
+    private final boolean updateCheck;
+    @NotNull
+    private final String durationFormat;
+    @Nullable
+    private final Duration expiration;
+
+    @NotNull
+    private final InventoryOptions inventoryOptions;
+
+    @Nullable
+    private final HologramOptions hologramOptions;
+
+    @Nullable
+    private final ParticleOptions particleOptions;
+
+    @Nullable
+    private final BreakEffectOptions breakEffectOptions;
+
+    @Nullable
+    private final NotificationOptions notificationOptions;
+
+    @Nullable
     private final String preferredHologramService;
+    @Nullable
     private final String preferredAnimationService;
 
     public static DeathChestConfig load(FileConfiguration config) {
+        int configVersion = config.getInt("config-version");
         boolean updateCheck = config.getBoolean("update-check", true);
-        String format = config.getString("format", "mm:ss");
-        int expirationInSeconds = config.getInt("expiration", 60 * 10);
+        String durationFormat = config.getString("duration-format", "mm:ss");
 
-        String inventoryTitle = ChatColor.translateAlternateColorCodes('&', config.getString("inventory-title", "Death Chest"));
-
-        boolean hologram = config.getBoolean("spawn-hologram", true);
-
-        boolean notify = config.getBoolean("notify.enabled");
-        String[] message = null;
-        if (notify) {
-            String string = config.getString("notify.message");
-            if (string != null) {
-                message = ChatColor.translateAlternateColorCodes('&', string).split("\n");
+        Duration expiration = null;
+        if (config.contains("expiration")) {
+            long expirationInSeconds = config.getLong("expiration", 60 * 10);
+            if (expirationInSeconds > 0) {
+                expiration = Duration.ofSeconds(expirationInSeconds);
             }
         }
+
+        // Inventory
+        InventoryOptions inventoryOptions = InventoryOptions.load(config.getConfigurationSection("inventory"));
+        if (inventoryOptions == null) {
+            throw new IllegalArgumentException("Missing inventory section in configuration file");
+        }
+
+        // Hologram
+        HologramOptions hologramOptions = HologramOptions.load(config.getConfigurationSection("hologram"));
+
+        // Particle
+        ParticleOptions particleOptions = ParticleOptions.load(config.getConfigurationSection("particle"));
+
+        // Effect
+        BreakEffectOptions breakEffectOptions = BreakEffectOptions.load(config.getConfigurationSection("break-effect"));
+
+        // Notification
+        NotificationOptions notificationOptions = NotificationOptions.load(config.getConfigurationSection("notify"));
 
         String preferredHologramService = config.getString("preferred-hologram-service");
         String preferredAnimationService = config.getString("preferred-animation-service");
 
-        return new DeathChestConfig(updateCheck, format, Duration.ofSeconds(expirationInSeconds), inventoryTitle, hologram, message, preferredHologramService, preferredAnimationService);
+        return new DeathChestConfig(
+                configVersion,
+                updateCheck,
+                durationFormat,
+                expiration,
+                inventoryOptions,
+                hologramOptions,
+                particleOptions,
+                breakEffectOptions,
+                notificationOptions,
+                preferredHologramService,
+                preferredAnimationService);
     }
 }
