@@ -55,7 +55,6 @@ public class DeathChestPlugin extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         // Recreate config when the config is too old.
-        System.out.println(getConfig().getInt("config-version"));
         if (getConfig().getInt("config-version", 0) != DeathChestConfig.CONFIG_VERSION) {
             File configFile = new File(getDataFolder(), "config.yml");
             if (configFile.isFile()) {

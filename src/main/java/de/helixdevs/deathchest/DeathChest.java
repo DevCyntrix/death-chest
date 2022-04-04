@@ -330,7 +330,7 @@ public class DeathChest implements Listener, Closeable {
         if (world != null) {
             Block block = this.location.getBlock();
             world.spawnParticle(Particle.BLOCK_CRACK, this.location.clone().add(0.5, 0.5, 0.5), 10, block.getBlockData());
-            block.setType(Material.AIR);
+            Bukkit.getScheduler().runTask(plugin, () -> block.setType(Material.AIR));
         }
 
         if (this.hologram != null)
