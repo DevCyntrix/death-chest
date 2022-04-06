@@ -1,4 +1,4 @@
-package de.helixdevs.deathchest.animation;
+package de.helixdevs.deathchest.support.animation;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;

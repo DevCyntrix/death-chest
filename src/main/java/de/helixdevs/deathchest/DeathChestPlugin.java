@@ -1,6 +1,7 @@
 package de.helixdevs.deathchest;
 
 import com.google.common.collect.ImmutableList;
+import de.helixdevs.deathchest.api.DeathChest;
 import de.helixdevs.deathchest.api.animation.IAnimationService;
 import de.helixdevs.deathchest.api.hologram.IHologramService;
 import de.helixdevs.deathchest.api.protection.IProtectionService;
@@ -9,7 +10,7 @@ import de.helixdevs.deathchest.config.NotificationOptions;
 import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Chest;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
@@ -25,6 +26,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.io.IOException;
+import java.time.Duration;
 import java.util.*;
 
 /**
@@ -34,6 +37,7 @@ import java.util.*;
 public class DeathChestPlugin extends JavaPlugin implements Listener {
 
     public static final int RESOURCE_ID = 101066;
+    public static final int BSTATS_ID = 14866;
 
     private final Set<DeathChest> deathChests = new HashSet<>();
 
@@ -48,7 +52,13 @@ public class DeathChestPlugin extends JavaPlugin implements Listener {
     @Override
     public void onDisable() {
         // Reset all death chests
-        this.deathChests.forEach(DeathChest::close);
+        this.deathChests.forEach(deathChest -> {
+            try {
+                deathChest.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
         this.deathChests.clear();
     }
 
@@ -95,6 +105,8 @@ public class DeathChestPlugin extends JavaPlugin implements Listener {
                 getLogger().warning("Update the plugin at https://www.spigotmc.org/resources/death-chest.101066/");
             });
         }
+
+        Metrics metrics = new Metrics(this, BSTATS_ID);
     }
 
     /**
@@ -153,17 +165,21 @@ public class DeathChestPlugin extends JavaPlugin implements Listener {
         if (!build)
             return;
 
-        // Spawns the death chest
-        deathLocation.getBlock().setType(Material.CHEST);
-        Chest chest = (Chest) deathLocation.getBlock().getState();
-        DeathChest deathChest = new DeathChest(
-                this,
-                chest,
-                deathChestConfig.expiration(),
-                player,
-                event.getDrops().toArray(new ItemStack[0]));
-        getServer().getPluginManager().registerEvents(deathChest, this);
-        this.deathChests.add(deathChest);
+        Duration expiration = deathChestConfig.expiration();
+        if (expiration == null)
+            expiration = Duration.ofSeconds(-1);
+
+        long createdAt = System.currentTimeMillis();
+
+        long expireAt;
+        if (!expiration.isNegative() && !expiration.isZero()) {
+            expireAt = createdAt + expiration.toMillis();
+        } else {
+            expireAt = -1; // Permanent
+        }
+
+        DeathChest chest = createDeathChest(deathLocation.getBlock().getLocation(), createdAt, expireAt, player, event.getDrops().toArray(new ItemStack[0]));
+        this.deathChests.add(chest);
 
         NotificationOptions notificationOptions = deathChestConfig.notificationOptions();
 
@@ -173,6 +189,32 @@ public class DeathChestPlugin extends JavaPlugin implements Listener {
 
         // Clears the drops
         event.getDrops().clear();
+    }
+
+    public @NotNull DeathChest createDeathChest(@NotNull Location location, ItemStack @NotNull ... stacks) {
+        return createDeathChest(location, null, stacks);
+    }
+
+    public @NotNull DeathChest createDeathChest(@NotNull Location location, @Nullable OfflinePlayer player, ItemStack @NotNull ... stacks) {
+        return createDeathChest(location, -1, player, stacks);
+    }
+
+    public @NotNull DeathChest createDeathChest(@NotNull Location location, long expireAt, @Nullable OfflinePlayer player, ItemStack @NotNull ... stacks) {
+        return createDeathChest(location, System.currentTimeMillis(), expireAt, player, stacks);
+    }
+
+    public @NotNull DeathChest createDeathChest(@NotNull Location location, long createdAt, long expireAt, @Nullable OfflinePlayer player, ItemStack @NotNull ... stacks) {
+        return DeathChestBuilder.builder()
+                .setCreatedAt(createdAt)
+                .setExpireAt(expireAt)
+                .setPlayer(player)
+                .setItems(stacks)
+                .setAnimationService(animationService)
+                .setHologramService(hologramService)
+                .setBreakEffectOptions(deathChestConfig.breakEffectOptions())
+                .setHologramOptions(deathChestConfig.hologramOptions())
+                .setParticleOptions(deathChestConfig.particleOptions())
+                .build(location, deathChestConfig.inventoryOptions());
     }
 
     @EventHandler
@@ -186,11 +228,11 @@ public class DeathChestPlugin extends JavaPlugin implements Listener {
         player.sendMessage("§8[§cDeath Chest§8] §cPlease update the plugin at https://www.spigotmc.org/resources/death-chest.101066/");
     }
 
-    public void addChest(DeathChest chest) {
+    public void addChest(DeathChestImpl chest) {
         this.deathChests.add(chest);
     }
 
-    public void removeChest(DeathChest chest) {
+    public void removeChest(DeathChestImpl chest) {
         this.deathChests.remove(chest);
     }
 }

@@ -1,15 +1,15 @@
 package de.helixdevs.deathchest;
 
-import de.helixdevs.deathchest.animation.ProtocolLibAnimation;
 import de.helixdevs.deathchest.api.animation.IAnimationService;
 import de.helixdevs.deathchest.api.hologram.IHologramService;
 import de.helixdevs.deathchest.api.protection.IProtectionService;
-import de.helixdevs.deathchest.decentholograms.DHService;
-import de.helixdevs.deathchest.holograms.HologramsService;
-import de.helixdevs.deathchest.holographicdisplays.HDService;
-import de.helixdevs.deathchest.protection.CombinedProtectionService;
-import de.helixdevs.deathchest.protection.PlotSquaredProtection;
-import de.helixdevs.deathchest.protection.WorldGuardProtection;
+import de.helixdevs.deathchest.support.animation.ProtocolLibAnimation;
+import de.helixdevs.deathchest.support.hologram.decentholograms.DHService;
+import de.helixdevs.deathchest.support.hologram.holograms.HologramsService;
+import de.helixdevs.deathchest.support.hologram.holographicdisplays.HDService;
+import de.helixdevs.deathchest.support.protection.CombinedProtectionService;
+import de.helixdevs.deathchest.support.protection.PlotSquaredProtection;
+import de.helixdevs.deathchest.support.protection.WorldGuardProtection;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;

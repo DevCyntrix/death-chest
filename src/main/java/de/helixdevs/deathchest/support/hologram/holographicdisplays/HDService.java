@@ -1,4 +1,4 @@
-package de.helixdevs.deathchest.holographicdisplays;
+package de.helixdevs.deathchest.support.hologram.holographicdisplays;
 
 import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;

@@ -1,20 +1,19 @@
-package de.helixdevs.deathchest.holograms;
+package de.helixdevs.deathchest.support.hologram.holographicdisplays;
 
-import com.sainttx.holograms.api.Hologram;
-import com.sainttx.holograms.api.line.TextLine;
-import com.sainttx.holograms.api.line.TextualHologramLine;
+import com.gmail.filoghost.holographicdisplays.api.Hologram;
+import com.gmail.filoghost.holographicdisplays.api.line.TextLine;
 import de.helixdevs.deathchest.api.hologram.IHologram;
 import de.helixdevs.deathchest.api.hologram.IHologramService;
 import de.helixdevs.deathchest.api.hologram.IHologramTextLine;
 import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
 
-public class HologramsHologram implements IHologram {
+public class HDHologram implements IHologram {
 
-    private final HologramsService service;
+    private final HDService service;
     private final Hologram hologram;
 
-    public HologramsHologram(HologramsService service, Hologram hologram) {
+    public HDHologram(HDService service, Hologram hologram) {
         this.service = service;
         this.hologram = hologram;
     }
@@ -31,13 +30,12 @@ public class HologramsHologram implements IHologram {
 
     @Override
     public IHologramTextLine appendLine(@NotNull String line) {
-        TextualHologramLine hologramLine = new TextLine(this.hologram, line);
-        return new HologramsTextLine(this.hologram, hologramLine);
+        TextLine textLine = hologram.appendTextLine(line);
+        return new HDTextLine(textLine);
     }
 
     @Override
     public void delete() {
-        hologram.despawn();
-        service.getHologramManager().deleteHologram(hologram);
+        hologram.delete();
     }
 }

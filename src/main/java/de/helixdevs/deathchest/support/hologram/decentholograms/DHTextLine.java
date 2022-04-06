@@ -1,4 +1,4 @@
-package de.helixdevs.deathchest.decentholograms;
+package de.helixdevs.deathchest.support.hologram.decentholograms;
 
 import de.helixdevs.deathchest.api.hologram.IHologramTextLine;
 import eu.decentsoftware.holograms.api.holograms.HologramLine;
