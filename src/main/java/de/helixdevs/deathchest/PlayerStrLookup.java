@@ -3,24 +3,33 @@ package de.helixdevs.deathchest;
 import org.apache.commons.lang.text.StrLookup;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;
 
 public class PlayerStrLookup extends StrLookup {
 
+    @Nullable
     private final OfflinePlayer player;
+    @NotNull
     private final Supplier<String> duration;
 
-    public PlayerStrLookup(OfflinePlayer player, Supplier<String> duration) {
+    public PlayerStrLookup(@Nullable OfflinePlayer player, @NotNull Supplier<String> duration) {
         this.player = player;
         this.duration = duration;
     }
 
     @Override
     public String lookup(String key) {
-        if (key.equals("player_name"))
+        if (key.equals("player_name")) {
+            if (player == null)
+                return "Unknown";
             return player.getName();
+        }
         if (key.equals("player_displayname")) {
+            if (player == null)
+                return "Unknown";
             Player oP = player.getPlayer();
             return oP != null ? oP.getDisplayName() : player.getName();
         }

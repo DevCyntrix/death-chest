@@ -1,4 +1,4 @@
-package de.helixdevs.deathchest.holograms;
+package de.helixdevs.deathchest.support.hologram.holograms;
 
 import com.sainttx.holograms.api.Hologram;
 import com.sainttx.holograms.api.HologramManager;

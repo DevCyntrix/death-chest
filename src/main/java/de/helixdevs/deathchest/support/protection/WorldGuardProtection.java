@@ -1,4 +1,4 @@
-package de.helixdevs.deathchest.protection;
+package de.helixdevs.deathchest.support.protection;
 
 import com.sk89q.worldguard.bukkit.ProtectionQuery;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;

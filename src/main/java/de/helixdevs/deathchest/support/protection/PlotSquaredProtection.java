@@ -1,4 +1,4 @@
-package de.helixdevs.deathchest.protection;
+package de.helixdevs.deathchest.support.protection;
 
 import com.plotsquared.bukkit.player.BukkitPlayer;
 import com.plotsquared.bukkit.util.BukkitUtil;
