@@ -37,6 +37,7 @@ import java.util.*;
 public class DeathChestPlugin extends JavaPlugin implements Listener {
 
     public static final int RESOURCE_ID = 101066;
+    public static final int BSTATS_ID = 14866;
 
     private final Set<DeathChest> deathChests = new HashSet<>();
 
@@ -104,6 +105,8 @@ public class DeathChestPlugin extends JavaPlugin implements Listener {
                 getLogger().warning("Update the plugin at https://www.spigotmc.org/resources/death-chest.101066/");
             });
         }
+
+        Metrics metrics = new Metrics(this, BSTATS_ID);
     }
 
     /**
