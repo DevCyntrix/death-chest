@@ -37,6 +37,7 @@ dependencies {
     api("com.sk89q.worldguard:worldguard-bukkit:7.0.7")
     api("com.plotsquared:PlotSquared-Core:6.6.1")
     api("com.plotsquared:PlotSquared-Bukkit:6.6.1") { isTransitive = false }
+    api("com.github.TechFortress:GriefPrevention:16.18")
 
     // Animation Support
     api("com.comphenix.protocol:ProtocolLib:4.7.0")
@@ -79,7 +80,7 @@ bukkit {
     main = "de.helixdevs.deathchest.DeathChestPlugin"
     apiVersion = "1.15"
     authors = listOf("CyntrixAlgorithm")
-    softDepend = listOf("WorldGuard", "HolographicDisplays", "ProtocolLib", "DecentHolograms")
+    softDepend = listOf("WorldGuard", "HolographicDisplays", "ProtocolLib", "DecentHolograms", "GriefPrevention")
     commands {
         register("deathchest") {
             description = "The admin command for reloading the plugin's configuration"
