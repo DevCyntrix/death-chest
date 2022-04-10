@@ -118,7 +118,7 @@ public class DeathChestImpl implements DeathChest {
         BreakEffectOptions breakEffectOptions = builder.breakEffectOptions();
         // Spawns the block break animation
         if (animationService != null && isExpiring() && breakEffectOptions.enabled()) {
-            tasks.add(runAnimationTask(animationService));
+            tasks.add(runAnimationTask(animationService, breakEffectOptions));
         }
 
         ParticleOptions particleOptions = builder.particleOptions();
@@ -160,7 +160,7 @@ public class DeathChestImpl implements DeathChest {
         }).runTaskTimerAsynchronously(this.plugin, 0, (long) (20 / particleOptions.speed()));
     }
 
-    private BukkitTask runAnimationTask(@NotNull IAnimationService animationService) {
+    private BukkitTask runAnimationTask(@NotNull IAnimationService animationService, BreakEffectOptions breakEffectOptions) {
         return new BukkitRunnable() {
 
             @Override
@@ -170,7 +170,12 @@ public class DeathChestImpl implements DeathChest {
                 try {
                     Stream<Player> playerStream = Bukkit.getScheduler().callSyncMethod(plugin, () ->
                             getWorld().
-                                    getNearbyEntities(getLocation(), 20, 20, 20, entity -> entity.getType() == EntityType.PLAYER).stream()
+                                    getNearbyEntities(
+                                            getLocation(),
+                                            breakEffectOptions.viewDistance(),
+                                            breakEffectOptions.viewDistance(),
+                                            breakEffectOptions.viewDistance(),
+                                            entity -> entity.getType() == EntityType.PLAYER).stream()
                                     .map(entity -> (Player) entity)).get(1, TimeUnit.SECONDS);
                     animationService.spawnBlockBreakAnimation(getLocation().toVector(), (byte) (9 * process), playerStream);
                 } catch (InterruptedException | ExecutionException e) {
