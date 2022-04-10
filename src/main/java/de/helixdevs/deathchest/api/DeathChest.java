@@ -18,7 +18,7 @@ public interface DeathChest extends Listener, Closeable {
 
     @NotNull Location getLocation();
 
-    Chest getBukkitChest();
+    @NotNull Chest getBukkitChest();
 
     Inventory getInventory();
 

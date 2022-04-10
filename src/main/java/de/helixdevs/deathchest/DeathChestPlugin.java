@@ -2,6 +2,7 @@ package de.helixdevs.deathchest;
 
 import com.google.common.collect.ImmutableList;
 import de.helixdevs.deathchest.api.DeathChest;
+import de.helixdevs.deathchest.api.DeathChestService;
 import de.helixdevs.deathchest.api.animation.IAnimationService;
 import de.helixdevs.deathchest.api.hologram.IHologramService;
 import de.helixdevs.deathchest.api.protection.IProtectionService;
@@ -20,6 +21,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
@@ -34,12 +36,12 @@ import java.util.*;
  * This plugin will create chests on death and will destroy them in after a specific time.
  */
 @Getter
-public class DeathChestPlugin extends JavaPlugin implements Listener {
+public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChestService {
 
     public static final int RESOURCE_ID = 101066;
     public static final int BSTATS_ID = 14866;
 
-    private final Set<DeathChest> deathChests = new HashSet<>();
+    protected final Set<DeathChest> deathChests = new HashSet<>();
 
     private DeathChestConfig deathChestConfig;
 
@@ -89,6 +91,8 @@ public class DeathChestPlugin extends JavaPlugin implements Listener {
             this.protectionService = (player, location, material) -> true;
 
         getServer().getPluginManager().registerEvents(this, this);
+        getServer().getServicesManager().register(DeathChestService.class, this, this, ServicePriority.Normal);
+
         PluginCommand deathChestCommand = getCommand("deathchest");
         if (deathChestCommand != null) {
             deathChestCommand.setExecutor(this);
@@ -179,7 +183,6 @@ public class DeathChestPlugin extends JavaPlugin implements Listener {
         }
 
         DeathChest chest = createDeathChest(deathLocation.getBlock().getLocation(), createdAt, expireAt, player, event.getDrops().toArray(new ItemStack[0]));
-        this.deathChests.add(chest);
 
         NotificationOptions notificationOptions = deathChestConfig.notificationOptions();
 
@@ -191,20 +194,24 @@ public class DeathChestPlugin extends JavaPlugin implements Listener {
         event.getDrops().clear();
     }
 
+    @Override
     public @NotNull DeathChest createDeathChest(@NotNull Location location, ItemStack @NotNull ... stacks) {
         return createDeathChest(location, null, stacks);
     }
 
+    @Override
     public @NotNull DeathChest createDeathChest(@NotNull Location location, @Nullable OfflinePlayer player, ItemStack @NotNull ... stacks) {
         return createDeathChest(location, -1, player, stacks);
     }
 
+    @Override
     public @NotNull DeathChest createDeathChest(@NotNull Location location, long expireAt, @Nullable OfflinePlayer player, ItemStack @NotNull ... stacks) {
         return createDeathChest(location, System.currentTimeMillis(), expireAt, player, stacks);
     }
 
+    @Override
     public @NotNull DeathChest createDeathChest(@NotNull Location location, long createdAt, long expireAt, @Nullable OfflinePlayer player, ItemStack @NotNull ... stacks) {
-        return DeathChestBuilder.builder()
+        DeathChest build = DeathChestBuilder.builder()
                 .setCreatedAt(createdAt)
                 .setExpireAt(expireAt)
                 .setPlayer(player)
@@ -215,6 +222,8 @@ public class DeathChestPlugin extends JavaPlugin implements Listener {
                 .setHologramOptions(deathChestConfig.hologramOptions())
                 .setParticleOptions(deathChestConfig.particleOptions())
                 .build(location, deathChestConfig.inventoryOptions());
+        this.deathChests.add(build);
+        return build;
     }
 
     @EventHandler
@@ -228,11 +237,23 @@ public class DeathChestPlugin extends JavaPlugin implements Listener {
         player.sendMessage("§8[§cDeath Chest§8] §cPlease update the plugin at https://www.spigotmc.org/resources/death-chest.101066/");
     }
 
-    public void addChest(DeathChestImpl chest) {
-        this.deathChests.add(chest);
+    @Override
+    public @NotNull Set<@NotNull DeathChest> getChests() {
+        return this.deathChests;
     }
 
-    public void removeChest(DeathChestImpl chest) {
-        this.deathChests.remove(chest);
+    @Override
+    public IHologramService getHologramService() {
+        return hologramService;
+    }
+
+    @Override
+    public IAnimationService getAnimationService() {
+        return animationService;
+    }
+
+    @Override
+    public @NotNull IProtectionService getProtectionService() {
+        return protectionService;
     }
 }

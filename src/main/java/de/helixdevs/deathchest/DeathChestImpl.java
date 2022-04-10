@@ -14,6 +14,7 @@ import org.apache.commons.lang.text.StrSubstitutor;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.HumanEntity;
@@ -74,7 +75,10 @@ public class DeathChestImpl implements DeathChest {
         if (!(block.getState() instanceof Chest)) {
             block.setType(Material.CHEST);
         }
-        this.chest = (Chest) block.getState();
+        BlockState state = block.getState();
+        if (!(state instanceof Chest chest))
+            throw new IllegalStateException();
+        this.chest = chest;
 
         this.createdAt = builder.createdAt();
         this.expireAt = builder.expireAt();
@@ -114,7 +118,7 @@ public class DeathChestImpl implements DeathChest {
         BreakEffectOptions breakEffectOptions = builder.breakEffectOptions();
         // Spawns the block break animation
         if (animationService != null && isExpiring() && breakEffectOptions.enabled()) {
-            tasks.add(runAnimationTask(animationService, breakEffectOptions));
+            tasks.add(runAnimationTask(animationService));
         }
 
         ParticleOptions particleOptions = builder.particleOptions();
@@ -156,7 +160,7 @@ public class DeathChestImpl implements DeathChest {
         }).runTaskTimerAsynchronously(this.plugin, 0, (long) (20 / particleOptions.speed()));
     }
 
-    private BukkitTask runAnimationTask(@Nullable IAnimationService animationService, BreakEffectOptions breakEffectOptions) {
+    private BukkitTask runAnimationTask(@NotNull IAnimationService animationService) {
         return new BukkitRunnable() {
 
             @Override
@@ -373,17 +377,20 @@ public class DeathChestImpl implements DeathChest {
             block.setType(Material.AIR);
         });
 
-        if (this.hologram != null)
+        if (this.hologram != null) {
             this.hologram.delete();
+            this.hologram = null;
+        }
 
         this.tasks.forEach(BukkitTask::cancel);
+        this.tasks.clear();
 
         HandlerList.unregisterAll(this);
-        this.plugin.removeChest(this);
+        this.plugin.deathChests.remove(this);
     }
 
     @Override
-    public Chest getBukkitChest() {
+    public @NotNull Chest getBukkitChest() {
         return this.chest;
     }
 
