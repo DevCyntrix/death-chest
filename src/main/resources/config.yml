@@ -62,4 +62,4 @@ break-effect:
 notify:
   enabled: true
   message: |-
-    &7You died. Your items were put into a chest which dispears after &c10 minutes&7!
+    &7You died. Your items were put into a chest which disppears after &c10 minutes&7!
