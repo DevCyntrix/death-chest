@@ -1,6 +1,6 @@
 package de.helixdevs.deathchest;
 
-import org.bukkit.block.Chest;
+import de.helixdevs.deathchest.api.DeathChest;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.NotNull;
@@ -8,9 +8,9 @@ import org.jetbrains.annotations.NotNull;
 public class DeathChestHolder implements InventoryHolder {
 
     @NotNull
-    private final Chest chest;
+    private final DeathChest chest;
 
-    public DeathChestHolder(@NotNull Chest chest) {
+    public DeathChestHolder(@NotNull DeathChest chest) {
         this.chest = chest;
     }
 
@@ -20,7 +20,7 @@ public class DeathChestHolder implements InventoryHolder {
         return null;
     }
 
-    public @NotNull Chest getChest() {
+    public @NotNull DeathChest getChest() {
         return chest;
     }
 }

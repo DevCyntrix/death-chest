@@ -15,7 +15,8 @@ import org.apache.commons.lang.time.DurationFormatUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
-import org.bukkit.block.Chest;
+import org.bukkit.block.Container;
+import org.bukkit.block.Lidded;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -52,7 +53,7 @@ public class DeathChestImpl implements DeathChest {
     private final DeathChestPlugin plugin;
     private final Location location;
 
-    private final Chest chest;
+    private final BlockState state;
 
     private final Inventory inventory;
     private final long createdAt;
@@ -72,13 +73,9 @@ public class DeathChestImpl implements DeathChest {
         this.plugin = JavaPlugin.getPlugin(DeathChestPlugin.class);
 
         Block block = location.getBlock();
-        if (!(block.getState() instanceof Chest)) {
-            block.setType(Material.CHEST);
-        }
-        BlockState state = block.getState();
-        if (!(state instanceof Chest chest))
-            throw new IllegalStateException();
-        this.chest = chest;
+        block.setType(Material.CHEST);
+
+        this.state = block.getState();
 
         this.createdAt = builder.createdAt();
         this.expireAt = builder.expireAt();
@@ -89,12 +86,11 @@ public class DeathChestImpl implements DeathChest {
             return DurationFormatUtils.formatDuration(duration, builder.durationFormat());
         };
 
-
         ItemStack[] stacks = builder.items();
 
         // Creates inventory
         InventoryOptions inventoryOptions = builder.inventoryOptions();
-        this.inventory = Bukkit.createInventory(new DeathChestHolder(this.chest), inventoryOptions.size().getSize(stacks.length), inventoryOptions.title());
+        this.inventory = Bukkit.createInventory(new DeathChestHolder(this), inventoryOptions.size().getSize(stacks.length), inventoryOptions.title());
         this.inventory.addItem(stacks);
 
         // Creates hologram
@@ -229,11 +225,14 @@ public class DeathChestImpl implements DeathChest {
         if (!inventory.equals(event.getInventory()))
             return;
 
-        if (inventory.getViewers().size() - 1 <= 0) {
-            DeathChestHolder holder = (DeathChestHolder) inventory.getHolder();
-            if (holder == null)
-                return;
-            holder.getChest().close();
+        DeathChestHolder holder = (DeathChestHolder) inventory.getHolder();
+        if (holder == null)
+            return;
+        DeathChest chest = holder.getChest();
+        BlockState state = chest.getState();
+
+        if (state instanceof Lidded lidded) {
+            lidded.close();
         }
 
         if (inventory.isEmpty()) {
@@ -259,15 +258,14 @@ public class DeathChestImpl implements DeathChest {
             return;
         if (!this.getLocation().equals(block.getLocation()))
             return;
-        if (!(block.getState() instanceof Chest chest))
-            return;
 
         Player player = event.getPlayer();
         if (event.isBlockInHand() && player.isSneaking()) // That maintains the natural minecraft feeling
             return;
         event.setCancelled(true);
-        if (this.inventory.getViewers().isEmpty()) {
-            chest.open();
+
+        if (block.getState() instanceof Lidded lidded) {
+            lidded.open();
         }
 
         player.openInventory(this.inventory);
@@ -283,7 +281,7 @@ public class DeathChestImpl implements DeathChest {
         if (!inventory.equals(event.getView().getTopInventory()))
             return;
         if (inventory.isEmpty()) {
-            Bukkit.getScheduler().runTask(plugin, () -> event.getWhoClicked().closeInventory());
+            event.getWhoClicked().closeInventory();
         }
     }
 
@@ -297,7 +295,7 @@ public class DeathChestImpl implements DeathChest {
         if (!inventory.equals(event.getInventory()))
             return;
         if (inventory.isEmpty()) {
-            Bukkit.getScheduler().runTask(plugin, () -> event.getWhoClicked().closeInventory());
+            event.getWhoClicked().closeInventory();
         }
     }
 
@@ -308,7 +306,11 @@ public class DeathChestImpl implements DeathChest {
      */
     @EventHandler(ignoreCancelled = true)
     public void onHopperMoveItem(InventoryMoveItemEvent event) {
-        if (!chest.getBlockInventory().equals(event.getDestination()))
+        if (!(state instanceof Container))
+            return;
+        Container container = (Container) this.state;
+
+        if (!container.getInventory().equals(event.getDestination()))
             return;
         event.setCancelled(true);
     }
@@ -327,6 +329,7 @@ public class DeathChestImpl implements DeathChest {
                 continue;
             getWorld().dropItemNaturally(getLocation(), content);
         }
+        event.setCancelled(true);
         close();
     }
 
@@ -337,8 +340,9 @@ public class DeathChestImpl implements DeathChest {
      */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onBlockExplode(BlockExplodeEvent event) {
-        if (event.blockList().stream().noneMatch(block -> block.getLocation().equals(getLocation())))
+        if (!event.blockList().removeIf(block -> block.getLocation().equals(getLocation())))
             return;
+
         for (ItemStack content : this.inventory.getContents()) {
             if (content == null)
                 continue;
@@ -354,8 +358,9 @@ public class DeathChestImpl implements DeathChest {
      */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onBlockExplode(EntityExplodeEvent event) {
-        if (event.blockList().stream().noneMatch(block -> block.getLocation().equals(getLocation())))
+        if (!event.blockList().removeIf(block -> block.getLocation().equals(getLocation())))
             return;
+
         for (ItemStack content : this.inventory.getContents()) {
             if (content == null)
                 continue;
@@ -370,17 +375,13 @@ public class DeathChestImpl implements DeathChest {
      */
     @Override
     public void close() {
-        if (this.inventory != null)
-            Bukkit.getScheduler().runTask(this.plugin, () -> {
-                LinkedList<HumanEntity> humanEntities = new LinkedList<>(inventory.getViewers()); // Copies the list to avoid a concurrent modification exception
-                humanEntities.forEach(HumanEntity::closeInventory);
-            });
-
-        Bukkit.getScheduler().runTask(plugin, () -> {
-            Block block = getLocation().getBlock();
-            getWorld().spawnParticle(Particle.BLOCK_CRACK, getLocation().clone().add(0.5, 0.5, 0.5), 10, block.getBlockData());
-            block.setType(Material.AIR);
-        });
+        if (this.inventory != null) {
+            LinkedList<HumanEntity> humanEntities = new LinkedList<>(inventory.getViewers()); // Copies the list to avoid a concurrent modification exception
+            humanEntities.forEach(HumanEntity::closeInventory);
+        }
+        Block block = getLocation().getBlock();
+        block.setType(Material.AIR);
+        getWorld().spawnParticle(Particle.BLOCK_CRACK, getLocation().clone().add(0.5, 0.5, 0.5), 10, block.getBlockData());
 
         if (this.hologram != null) {
             this.hologram.delete();
@@ -395,8 +396,8 @@ public class DeathChestImpl implements DeathChest {
     }
 
     @Override
-    public @NotNull Chest getBukkitChest() {
-        return this.chest;
+    public @NotNull BlockState getState() {
+        return this.state;
     }
 
     @Override

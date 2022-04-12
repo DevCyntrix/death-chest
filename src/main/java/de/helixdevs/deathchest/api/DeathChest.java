@@ -2,7 +2,7 @@ package de.helixdevs.deathchest.api;
 
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.block.Chest;
+import org.bukkit.block.BlockState;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +18,7 @@ public interface DeathChest extends Listener, Closeable {
 
     @NotNull Location getLocation();
 
-    @NotNull Chest getBukkitChest();
+    @NotNull BlockState getState();
 
     Inventory getInventory();
 
