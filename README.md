@@ -1,7 +1,7 @@
 # death-chest
 
 A spigot plugin for spawning a chest when the player dies. It supports Holographic Displays, Decent Holograms,
-ProtocolLib, WorldGuard, and PlotSquared for additional features
+ProtocolLib, WorldGuard, GriefPrevention and PlotSquared for additional features
 
 ## Configuration
 
