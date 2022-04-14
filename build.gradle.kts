@@ -13,21 +13,12 @@ java {
 
 repositories {
     mavenCentral()
-    maven {
-        url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-    }
-    maven {
-        url = uri("https://maven.enginehub.org/repo/")
-    }
-    maven {
-        url = uri("https://repo.codemc.io/repository/maven-public/")
-    }
-    maven {
-        url = uri("https://repo.dmulloy2.net/repository/public/")
-    }
-    maven {
-        url = uri("https://jitpack.io")
-    }
+    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
+    maven("https://maven.enginehub.org/repo/")
+
+    maven("https://repo.codemc.io/repository/maven-public/")
+    maven("https://repo.dmulloy2.net/repository/public/")
+    maven("https://jitpack.io")
 }
 
 dependencies {
@@ -79,6 +70,7 @@ bukkit {
     name = "DeathChest"
     main = "de.helixdevs.deathchest.DeathChestPlugin"
     apiVersion = "1.15"
+    website = "https://www.spigotmc.org/resources/death-chest.101066/"
     authors = listOf("CyntrixAlgorithm")
     softDepend = listOf("WorldGuard", "HolographicDisplays", "ProtocolLib", "DecentHolograms", "GriefPrevention")
     commands {
