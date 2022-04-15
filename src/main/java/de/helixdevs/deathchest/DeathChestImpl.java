@@ -58,6 +58,8 @@ public class DeathChestImpl implements DeathChest {
     private final Inventory inventory;
     private final long createdAt;
     private final long expireAt;
+    @Nullable
+    private final UUID player;
     private final Supplier<String> durationSupplier;
 
     private final List<BukkitTask> tasks = new LinkedList<>();
@@ -79,6 +81,7 @@ public class DeathChestImpl implements DeathChest {
 
         this.createdAt = builder.createdAt();
         this.expireAt = builder.expireAt();
+        this.player = builder.player().getUniqueId();
         this.durationSupplier = () -> {
             if (!isExpiring())
                 return DurationFormatUtils.formatDuration(0, builder.durationFormat());
@@ -91,7 +94,7 @@ public class DeathChestImpl implements DeathChest {
         // Creates inventory
         InventoryOptions inventoryOptions = builder.inventoryOptions();
         this.inventory = Bukkit.createInventory(new DeathChestHolder(this), inventoryOptions.size().getSize(stacks.length), inventoryOptions.title());
-        this.inventory.addItem(stacks);
+        this.inventory.setContents(stacks);
 
         // Creates hologram
         IHologramService hologramService = plugin.getHologramService();
@@ -398,6 +401,11 @@ public class DeathChestImpl implements DeathChest {
     @Override
     public @NotNull BlockState getState() {
         return this.state;
+    }
+
+    @Override
+    public @Nullable UUID getPlayer() {
+        return this.player;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package de.helixdevs.deathchest;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import de.helixdevs.deathchest.api.DeathChest;
 import de.helixdevs.deathchest.api.DeathChestService;
 import de.helixdevs.deathchest.api.animation.IAnimationService;
@@ -9,12 +10,14 @@ import de.helixdevs.deathchest.api.protection.IProtectionService;
 import de.helixdevs.deathchest.config.DeathChestConfig;
 import de.helixdevs.deathchest.config.NotificationOptions;
 import lombok.Getter;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -31,6 +34,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
+import java.util.function.Supplier;
 
 /**
  * This plugin will create chests on death and will destroy them in after a specific time.
@@ -53,6 +57,14 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
 
     @Override
     public void onDisable() {
+        // Save all chests
+        File savedChests = new File(getDataFolder(), "saved-chests.yml");
+        try {
+            saveChests(savedChests, this.deathChests);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         // Reset all death chests
         this.deathChests.forEach(deathChest -> {
             try {
@@ -62,6 +74,13 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
             }
         });
         this.deathChests.clear();
+    }
+
+    private void saveChests(File file, Collection<DeathChest> chests) throws IOException {
+        YamlConfiguration configuration = new YamlConfiguration();
+        List<Map<String, Object>> collect = chests.stream().map(DeathChest::serialize).collect((Supplier<List<Map<String, Object>>>) Lists::newArrayList, List::add, List::addAll);
+        configuration.set("chests", collect);
+        configuration.save(file);
     }
 
     @Override
@@ -78,10 +97,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
             }
         }
 
-        saveDefaultConfig();
-        reloadConfig();
-
-        this.deathChestConfig = DeathChestConfig.load(getConfig());
+        reload();
 
         this.hologramService = SupportServices.getHologramService(this, this.deathChestConfig.preferredHologramService());
         this.animationService = SupportServices.getAnimationService(this, this.deathChestConfig.preferredAnimationService());
@@ -99,6 +115,10 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
             deathChestCommand.setTabCompleter(this);
         }
 
+        File savedChests = new File(getDataFolder(), "saved-chests.yml");
+        int size = loadChests(savedChests).size();
+        getLogger().info(size + " death chests loaded.");
+
         if (this.deathChestConfig.updateChecker()) {
             UpdateChecker checker = new UpdateChecker(this, RESOURCE_ID);
             checker.getVersion(version -> {
@@ -113,10 +133,47 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         Metrics metrics = new Metrics(this, BSTATS_ID);
     }
 
+    private Collection<DeathChest> loadChests(File file) {
+        if (!file.isFile())
+            return Collections.emptyList();
+
+        YamlConfiguration configuration = YamlConfiguration.loadConfiguration(file);
+        List<?> chests = configuration.getList("chests");
+        if (chests == null)
+            return Collections.emptyList();
+
+        List<DeathChest> list = new ArrayList<>(chests.size());
+
+        for (Object chest : chests) {
+            if (!(chest instanceof Map<?, ?> map))
+                continue;
+
+            long expireAt = (long) map.get("expireAt");
+            if (expireAt <= System.currentTimeMillis()) // Expire here
+                continue;
+
+            Location location = (Location) map.get("location");
+            if (location == null)
+                continue;
+
+            long createdAt = (long) map.get("createdAt");
+            String player = (String) map.get("player");
+            UUID playerId = player == null ? null : UUID.fromString(player);
+
+            List<ItemStack> stacks = (List<ItemStack>) map.get("items");
+            if (stacks == null)
+                continue;
+
+            list.add(createDeathChest(location, createdAt, expireAt, playerId == null ? null : Bukkit.getOfflinePlayer(playerId), stacks.toArray(ItemStack[]::new)));
+        }
+        return list;
+    }
+
     /**
      * Reloads the configuration file of the plugin
      */
     public void reload() {
+        saveDefaultConfig();
         reloadConfig();
         this.deathChestConfig = DeathChestConfig.load(getConfig());
     }
@@ -182,7 +239,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
             expireAt = -1; // Permanent
         }
 
-        DeathChest chest = createDeathChest(deathLocation.getBlock().getLocation(), createdAt, expireAt, player, event.getDrops().toArray(new ItemStack[0]));
+        createDeathChest(deathLocation.getBlock().getLocation(), createdAt, expireAt, player, event.getDrops().toArray(new ItemStack[0]));
 
         NotificationOptions notificationOptions = deathChestConfig.notificationOptions();
 
