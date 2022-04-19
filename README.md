@@ -1,4 +1,6 @@
-# death-chest
+# Death Chest
+[![MIT License](https://img.shields.io/github/license/DevCyntrix/death-chest)](LICENSE)
+[![Discord](https://img.shields.io/discord/899027136046841958?label=Discord)](https://discord.gg/SdDeWUB8F6)
 
 A spigot plugin for spawning a chest when the player dies. It supports Holographic Displays, Decent Holograms,
 ProtocolLib, WorldGuard, GriefPrevention and PlotSquared for additional features
