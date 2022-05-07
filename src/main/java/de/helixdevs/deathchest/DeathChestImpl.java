@@ -67,6 +67,8 @@ public class DeathChestImpl implements DeathChest {
     private IHologram hologram;
     private StrSubstitutor substitutor;
 
+    private boolean closed;
+
     public DeathChestImpl(@NotNull Location location, @NotNull DeathChestBuilder builder) {
         this.location = location;
         if (location.getWorld() == null)
@@ -372,12 +374,14 @@ public class DeathChestImpl implements DeathChest {
         close();
     }
 
-
     /**
      * Destroys the chest, deletes the hologram, cancels the update scheduler and unregister all events for the death chest.
      */
     @Override
     public void close() {
+        if (closed)
+            return;
+        closed = true;
         if (this.inventory != null) {
             LinkedList<HumanEntity> humanEntities = new LinkedList<>(inventory.getViewers()); // Copies the list to avoid a concurrent modification exception
             humanEntities.forEach(HumanEntity::closeInventory);

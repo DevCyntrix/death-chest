@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "de.helixdevs"
-version = "1.4.0"
+version = "1.4.1"
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(17))
@@ -39,7 +39,7 @@ dependencies {
     api("com.gmail.filoghost.holographicdisplays:holographicdisplays-api:2.4.9")
 
     implementation("org.jetbrains:annotations:23.0.0")
-    compileOnly("org.projectlombok:lombok:1.18.22")
+    compileOnly("org.projectlombok:lombok:1.18.24")
     annotationProcessor("org.projectlombok:lombok:1.18.22")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
