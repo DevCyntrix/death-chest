@@ -10,8 +10,8 @@ import de.helixdevs.deathchest.config.HologramOptions;
 import de.helixdevs.deathchest.config.InventoryOptions;
 import de.helixdevs.deathchest.config.ParticleOptions;
 import lombok.Getter;
-import org.apache.commons.lang.text.StrSubstitutor;
-import org.apache.commons.lang.time.DurationFormatUtils;
+import org.apache.commons.lang3.time.DurationFormatUtils;
+import org.apache.commons.text.StringSubstitutor;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -65,7 +65,7 @@ public class DeathChestImpl implements DeathChest {
     private final List<BukkitTask> tasks = new LinkedList<>();
 
     private IHologram hologram;
-    private StrSubstitutor substitutor;
+    private StringSubstitutor substitutor;
 
     private boolean closed;
 
@@ -105,7 +105,7 @@ public class DeathChestImpl implements DeathChest {
             this.hologram = hologramService.spawnHologram(getLocation().clone().add(0.5, hologramOptions.height(), 0.5));
 
             Map<String, IHologramTextLine> map = new LinkedHashMap<>(hologramOptions.lines().size());
-            substitutor = new StrSubstitutor(new PlayerStrLookup(builder.player(), durationSupplier));
+            substitutor = new StringSubstitutor(new PlayerStringLookup(builder.player(), durationSupplier));
             hologramOptions.lines()
                     .forEach(line -> map.put(line, hologram.appendLine(substitutor.replace(line))));
 

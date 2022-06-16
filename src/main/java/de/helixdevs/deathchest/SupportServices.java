@@ -7,10 +7,7 @@ import de.helixdevs.deathchest.support.animation.ProtocolLibAnimation;
 import de.helixdevs.deathchest.support.hologram.decentholograms.DHService;
 import de.helixdevs.deathchest.support.hologram.holograms.HologramsService;
 import de.helixdevs.deathchest.support.hologram.holographicdisplays.HDService;
-import de.helixdevs.deathchest.support.protection.CombinedProtectionService;
-import de.helixdevs.deathchest.support.protection.GriefPreventionProtection;
-import de.helixdevs.deathchest.support.protection.PlotSquaredProtection;
-import de.helixdevs.deathchest.support.protection.WorldGuardProtection;
+import de.helixdevs.deathchest.support.protection.*;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
@@ -34,7 +31,8 @@ public final class SupportServices {
     private static final Map<String, Function<Plugin, IProtectionService>> protectionServiceMap = Map.of(
             "WorldGuard", plugin -> new WorldGuardProtection(),
             "PlotSquared", plugin -> new PlotSquaredProtection(),
-            "GriefPrevention", plugin -> new GriefPreventionProtection()
+            "GriefPrevention", plugin -> new GriefPreventionProtection(),
+            "RedProtect", plugin -> new RedProtection()
     );
 
     public static @Nullable IHologramService getHologramService(@NotNull Plugin plugin, @Nullable String preferred) {

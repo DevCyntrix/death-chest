@@ -2,10 +2,11 @@ plugins {
     `java-library`
     id("xyz.jpenilla.run-paper") version "1.0.6"
     id("net.minecrell.plugin-yml.bukkit") version "0.5.1"
+    id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
 group = "de.helixdevs"
-version = "1.4.1"
+version = "1.4.2"
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(17))
@@ -18,17 +19,21 @@ repositories {
 
     maven("https://repo.codemc.io/repository/maven-public/")
     maven("https://repo.dmulloy2.net/repository/public/")
+    maven("https://raw.githubusercontent.com/FabioZumbi12/RedProtect/mvn-repo/")
     maven("https://jitpack.io")
 }
 
 dependencies {
-    api("org.spigotmc:spigot-api:1.18.2-R0.1-SNAPSHOT")
+    api("org.spigotmc:spigot-api:1.19-R0.1-SNAPSHOT")
 
     // Protection Support
     api("com.sk89q.worldguard:worldguard-bukkit:7.0.7")
-    api("com.plotsquared:PlotSquared-Core:6.6.1")
-    api("com.plotsquared:PlotSquared-Bukkit:6.6.1") { isTransitive = false }
+    api("com.plotsquared:PlotSquared-Core:6.8.1")
+    api("com.plotsquared:PlotSquared-Bukkit:6.8.1") { isTransitive = false }
     api("com.github.TechFortress:GriefPrevention:16.18")
+    api("br.net.fabiozumbi12.RedProtect:RedProtect-Core:7.7.3") { isTransitive = false }
+    api("br.net.fabiozumbi12.RedProtect:RedProtect-Spigot:7.7.3") { isTransitive = false }
+
 
     // Animation Support
     api("com.comphenix.protocol:ProtocolLib:4.7.0")
@@ -38,6 +43,8 @@ dependencies {
     api("com.github.decentsoftware-eu:decentholograms:2.3.1")
     api("com.gmail.filoghost.holographicdisplays:holographicdisplays-api:2.4.9")
 
+
+    implementation("org.apache.commons:commons-text:1.9")
     implementation("org.jetbrains:annotations:23.0.0")
     compileOnly("org.projectlombok:lombok:1.18.24")
     annotationProcessor("org.projectlombok:lombok:1.18.22")
@@ -46,14 +53,13 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }
 
-tasks.getByName<Test>("test") {
-    useJUnitPlatform()
-}
-
 tasks {
     compileJava {
         options.encoding = Charsets.UTF_8.name()
         options.release.set(17)
+    }
+    shadowJar {
+        relocate("org.apache", "de.helixdevs.deathchest.lib.org.apache")
     }
     javadoc {
         options.encoding = Charsets.UTF_8.name()
@@ -62,7 +68,10 @@ tasks {
         filteringCharset = Charsets.UTF_8.name()
     }
     runServer {
-        minecraftVersion("1.18.2")
+        minecraftVersion("1.19")
+    }
+    test {
+        useJUnitPlatform()
     }
 }
 
