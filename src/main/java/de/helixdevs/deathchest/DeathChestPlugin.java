@@ -10,6 +10,7 @@ import de.helixdevs.deathchest.api.protection.IProtectionService;
 import de.helixdevs.deathchest.config.DeathChestConfig;
 import de.helixdevs.deathchest.config.NotificationOptions;
 import lombok.Getter;
+import org.apache.commons.text.StringSubstitutor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -244,7 +245,13 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         NotificationOptions notificationOptions = deathChestConfig.notificationOptions();
 
         if (notificationOptions != null && notificationOptions.enabled() && notificationOptions.messages() != null) {
-            player.sendMessage(notificationOptions.messages());
+            StringSubstitutor substitutor = new StringSubstitutor(Map.of(
+                    "x", deathLocation.getBlockX(),
+                    "y", deathLocation.getBlockY(),
+                    "z", deathLocation.getBlockZ()));
+            for (String message : notificationOptions.messages()) {
+                player.sendMessage(substitutor.replace(message));
+            }
         }
 
         // Clears the drops

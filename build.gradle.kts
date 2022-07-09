@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "de.helixdevs"
-version = "1.4.2"
+version = "1.4.3"
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(17))
@@ -24,7 +24,7 @@ repositories {
 }
 
 dependencies {
-    api("org.spigotmc:spigot-api:1.19-R0.1-SNAPSHOT")
+    api("org.spigotmc:spigot-api:1.18-R0.1-SNAPSHOT")
 
     // Protection Support
     api("com.sk89q.worldguard:worldguard-bukkit:7.0.7")
@@ -78,7 +78,7 @@ tasks {
 bukkit {
     name = "DeathChest"
     main = "de.helixdevs.deathchest.DeathChestPlugin"
-    apiVersion = "1.15"
+    apiVersion = "1.18"
     website = "https://www.spigotmc.org/resources/death-chest.101066/"
     authors = listOf("CyntrixAlgorithm")
     softDepend = listOf("WorldGuard", "HolographicDisplays", "ProtocolLib", "DecentHolograms", "GriefPrevention")

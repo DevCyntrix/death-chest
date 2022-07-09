@@ -58,7 +58,8 @@ break-effect:
 # This section is for handling the notification function in this plugin. You can remove this section to disable the feature,
 # or you set the 'enabled' option to false.
 # This feature sends a message to the dead player. Here you can inform the player about the chest and their expiration.
+# You can send the death coordination by using the placeholders: ${x} ${y} and ${z}
 notify:
   enabled: true
   message: |-
-    &7You died. Your items were put into a chest which disappears after &c10 minutes&7!
+    &7You died. Your items were put into a chest which disappears after &c10 minutes&7! ${x} ${y} ${z}
