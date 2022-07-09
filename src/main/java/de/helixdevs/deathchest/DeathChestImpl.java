@@ -387,7 +387,7 @@ public class DeathChestImpl implements DeathChest {
             humanEntities.forEach(HumanEntity::closeInventory);
         }
         Block block = getLocation().getBlock();
-        block.setType(Material.AIR);
+        Bukkit.getScheduler().runTask(plugin, () -> block.setType(Material.AIR));
         getWorld().spawnParticle(Particle.BLOCK_CRACK, getLocation().clone().add(0.5, 0.5, 0.5), 10, block.getBlockData());
 
         if (this.hologram != null) {

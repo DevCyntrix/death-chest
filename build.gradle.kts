@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "de.helixdevs"
-version = "1.4.3"
+version = "1.4.4"
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(17))
@@ -24,24 +24,24 @@ repositories {
 }
 
 dependencies {
-    api("org.spigotmc:spigot-api:1.18-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.18-R0.1-SNAPSHOT")
 
     // Protection Support
-    api("com.sk89q.worldguard:worldguard-bukkit:7.0.7")
-    api("com.plotsquared:PlotSquared-Core:6.8.1")
-    api("com.plotsquared:PlotSquared-Bukkit:6.8.1") { isTransitive = false }
-    api("com.github.TechFortress:GriefPrevention:16.18")
-    api("br.net.fabiozumbi12.RedProtect:RedProtect-Core:7.7.3") { isTransitive = false }
-    api("br.net.fabiozumbi12.RedProtect:RedProtect-Spigot:7.7.3") { isTransitive = false }
+    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.7")
+    compileOnly("com.plotsquared:PlotSquared-Core:6.8.1")
+    compileOnly("com.plotsquared:PlotSquared-Bukkit:6.8.1") { isTransitive = false }
+    compileOnly("com.github.TechFortress:GriefPrevention:16.18")
+    compileOnly("br.net.fabiozumbi12.RedProtect:RedProtect-Core:7.7.3") { isTransitive = false }
+    compileOnly("br.net.fabiozumbi12.RedProtect:RedProtect-Spigot:7.7.3") { isTransitive = false }
 
 
     // Animation Support
-    api("com.comphenix.protocol:ProtocolLib:4.7.0")
+    compileOnly("com.comphenix.protocol:ProtocolLib:4.7.0")
 
     // Hologram Support
-    api("com.github.sainttx.Holograms:holograms-api:0f5b027")
-    api("com.github.decentsoftware-eu:decentholograms:2.3.1")
-    api("com.gmail.filoghost.holographicdisplays:holographicdisplays-api:2.4.9")
+    compileOnly("com.github.sainttx.Holograms:holograms-api:0f5b027")
+    compileOnly("com.github.decentsoftware-eu:decentholograms:2.3.1")
+    compileOnly("com.gmail.filoghost.holographicdisplays:holographicdisplays-api:2.4.9")
 
 
     implementation("org.apache.commons:commons-text:1.9")
