@@ -88,6 +88,8 @@ public class DeathChestImpl implements DeathChest {
             if (!isExpiring())
                 return DurationFormatUtils.formatDuration(0, builder.durationFormat());
             long duration = expireAt - System.currentTimeMillis();
+            if (duration <= 0)
+                duration = 0;
             return DurationFormatUtils.formatDuration(duration, builder.durationFormat());
         };
 
