@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 
 public class ProtocolLibAnimation implements IAnimationService {
@@ -20,7 +21,7 @@ public class ProtocolLibAnimation implements IAnimationService {
     public void spawnBlockBreakAnimation(@NotNull Vector location, @Range(from = 0, to = 9) byte state, @NotNull Stream<Player> players) {
         ProtocolManager manager = ProtocolLibrary.getProtocolManager();
         PacketContainer packet = manager.createPacket(PacketType.Play.Server.BLOCK_BREAK_ANIMATION);
-        packet.getIntegers().write(0, 0);
+        packet.getIntegers().write(0, ThreadLocalRandom.current().nextInt(Integer.MAX_VALUE));
         packet.getBlockPositionModifier().write(0, new BlockPosition(location));
         packet.getIntegers().write(1, (int) state);
 

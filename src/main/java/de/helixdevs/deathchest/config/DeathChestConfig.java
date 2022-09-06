@@ -14,11 +14,12 @@ public record DeathChestConfig(int configVersion,
                                @Nullable HologramOptions hologramOptions,
                                @Nullable ParticleOptions particleOptions,
                                @Nullable BreakEffectOptions breakEffectOptions,
-                               @Nullable NotificationOptions notificationOptions,
+                               @Nullable PlayerNotificationOptions playerNotificationOptions,
+                               @Nullable GlobalNotificationOptions globalNotificationOptions,
                                @Nullable String preferredHologramService,
                                @Nullable String preferredAnimationService) {
 
-    public static final int CONFIG_VERSION = 1;
+    public static final int CONFIG_VERSION = 2;
 
     public static DeathChestConfig load(FileConfiguration config) {
         int configVersion = config.getInt("config-version");
@@ -49,7 +50,8 @@ public record DeathChestConfig(int configVersion,
         BreakEffectOptions breakEffectOptions = BreakEffectOptions.load(config.getConfigurationSection("break-effect"));
 
         // Notification
-        NotificationOptions notificationOptions = NotificationOptions.load(config.getConfigurationSection("notify"));
+        PlayerNotificationOptions playerNotificationOptions = PlayerNotificationOptions.load(config.getConfigurationSection("player-notification"));
+        GlobalNotificationOptions globalNotificationOptions = GlobalNotificationOptions.load(config.getConfigurationSection("global-notification"));
 
         String preferredHologramService = config.getString("preferred-hologram-service");
         String preferredAnimationService = config.getString("preferred-animation-service");
@@ -63,7 +65,8 @@ public record DeathChestConfig(int configVersion,
                 hologramOptions,
                 particleOptions,
                 breakEffectOptions,
-                notificationOptions,
+                playerNotificationOptions,
+                globalNotificationOptions,
                 preferredHologramService,
                 preferredAnimationService);
     }

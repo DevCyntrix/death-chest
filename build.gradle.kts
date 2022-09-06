@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "de.helixdevs"
-version = "1.4.4"
+version = "1.5.0"
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(17))
@@ -20,6 +20,7 @@ repositories {
     maven("https://repo.codemc.io/repository/maven-public/")
     maven("https://repo.dmulloy2.net/repository/public/")
     maven("https://raw.githubusercontent.com/FabioZumbi12/RedProtect/mvn-repo/")
+    maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
     maven("https://jitpack.io")
 }
 
@@ -40,9 +41,11 @@ dependencies {
 
     // Hologram Support
     compileOnly("com.github.sainttx.Holograms:holograms-api:0f5b027")
-    compileOnly("com.github.decentsoftware-eu:decentholograms:2.3.1")
+    compileOnly("com.github.decentsoftware-eu:decentholograms:2.5.2")
     compileOnly("com.gmail.filoghost.holographicdisplays:holographicdisplays-api:2.4.9")
 
+    // Placeholder API
+    compileOnly("me.clip:placeholderapi:2.11.2")
 
     implementation("org.apache.commons:commons-text:1.9")
     implementation("org.jetbrains:annotations:23.0.0")
@@ -81,7 +84,14 @@ bukkit {
     apiVersion = "1.18"
     website = "https://www.spigotmc.org/resources/death-chest.101066/"
     authors = listOf("CyntrixAlgorithm")
-    softDepend = listOf("WorldGuard", "HolographicDisplays", "ProtocolLib", "DecentHolograms", "GriefPrevention")
+    softDepend = listOf(
+        "WorldGuard",
+        "HolographicDisplays",
+        "ProtocolLib",
+        "DecentHolograms",
+        "GriefPrevention",
+        "PlaceholderAPI"
+    )
     commands {
         register("deathchest") {
             description = "The admin command for reloading the plugin's configuration"

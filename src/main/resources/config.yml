@@ -4,7 +4,7 @@
 #
 
 # Do not touch this!
-config-version: 1
+config-version: 2
 
 # I recommend leaving this on true to receive notification when I have performance improvements.
 update-checker: true
@@ -59,7 +59,12 @@ break-effect:
 # or you set the 'enabled' option to false.
 # This feature sends a message to the dead player. Here you can inform the player about the chest and their expiration.
 # You can send the death coordination by using the placeholders: ${x} ${y} and ${z}
-notify:
+player-notification:
   enabled: true
   message: |-
     &7You died. Your items were put into a chest which disappears after &c10 minutes&7! ${x} ${y} ${z}
+
+global-notification:
+  enabled: true
+  message: |-
+    &7Test

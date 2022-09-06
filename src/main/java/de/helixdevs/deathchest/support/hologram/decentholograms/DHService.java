@@ -22,7 +22,7 @@ public class DHService implements IHologramService {
 
     @Override
     public @NotNull IHologram spawnHologram(@NotNull Location location) {
-        plugin.getLogger().info("Spawning hologram with decent holograms");
+        plugin.getLogger().info("Spawning holograms with DecentHolograms");
         Hologram hologram = DHAPI.createHologram(UUID.randomUUID().toString(), location, false);
         return new DHHologram(this, hologram);
     }

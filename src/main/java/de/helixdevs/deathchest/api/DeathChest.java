@@ -1,6 +1,7 @@
 package de.helixdevs.deathchest.api;
 
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.BlockState;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
@@ -13,7 +14,6 @@ import java.io.Closeable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
 
 public interface DeathChest extends Listener, Closeable, ConfigurationSerializable {
 
@@ -27,7 +27,7 @@ public interface DeathChest extends Listener, Closeable, ConfigurationSerializab
 
     @NotNull Inventory getInventory();
 
-    @Nullable UUID getPlayer();
+    @Nullable OfflinePlayer getPlayer();
 
     long getCreatedAt();
 
@@ -43,7 +43,7 @@ public interface DeathChest extends Listener, Closeable, ConfigurationSerializab
         map.put("createdAt", getCreatedAt());
         map.put("expireAt", getExpireAt());
         if (getPlayer() != null)
-            map.put("player", getPlayer().toString());
+            map.put("player", getPlayer().getUniqueId().toString());
         map.put("items", getInventory().getContents());
         return map;
     }

@@ -10,6 +10,7 @@ import de.helixdevs.deathchest.config.HologramOptions;
 import de.helixdevs.deathchest.config.InventoryOptions;
 import de.helixdevs.deathchest.config.ParticleOptions;
 import lombok.Getter;
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.bukkit.*;
@@ -59,7 +60,7 @@ public class DeathChestImpl implements DeathChest {
     private final long createdAt;
     private final long expireAt;
     @Nullable
-    private final UUID player;
+    private final OfflinePlayer player;
     private final Supplier<String> durationSupplier;
 
     private final List<BukkitTask> tasks = new LinkedList<>();
@@ -83,7 +84,7 @@ public class DeathChestImpl implements DeathChest {
 
         this.createdAt = builder.createdAt();
         this.expireAt = builder.expireAt();
-        this.player = builder.player().getUniqueId();
+        this.player = builder.player();
         this.durationSupplier = () -> {
             if (!isExpiring())
                 return DurationFormatUtils.formatDuration(0, builder.durationFormat());
@@ -106,14 +107,14 @@ public class DeathChestImpl implements DeathChest {
         if (hologramService != null && hologramOptions != null && hologramOptions.enabled()) {
             this.hologram = hologramService.spawnHologram(getLocation().clone().add(0.5, hologramOptions.height(), 0.5));
 
-            Map<String, IHologramTextLine> map = new LinkedHashMap<>(hologramOptions.lines().size());
+            Map<String, IHologramTextLine> blueprints = new LinkedHashMap<>(hologramOptions.lines().size());
             substitutor = new StringSubstitutor(new PlayerStringLookup(builder.player(), durationSupplier));
             hologramOptions.lines()
-                    .forEach(line -> map.put(line, hologram.appendLine(substitutor.replace(line))));
+                    .forEach(line -> blueprints.put(line, hologram.appendLine(substitutor.replace(line)))); // A map of blueprints
 
             // Start task
-            if (!map.isEmpty()) {
-                this.tasks.add(runHologramUpdateTask(map));
+            if (!blueprints.isEmpty()) {
+                this.tasks.add(runHologramUpdateTask(blueprints));
             }
         }
 
@@ -135,15 +136,17 @@ public class DeathChestImpl implements DeathChest {
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
-    private BukkitTask runHologramUpdateTask(Map<String, IHologramTextLine> map) {
+    private BukkitTask runHologramUpdateTask(Map<String, IHologramTextLine> blueprints) {
         return new BukkitRunnable() {
 
             @Override
             public void run() {
                 // Updates the hologram lines
-                map.forEach((s, line) -> {
+                blueprints.forEach((s, line) -> {
                     if (substitutor != null)
                         s = substitutor.replace(s);
+                    if (plugin.isPlaceholderAPIEnabled())
+                        s = PlaceholderAPI.setPlaceholders(player, s);
                     line.rename(s);
                 });
             }
@@ -199,7 +202,7 @@ public class DeathChestImpl implements DeathChest {
                 if (isExpiring()) {
                     long duration = expireAt - System.currentTimeMillis();
                     if (duration < 0) {
-                        close();
+                        Bukkit.getScheduler().runTask(plugin, () -> close());
 
                         // Reset animation
                         if (animationService != null) {
@@ -389,7 +392,7 @@ public class DeathChestImpl implements DeathChest {
             humanEntities.forEach(HumanEntity::closeInventory);
         }
         Block block = getLocation().getBlock();
-        Bukkit.getScheduler().runTask(plugin, () -> block.setType(Material.AIR));
+        block.setType(Material.AIR);
         getWorld().spawnParticle(Particle.BLOCK_CRACK, getLocation().clone().add(0.5, 0.5, 0.5), 10, block.getBlockData());
 
         if (this.hologram != null) {
@@ -410,7 +413,7 @@ public class DeathChestImpl implements DeathChest {
     }
 
     @Override
-    public @Nullable UUID getPlayer() {
+    public @Nullable OfflinePlayer getPlayer() {
         return this.player;
     }
 
