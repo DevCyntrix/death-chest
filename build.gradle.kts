@@ -47,8 +47,9 @@ dependencies {
     // Placeholder API
     compileOnly("me.clip:placeholderapi:2.11.2")
 
-    implementation("org.apache.commons:commons-text:1.9")
-    implementation("org.jetbrains:annotations:23.0.0")
+    compileOnly("org.apache.commons:commons-text:1.9")
+    compileOnly("org.jetbrains:annotations:23.0.0")
+
     compileOnly("org.projectlombok:lombok:1.18.24")
     annotationProcessor("org.projectlombok:lombok:1.18.22")
 
@@ -91,6 +92,10 @@ bukkit {
         "DecentHolograms",
         "GriefPrevention",
         "PlaceholderAPI"
+    )
+    libraries = listOf(
+        "org.apache.commons:commons-text:1.9",
+        "org.jetbrains:annotations:23.0.0"
     )
     commands {
         register("deathchest") {
