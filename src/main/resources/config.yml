@@ -64,7 +64,13 @@ player-notification:
   message: |-
     &7You died. Your items were put into a chest which disappears after &c10 minutes&7! ${x} ${y} ${z}
 
+# ${player_name}, ${player_displayname} ${x} ${y} and ${z}
 global-notification:
-  enabled: true
+  enabled: false
   message: |-
     &7Test
+
+world-filter:
+  filter: whitelist
+  worlds:
+    - disabled_world

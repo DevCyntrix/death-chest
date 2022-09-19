@@ -46,7 +46,7 @@ dependencies {
 
     // Placeholder API
     compileOnly("me.clip:placeholderapi:2.11.2")
-
+    //implementation("com.github.MP-MC:Canvas:941db8c981")
     compileOnly("org.apache.commons:commons-text:1.9")
     compileOnly("org.jetbrains:annotations:23.0.0")
 

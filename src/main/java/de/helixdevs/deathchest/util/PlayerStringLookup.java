@@ -1,4 +1,4 @@
-package de.helixdevs.deathchest;
+package de.helixdevs.deathchest.util;
 
 import org.apache.commons.text.lookup.StringLookup;
 import org.bukkit.OfflinePlayer;

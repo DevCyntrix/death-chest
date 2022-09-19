@@ -1,5 +1,6 @@
-package de.helixdevs.deathchest;
+package de.helixdevs.deathchest.listener;
 
+import de.helixdevs.deathchest.DeathChestPlugin;
 import de.helixdevs.deathchest.config.DeathChestConfig;
 import de.helixdevs.deathchest.config.GlobalNotificationOptions;
 import de.helixdevs.deathchest.config.PlayerNotificationOptions;
@@ -43,6 +44,9 @@ public class SpawnChestListener implements Listener {
         Player player = event.getEntity();
         Location deathLocation = player.getLocation();
 
+        if (!plugin.getDeathChestConfig().worldFilterConfig().test(deathLocation.getWorld()))
+            return;
+
         // fell into void
         if (deathLocation.getBlockY() <= player.getWorld().getMinHeight())
             return;
@@ -66,7 +70,14 @@ public class SpawnChestListener implements Listener {
             expireAt = -1; // Permanent
         }
 
-        plugin.createDeathChest(deathLocation.getBlock().getLocation(), createdAt, expireAt, player, event.getDrops().toArray(new ItemStack[0]));
+        try {
+            plugin.createDeathChest(deathLocation.getBlock().getLocation(), createdAt, expireAt, player, event.getDrops().toArray(new ItemStack[0]));
+
+            // Clears the drops
+            event.getDrops().clear();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // Player notification
         PlayerNotificationOptions playerNotificationOptions = deathChestConfig.playerNotificationOptions();
@@ -106,8 +117,6 @@ public class SpawnChestListener implements Listener {
         }
 
 
-        // Clears the drops
-        event.getDrops().clear();
     }
 
 }

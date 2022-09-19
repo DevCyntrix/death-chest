@@ -16,6 +16,7 @@ public record DeathChestConfig(int configVersion,
                                @Nullable BreakEffectOptions breakEffectOptions,
                                @Nullable PlayerNotificationOptions playerNotificationOptions,
                                @Nullable GlobalNotificationOptions globalNotificationOptions,
+                               @NotNull WorldFilterConfig worldFilterConfig,
                                @Nullable String preferredHologramService,
                                @Nullable String preferredAnimationService) {
 
@@ -53,6 +54,8 @@ public record DeathChestConfig(int configVersion,
         PlayerNotificationOptions playerNotificationOptions = PlayerNotificationOptions.load(config.getConfigurationSection("player-notification"));
         GlobalNotificationOptions globalNotificationOptions = GlobalNotificationOptions.load(config.getConfigurationSection("global-notification"));
 
+        WorldFilterConfig worldFilterConfig = WorldFilterConfig.load(config.getConfigurationSection("world-filter"));
+
         String preferredHologramService = config.getString("preferred-hologram-service");
         String preferredAnimationService = config.getString("preferred-animation-service");
 
@@ -67,6 +70,7 @@ public record DeathChestConfig(int configVersion,
                 breakEffectOptions,
                 playerNotificationOptions,
                 globalNotificationOptions,
+                worldFilterConfig,
                 preferredHologramService,
                 preferredAnimationService);
     }

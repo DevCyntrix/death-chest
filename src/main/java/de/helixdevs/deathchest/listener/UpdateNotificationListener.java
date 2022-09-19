@@ -1,5 +1,6 @@
-package de.helixdevs.deathchest;
+package de.helixdevs.deathchest.listener;
 
+import de.helixdevs.deathchest.DeathChestPlugin;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

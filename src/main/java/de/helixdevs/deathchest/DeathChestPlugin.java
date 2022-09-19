@@ -6,7 +6,12 @@ import de.helixdevs.deathchest.api.DeathChestService;
 import de.helixdevs.deathchest.api.animation.IAnimationService;
 import de.helixdevs.deathchest.api.hologram.IHologramService;
 import de.helixdevs.deathchest.api.protection.IProtectionService;
+import de.helixdevs.deathchest.command.DeathChestCommand;
 import de.helixdevs.deathchest.config.DeathChestConfig;
+import de.helixdevs.deathchest.listener.SpawnChestListener;
+import de.helixdevs.deathchest.listener.UpdateNotificationListener;
+import de.helixdevs.deathchest.util.Metrics;
+import de.helixdevs.deathchest.util.UpdateChecker;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -95,6 +100,8 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
 
         getServer().getPluginManager().registerEvents(new UpdateNotificationListener(this), this);
         getServer().getPluginManager().registerEvents(new SpawnChestListener(this), this);
+        //getServer().getPluginManager().registerEvents(new MenuFunctionListener(), this);
+
         getServer().getServicesManager().register(DeathChestService.class, this, this, ServicePriority.Normal);
 
         PluginCommand deathChestCommand = getCommand("deathchest");

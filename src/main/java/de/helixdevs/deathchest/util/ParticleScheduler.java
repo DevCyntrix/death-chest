@@ -1,4 +1,4 @@
-package de.helixdevs.deathchest;
+package de.helixdevs.deathchest.util;
 
 import org.bukkit.Location;
 import org.bukkit.scheduler.BukkitRunnable;

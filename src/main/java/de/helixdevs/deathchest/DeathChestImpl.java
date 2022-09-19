@@ -9,6 +9,8 @@ import de.helixdevs.deathchest.config.BreakEffectOptions;
 import de.helixdevs.deathchest.config.HologramOptions;
 import de.helixdevs.deathchest.config.InventoryOptions;
 import de.helixdevs.deathchest.config.ParticleOptions;
+import de.helixdevs.deathchest.util.ParticleScheduler;
+import de.helixdevs.deathchest.util.PlayerStringLookup;
 import lombok.Getter;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.apache.commons.lang3.time.DurationFormatUtils;
@@ -241,7 +243,9 @@ public class DeathChestImpl implements DeathChest {
         DeathChest chest = holder.getChest();
         BlockState state = chest.getState();
 
-        if (state instanceof Lidded lidded) {
+        HumanEntity human = event.getPlayer();
+
+        if (state instanceof Lidded lidded && human.getGameMode() != GameMode.SPECTATOR) {
             lidded.close();
         }
 
@@ -274,7 +278,7 @@ public class DeathChestImpl implements DeathChest {
             return;
         event.setCancelled(true);
 
-        if (block.getState() instanceof Lidded lidded) {
+        if (block.getState() instanceof Lidded lidded && player.getGameMode() != GameMode.SPECTATOR) {
             lidded.open();
         }
 
