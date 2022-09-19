@@ -71,6 +71,6 @@ global-notification:
     &7Test
 
 world-filter:
-  filter: whitelist
+  filter: blacklist
   worlds:
     - disabled_world

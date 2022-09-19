@@ -62,9 +62,6 @@ tasks {
         options.encoding = Charsets.UTF_8.name()
         options.release.set(17)
     }
-    shadowJar {
-        relocate("org.apache", "de.helixdevs.deathchest.lib.org.apache")
-    }
     javadoc {
         options.encoding = Charsets.UTF_8.name()
     }
