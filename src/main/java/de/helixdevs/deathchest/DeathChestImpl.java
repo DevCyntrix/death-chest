@@ -354,6 +354,8 @@ public class DeathChestImpl implements DeathChest {
      */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onBlockExplode(BlockExplodeEvent event) {
+        if (plugin.getDeathChestConfig().blastProtection())
+            return;
         if (!event.blockList().removeIf(block -> block.getLocation().equals(getLocation())))
             return;
 
@@ -372,6 +374,8 @@ public class DeathChestImpl implements DeathChest {
      */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onBlockExplode(EntityExplodeEvent event) {
+        if (plugin.getDeathChestConfig().blastProtection())
+            return;
         if (!event.blockList().removeIf(block -> block.getLocation().equals(getLocation())))
             return;
 

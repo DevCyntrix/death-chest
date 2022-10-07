@@ -64,13 +64,18 @@ player-notification:
   message: |-
     &7You died. Your items were put into a chest which disappears after &c10 minutes&7! ${x} ${y} ${z}
 
-# ${player_name}, ${player_displayname} ${x} ${y} and ${z}
+# ${player_name}, ${player_displayname} ${x}, ${y}, ${z}, ${world}
 global-notification:
   enabled: false
   message: |-
-    &7Test
+    &7${player_name} dies at ${x} ${y} ${z} in ${world}
 
+# This section configures the activation of this plugin for specific worlds.
 world-filter:
+  # Possible values: blacklist, whitelist
   filter: blacklist
   worlds:
     - disabled_world
+
+# Set this option to true if you don't want explosions to be able to destroy the death chests.
+blast-protection: false
