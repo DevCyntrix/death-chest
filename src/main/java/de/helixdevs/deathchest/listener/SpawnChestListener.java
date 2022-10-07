@@ -103,6 +103,7 @@ public class SpawnChestListener implements Listener {
                     "x", deathLocation.getBlockX(),
                     "y", deathLocation.getBlockY(),
                     "z", deathLocation.getBlockZ(),
+                    "world", deathLocation.getWorld().getName(),
                     "player_name", player.getName(),
                     "player_displayname", player.getDisplayName()));
 
