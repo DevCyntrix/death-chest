@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.function.Supplier;
 
 /**
@@ -41,7 +42,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
     public static final int RESOURCE_ID = 101066;
     public static final int BSTATS_ID = 14866;
 
-    protected final Set<DeathChest> deathChests = new HashSet<>();
+    protected final Set<DeathChest> deathChests = new CopyOnWriteArraySet<>();
 
     private DeathChestConfig deathChestConfig;
 
@@ -257,5 +258,9 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
     @Override
     public @NotNull IProtectionService getProtectionService() {
         return protectionService;
+    }
+
+    public String getPrefix() {
+        return "§cᴅᴇᴀᴛʜ ᴄʜᴇꜱᴛ §8︳ §r";
     }
 }
