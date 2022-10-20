@@ -12,6 +12,7 @@ import de.helixdevs.deathchest.listener.SpawnChestListener;
 import de.helixdevs.deathchest.listener.UpdateNotificationListener;
 import de.helixdevs.deathchest.util.Metrics;
 import de.helixdevs.deathchest.util.UpdateChecker;
+import de.helixdevs.deathchest.util.WorldGuardDeathChestFlag;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -74,6 +75,11 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
     }
 
     @Override
+    public void onLoad() {
+        WorldGuardDeathChestFlag.register();
+    }
+
+    @Override
     public void onEnable() {
         placeholderAPIEnabled = Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI");
 
@@ -114,6 +120,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         File savedChests = new File(getDataFolder(), "saved-chests.yml");
         int size = loadChests(savedChests).size();
         getLogger().info(size + " death chests loaded.");
+
 
         if (this.deathChestConfig.updateChecker()) {
             UpdateChecker checker = new UpdateChecker(this, RESOURCE_ID);
