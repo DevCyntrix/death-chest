@@ -47,11 +47,11 @@ dependencies {
     // Placeholder API
     compileOnly("me.clip:placeholderapi:2.11.2")
     //implementation("com.github.MP-MC:Canvas:941db8c981")
-    compileOnly("org.apache.commons:commons-text:1.9")
+    compileOnly("org.apache.commons:commons-text:1.10.0")
     compileOnly("org.jetbrains:annotations:23.0.0")
 
     compileOnly("org.projectlombok:lombok:1.18.24")
-    annotationProcessor("org.projectlombok:lombok:1.18.22")
+    annotationProcessor("org.projectlombok:lombok:1.18.24")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
@@ -69,7 +69,7 @@ tasks {
         filteringCharset = Charsets.UTF_8.name()
     }
     runServer {
-        minecraftVersion("1.19")
+        minecraftVersion("1.19.2")
     }
     test {
         useJUnitPlatform()
