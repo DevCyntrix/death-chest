@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "de.helixdevs"
-version = "1.5.2"
+version = "1.5.3"
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(17))
