@@ -21,6 +21,8 @@ import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -77,7 +79,9 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
 
     @Override
     public void onLoad() {
-        WorldGuardDeathChestFlag.register();
+        PluginManager pluginManager = Bukkit.getPluginManager();
+        Plugin plugin = pluginManager.getPlugin("WorldGuard");
+        if (plugin != null) { WorldGuardDeathChestFlag.register(); }
     }
 
     @Override
