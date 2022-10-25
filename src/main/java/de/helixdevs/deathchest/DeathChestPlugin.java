@@ -81,7 +81,9 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
     public void onLoad() {
         PluginManager pluginManager = Bukkit.getPluginManager();
         Plugin plugin = pluginManager.getPlugin("WorldGuard");
-        if (plugin != null) { WorldGuardDeathChestFlag.register(); }
+        if (plugin != null) {
+            WorldGuardDeathChestFlag.register();
+        }
     }
 
     @Override
@@ -138,7 +140,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
             });
         }
 
-        Metrics metrics = new Metrics(this, BSTATS_ID);
+        new Metrics(this, BSTATS_ID);
     }
 
 

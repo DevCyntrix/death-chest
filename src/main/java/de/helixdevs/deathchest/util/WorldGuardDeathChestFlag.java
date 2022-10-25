@@ -8,13 +8,11 @@ public final class WorldGuardDeathChestFlag {
     public static StateFlag FLAG;
 
 
-    public static void register()
-    {
+    public static void register() {
         WorldGuard instance = WorldGuard.getInstance();
-        if (instance != null)
-        {
-            FLAG = new StateFlag("spawn-death-chest", false);
-            instance.getFlagRegistry().register(FLAG);
-        }
+        if (instance == null)
+            return;
+        FLAG = new StateFlag("spawn-death-chest", false);
+        instance.getFlagRegistry().register(FLAG);
     }
 }
