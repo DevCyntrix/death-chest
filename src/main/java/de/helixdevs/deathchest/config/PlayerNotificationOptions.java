@@ -10,7 +10,7 @@ public record PlayerNotificationOptions(boolean enabled, String[] messages) {
         if (section == null)
             return null;
 
-        boolean enabled = section.getBoolean("enabled");
+        boolean enabled = section.getBoolean("enabled", false);
         String message = section.getString("message");
         String[] coloredMessage = null;
         if (message != null)

@@ -14,9 +14,7 @@ public record InventoryOptions(@NotNull String title, @NotNull InventorySize siz
             return null;
 
         String title = ChatColor.translateAlternateColorCodes('&', section.getString("title", "Death Chest"));
-        String sizeString = section.getString("size");
-        if (sizeString == null)
-            throw new IllegalArgumentException("Missing inventory.size in config.yml");
+        String sizeString = section.getString("size", "flexible");
         InventoryOptions.InventorySize size = InventoryOptions.InventorySize.valueOf(sizeString.toUpperCase());
 
         return new InventoryOptions(title, size);

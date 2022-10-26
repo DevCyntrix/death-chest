@@ -5,14 +5,12 @@ import de.helixdevs.deathchest.api.animation.IAnimationService;
 import de.helixdevs.deathchest.api.hologram.IHologram;
 import de.helixdevs.deathchest.api.hologram.IHologramService;
 import de.helixdevs.deathchest.api.hologram.IHologramTextLine;
-import de.helixdevs.deathchest.config.BreakEffectOptions;
-import de.helixdevs.deathchest.config.HologramOptions;
-import de.helixdevs.deathchest.config.InventoryOptions;
-import de.helixdevs.deathchest.config.ParticleOptions;
+import de.helixdevs.deathchest.config.*;
 import de.helixdevs.deathchest.util.ParticleScheduler;
 import de.helixdevs.deathchest.util.PlayerStringLookup;
 import lombok.Getter;
 import me.clip.placeholderapi.PlaceholderAPI;
+import net.milkbowl.vault.permission.Permission;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.bukkit.*;
@@ -277,6 +275,20 @@ public class DeathChestImpl implements DeathChest {
         if (event.isBlockInHand() && player.isSneaking()) // That maintains the natural minecraft feeling
             return;
         event.setCancelled(true);
+
+        // Chest Protection (Vault is required)
+        Permission permission = getPlugin().getPermission();
+        ChestProtectionOptions protectionOptions = getPlugin().getDeathChestConfig().chestProtectionOptions();
+        if (protectionOptions.enabled() &&
+                getPlugin().getPermission() != null &&
+                getPlayer() != null &&
+                player != getPlayer() &&
+                permission.playerHas(getWorld().getName(), getPlayer(), protectionOptions.permission()) &&
+                !permission.playerHas(getWorld().getName(), player, protectionOptions.bypassPermission())) {
+            player.playSound(block.getLocation(), Sound.BLOCK_CHEST_LOCKED, 1.0F, 1.0F);
+            player.sendMessage("§cNot permitted");
+            return;
+        }
 
         if (block.getState() instanceof Lidded lidded && player.getGameMode() != GameMode.SPECTATOR) {
             lidded.open();

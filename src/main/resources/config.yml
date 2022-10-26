@@ -79,3 +79,9 @@ world-filter:
 
 # Set this option to true if you don't want explosions to be able to destroy the death chests.
 blast-protection: false
+
+# For this option is Vault required.
+chest-protection:
+  enabled: false
+  permission: deathchest.thiefprotected
+  bypass-permission: deathchest.thiefprotected.bypass
