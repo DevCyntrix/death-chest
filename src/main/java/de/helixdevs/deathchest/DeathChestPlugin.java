@@ -56,12 +56,13 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
 
     private boolean placeholderAPIEnabled;
 
+    private File savedChests;
+
     @Override
     public void onDisable() {
         // Save all chests
-        File savedChests = new File(getDataFolder(), "saved-chests.yml");
         try {
-            saveChests(savedChests, this.deathChests);
+            saveChests();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -125,7 +126,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         }
 
         File savedChests = new File(getDataFolder(), "saved-chests.yml");
-        int size = loadChests(savedChests).size();
+        int size = loadChests().size();
         getLogger().info(size + " death chests loaded.");
 
 
@@ -143,19 +144,19 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         new Metrics(this, BSTATS_ID);
     }
 
-
-    private void saveChests(File file, Collection<DeathChest> chests) throws IOException {
+    @Override
+    public void saveChests() throws IOException {
         YamlConfiguration configuration = new YamlConfiguration();
-        List<Map<String, Object>> collect = chests.stream().map(DeathChest::serialize).collect((Supplier<List<Map<String, Object>>>) Lists::newArrayList, List::add, List::addAll);
+        List<Map<String, Object>> collect = deathChests.stream().map(DeathChest::serialize).collect((Supplier<List<Map<String, Object>>>) Lists::newArrayList, List::add, List::addAll);
         configuration.set("chests", collect);
-        configuration.save(file);
+        configuration.save(savedChests);
     }
 
-    private Collection<DeathChest> loadChests(File file) {
-        if (!file.isFile())
+    private Collection<DeathChest> loadChests() {
+        if (!savedChests.isFile())
             return Collections.emptyList();
 
-        YamlConfiguration configuration = YamlConfiguration.loadConfiguration(file);
+        YamlConfiguration configuration = YamlConfiguration.loadConfiguration(savedChests);
         List<?> chests = configuration.getList("chests");
         if (chests == null)
             return Collections.emptyList();

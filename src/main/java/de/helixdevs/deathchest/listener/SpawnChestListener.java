@@ -47,8 +47,10 @@ public class SpawnChestListener implements Listener {
         if (!plugin.getDeathChestConfig().worldFilterConfig().test(deathLocation.getWorld()))
             return;
 
-        // fell into void
-        if (deathLocation.getBlockY() <= player.getWorld().getMinHeight())
+        // Check Minecraft limitation of block positions
+        if (deathLocation.getBlockY() <= player.getWorld().getMinHeight()) // Min build height
+            return;
+        if (deathLocation.getBlockY() >= player.getWorld().getMaxHeight()) // Max build height
             return;
 
         // Check protection
@@ -85,7 +87,8 @@ public class SpawnChestListener implements Listener {
             StringSubstitutor substitutor = new StringSubstitutor(Map.of(
                     "x", deathLocation.getBlockX(),
                     "y", deathLocation.getBlockY(),
-                    "z", deathLocation.getBlockZ()));
+                    "z", deathLocation.getBlockZ(),
+                    "world", deathLocation.getWorld().getName()));
             for (String message : playerNotificationOptions.messages()) {
                 message = substitutor.replace(message);
 

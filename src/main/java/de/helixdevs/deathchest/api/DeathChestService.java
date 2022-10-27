@@ -9,9 +9,12 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.util.Set;
 
 public interface DeathChestService {
+
+    void saveChests() throws IOException;
 
     @NotNull DeathChest createDeathChest(@NotNull Location location, ItemStack @NotNull ... stacks);
 
