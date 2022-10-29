@@ -142,7 +142,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
             deathChestCommand.setTabCompleter(command);
         }
 
-        File savedChests = new File(getDataFolder(), "saved-chests.yml");
+        this.savedChests = new File(getDataFolder(), "saved-chests.yml");
         int size = loadChests().size();
         getLogger().info(size + " death chests loaded.");
 
