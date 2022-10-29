@@ -39,7 +39,7 @@ public class DeathChestCommand implements TabExecutor {
             return true;
         }
 
-        if (args.length <= 2 && args[0].equalsIgnoreCase("deleteInWorld")) {
+        if (args.length <= 2 && args[0].equalsIgnoreCase("deleteInWorld") && sender.hasPermission("deathchest.command.deleteInWorld")) {
             World world = null;
             if (args.length == 2) {
                 world = Bukkit.getWorld(args[1]);

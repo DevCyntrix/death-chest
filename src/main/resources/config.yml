@@ -80,11 +80,14 @@ world-filter:
 # Set this option to true if you don't want explosions to be able to destroy the death chests.
 blast-protection: false
 
+# This option protects the death chest against thieves if the player has the specific permission and the thief
+# not the bypass permission.
 # For this option is Vault required.
 chest-protection:
   enabled: false
   permission: deathchest.thiefprotected
   bypass-permission: deathchest.thiefprotected.bypass
+  # If you want to disable the sound or the message, you can delete this options
   sound: BLOCK_CHEST_LOCKED;1.0;1.0
   message: |-
     &cYour are not permitted to open this chest
