@@ -7,6 +7,7 @@ import de.helixdevs.deathchest.api.animation.IAnimationService;
 import de.helixdevs.deathchest.api.hologram.IHologramService;
 import de.helixdevs.deathchest.api.protection.IProtectionService;
 import de.helixdevs.deathchest.command.DeathChestCommand;
+import de.helixdevs.deathchest.config.ChestProtectionOptions;
 import de.helixdevs.deathchest.config.DeathChestConfig;
 import de.helixdevs.deathchest.listener.SpawnChestListener;
 import de.helixdevs.deathchest.listener.UpdateNotificationListener;
@@ -14,6 +15,7 @@ import de.helixdevs.deathchest.util.Metrics;
 import de.helixdevs.deathchest.util.UpdateChecker;
 import de.helixdevs.deathchest.util.WorldGuardDeathChestFlag;
 import lombok.Getter;
+import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -24,6 +26,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.ServicePriority;
+import org.bukkit.plugin.ServicesManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -52,6 +55,10 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
     private IAnimationService animationService;
     private IProtectionService protectionService;
 
+    @Getter
+    private Permission permission;
+
+    @Getter
     private String newerVersion;
 
     private boolean placeholderAPIEnabled;
@@ -112,11 +119,21 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         if (protectionService == null)
             this.protectionService = (player, location, material) -> true;
 
-        getServer().getPluginManager().registerEvents(new UpdateNotificationListener(this), this);
-        getServer().getPluginManager().registerEvents(new SpawnChestListener(this), this);
+        PluginManager pluginManager = getServer().getPluginManager();
+
+        ChestProtectionOptions protectionOptions = getDeathChestConfig().chestProtectionOptions();
+        if (protectionOptions.enabled()) {
+            pluginManager.addPermission(new org.bukkit.permissions.Permission(protectionOptions.permission()));
+            pluginManager.addPermission(new org.bukkit.permissions.Permission(protectionOptions.bypassPermission()));
+        }
+
+        pluginManager.registerEvents(new UpdateNotificationListener(this), this);
+        pluginManager.registerEvents(new SpawnChestListener(this), this);
         //getServer().getPluginManager().registerEvents(new MenuFunctionListener(), this);
 
-        getServer().getServicesManager().register(DeathChestService.class, this, this, ServicePriority.Normal);
+        ServicesManager servicesManager = getServer().getServicesManager();
+        this.permission = servicesManager.load(Permission.class);
+        servicesManager.register(DeathChestService.class, this, this, ServicePriority.Normal);
 
         PluginCommand deathChestCommand = getCommand("deathchest");
         if (deathChestCommand != null) {
@@ -198,10 +215,6 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         return list;
     }
 
-    public boolean isPlaceholderAPIEnabled() {
-        return placeholderAPIEnabled;
-    }
-
     /**
      * Reloads the configuration file of the plugin
      */
@@ -241,10 +254,6 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
                 .build(location, deathChestConfig.inventoryOptions());
         this.deathChests.add(build);
         return build;
-    }
-
-    public String getNewerVersion() {
-        return newerVersion;
     }
 
     @Override

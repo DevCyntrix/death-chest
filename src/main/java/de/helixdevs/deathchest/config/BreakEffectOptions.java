@@ -9,8 +9,8 @@ public record BreakEffectOptions(boolean enabled, double viewDistance) {
         if (section == null)
             return null;
 
-        boolean enabled = section.getBoolean("enabled");
-        double viewDistance = section.getDouble("view-distance");
+        boolean enabled = section.getBoolean("enabled", true);
+        double viewDistance = section.getDouble("view-distance", 20.0);
         return new BreakEffectOptions(enabled, viewDistance);
     }
 
