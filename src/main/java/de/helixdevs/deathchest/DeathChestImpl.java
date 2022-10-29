@@ -73,7 +73,7 @@ public class DeathChestImpl implements DeathChest {
     public DeathChestImpl(@NotNull Location location, @NotNull DeathChestBuilder builder) {
         this.location = location;
         if (location.getWorld() == null)
-            throw new IllegalArgumentException("Illegal world");
+            throw new IllegalArgumentException("The world cannot be null");
 
         this.plugin = JavaPlugin.getPlugin(DeathChestPlugin.class);
 
@@ -285,8 +285,8 @@ public class DeathChestImpl implements DeathChest {
                 player != getPlayer() &&
                 permission.playerHas(getWorld().getName(), getPlayer(), protectionOptions.permission()) &&
                 !permission.playerHas(getWorld().getName(), player, protectionOptions.bypassPermission())) {
-            player.playSound(block.getLocation(), Sound.BLOCK_CHEST_LOCKED, 1.0F, 1.0F);
-            player.sendMessage("§cNot permitted");
+            protectionOptions.playSound(player, block.getLocation());
+            protectionOptions.sendMessage(player);
             return;
         }
 

@@ -85,3 +85,6 @@ chest-protection:
   enabled: false
   permission: deathchest.thiefprotected
   bypass-permission: deathchest.thiefprotected.bypass
+  sound: BLOCK_CHEST_LOCKED;1.0;1.0
+  message: |-
+    &cYour are not permitted to open this chest
