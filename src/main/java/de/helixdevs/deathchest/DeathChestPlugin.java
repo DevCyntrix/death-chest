@@ -132,7 +132,9 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         //getServer().getPluginManager().registerEvents(new MenuFunctionListener(), this);
 
         ServicesManager servicesManager = getServer().getServicesManager();
-        this.permission = servicesManager.load(Permission.class);
+        if (pluginManager.isPluginEnabled("Vault")) {
+            this.permission = servicesManager.load(Permission.class);
+        }
         servicesManager.register(DeathChestService.class, this, this, ServicePriority.Normal);
 
         PluginCommand deathChestCommand = getCommand("deathchest");
