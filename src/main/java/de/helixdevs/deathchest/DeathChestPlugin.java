@@ -61,7 +61,8 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
     @Getter
     private String newerVersion;
 
-    private boolean placeholderAPIEnabled;
+    @Getter
+    private static boolean placeholderAPIEnabled;
 
     private File savedChests;
 
@@ -98,18 +99,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
     public void onEnable() {
         placeholderAPIEnabled = Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI");
 
-        // Recreate the config when the config version is too old.
-        if (getConfig().getInt("config-version", 0) != DeathChestConfig.CONFIG_VERSION) {
-            File configFile = new File(getDataFolder(), "config.yml");
-            if (configFile.isFile()) {
-                File oldConfigFile = new File(getDataFolder(), "config.yml.old");
-                boolean b = configFile.renameTo(oldConfigFile);
-                if (!b) {
-                    throw new IllegalStateException("Failed to rename the configuration file to old.");
-                }
-            }
-        }
-
+        checkConfigVersion();
         reload();
 
         this.hologramService = SupportServices.getHologramService(this, this.deathChestConfig.preferredHologramService());
@@ -161,6 +151,20 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         }
 
         new Metrics(this, BSTATS_ID);
+    }
+
+    private void checkConfigVersion() {
+        // Recreate the config when the config version is too old.
+        if (getConfig().getInt("config-version", 0) != DeathChestConfig.CONFIG_VERSION) {
+            File configFile = new File(getDataFolder(), "config.yml");
+            if (configFile.isFile()) {
+                File oldConfigFile = new File(getDataFolder(), "config.yml.old");
+                boolean b = configFile.renameTo(oldConfigFile);
+                if (!b) {
+                    throw new IllegalStateException("Failed to rename the configuration file to old.");
+                }
+            }
+        }
     }
 
     @Override

@@ -92,7 +92,7 @@ public class SpawnChestListener implements Listener {
             for (String message : playerNotificationOptions.messages()) {
                 message = substitutor.replace(message);
 
-                if (plugin.isPlaceholderAPIEnabled())
+                if (DeathChestPlugin.isPlaceholderAPIEnabled())
                     message = PlaceholderAPI.setPlaceholders(player, message);
 
                 player.sendMessage(message);
@@ -109,11 +109,12 @@ public class SpawnChestListener implements Listener {
                     "world", deathLocation.getWorld().getName(),
                     "player_name", player.getName(),
                     "player_displayname", player.getDisplayName()));
+            globalNotificationOptions.showNotification(player, substitutor);
 
             for (String message : globalNotificationOptions.messages()) {
                 message = substitutor.replace(message);
 
-                if (plugin.isPlaceholderAPIEnabled())
+                if (DeathChestPlugin.isPlaceholderAPIEnabled())
                     message = PlaceholderAPI.setPlaceholders(player, message);
 
                 Bukkit.broadcastMessage(message);
