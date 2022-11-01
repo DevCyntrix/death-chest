@@ -14,8 +14,6 @@ import java.util.Set;
 
 public interface DeathChestService {
 
-    void saveChests() throws IOException;
-
     @NotNull DeathChest createDeathChest(@NotNull Location location, ItemStack @NotNull ... stacks);
 
     @NotNull DeathChest createDeathChest(@NotNull Location location, @Nullable OfflinePlayer player, ItemStack @NotNull ... stacks);
@@ -25,6 +23,8 @@ public interface DeathChestService {
     @NotNull DeathChest createDeathChest(@NotNull Location location, long createdAt, long expireAt, @Nullable OfflinePlayer player, ItemStack @NotNull ... stacks);
 
     @NotNull Set<@NotNull DeathChest> getChests();
+
+    void saveChests() throws IOException;
 
     default boolean hasHologram() {
         return getHologramService() != null;

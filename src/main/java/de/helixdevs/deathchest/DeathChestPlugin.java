@@ -3,6 +3,7 @@ package de.helixdevs.deathchest;
 import com.google.common.collect.Lists;
 import de.helixdevs.deathchest.api.DeathChest;
 import de.helixdevs.deathchest.api.DeathChestService;
+import de.helixdevs.deathchest.api.DeathChestSnapshot;
 import de.helixdevs.deathchest.api.animation.IAnimationService;
 import de.helixdevs.deathchest.api.hologram.IHologramService;
 import de.helixdevs.deathchest.api.protection.IProtectionService;
@@ -140,17 +141,21 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
 
 
         if (this.deathChestConfig.updateChecker()) {
-            UpdateChecker checker = new UpdateChecker(this, RESOURCE_ID);
-            checker.getVersion(version -> {
-                if (getDescription().getVersion().equals(version))
-                    return;
-                this.newerVersion = version;
-                getLogger().warning("New version " + version + " is out. You are still running " + getDescription().getVersion());
-                getLogger().warning("Update the plugin at https://www.spigotmc.org/resources/death-chest.101066/");
-            });
+            checkUpdates();
         }
 
         new Metrics(this, BSTATS_ID);
+    }
+
+    private void checkUpdates() {
+        UpdateChecker checker = new UpdateChecker(this, RESOURCE_ID);
+        checker.getVersion(version -> {
+            if (getDescription().getVersion().equals(version))
+                return;
+            this.newerVersion = version;
+            getLogger().warning("New version " + version + " is out. You are still running " + getDescription().getVersion());
+            getLogger().warning("Update the plugin at https://www.spigotmc.org/resources/death-chest.101066/");
+        });
     }
 
     private void checkConfigVersion() {
@@ -170,7 +175,10 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
     @Override
     public void saveChests() throws IOException {
         YamlConfiguration configuration = new YamlConfiguration();
-        List<Map<String, Object>> collect = deathChests.stream().map(DeathChest::serialize).collect((Supplier<List<Map<String, Object>>>) Lists::newArrayList, List::add, List::addAll);
+        List<Map<String, Object>> collect = deathChests.stream()
+                .map(DeathChest::createSnapshot)
+                .map(DeathChestSnapshot::serialize)
+                .collect((Supplier<List<Map<String, Object>>>) Lists::newArrayList, List::add, List::addAll);
         configuration.set("chests", collect);
         configuration.save(savedChests);
     }
