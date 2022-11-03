@@ -3,6 +3,7 @@ package de.helixdevs.deathchest;
 import com.google.common.collect.Lists;
 import de.helixdevs.deathchest.api.DeathChest;
 import de.helixdevs.deathchest.api.DeathChestService;
+import de.helixdevs.deathchest.api.DeathChestSnapshot;
 import de.helixdevs.deathchest.api.animation.IAnimationService;
 import de.helixdevs.deathchest.api.hologram.IHologramService;
 import de.helixdevs.deathchest.api.protection.IProtectionService;
@@ -33,7 +34,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
-import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.function.Supplier;
@@ -140,17 +140,21 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
 
 
         if (this.deathChestConfig.updateChecker()) {
-            UpdateChecker checker = new UpdateChecker(this, RESOURCE_ID);
-            checker.getVersion(version -> {
-                if (getDescription().getVersion().equals(version))
-                    return;
-                this.newerVersion = version;
-                getLogger().warning("New version " + version + " is out. You are still running " + getDescription().getVersion());
-                getLogger().warning("Update the plugin at https://www.spigotmc.org/resources/death-chest.101066/");
-            });
+            checkUpdates();
         }
 
         new Metrics(this, BSTATS_ID);
+    }
+
+    private void checkUpdates() {
+        UpdateChecker checker = new UpdateChecker(this, RESOURCE_ID);
+        checker.getVersion(version -> {
+            if (getDescription().getVersion().equals(version))
+                return;
+            this.newerVersion = version;
+            getLogger().warning("New version " + version + " is out. You are still running " + getDescription().getVersion());
+            getLogger().warning("Update the plugin at https://www.spigotmc.org/resources/death-chest.101066/");
+        });
     }
 
     private void checkConfigVersion() {
@@ -170,7 +174,10 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
     @Override
     public void saveChests() throws IOException {
         YamlConfiguration configuration = new YamlConfiguration();
-        List<Map<String, Object>> collect = deathChests.stream().map(DeathChest::serialize).collect((Supplier<List<Map<String, Object>>>) Lists::newArrayList, List::add, List::addAll);
+        List<Map<String, Object>> collect = deathChests.stream()
+                .map(DeathChest::createSnapshot)
+                .map(DeathChestSnapshot::serialize)
+                .collect((Supplier<List<Map<String, Object>>>) Lists::newArrayList, List::add, List::addAll);
         configuration.set("chests", collect);
         configuration.save(savedChests);
     }
@@ -190,33 +197,11 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
             if (!(chest instanceof Map<?, ?> map))
                 continue;
 
-            long createdAt = Long.parseLong(map.get("createdAt").toString());
-            long expireAt = Long.parseLong(map.get("expireAt").toString());
-
-            if (deathChestConfig.expiration() == null && expireAt != -1) // Renew the expiration when the configuration was changed.
-                expireAt = -1;
-            Duration expiration = deathChestConfig.expiration();
-            if (expiration != null) {
-                long newExpiration = createdAt + deathChestConfig.expiration().toMillis();
-                if (newExpiration != expireAt) // Renew the expiration when the configuration value was changed.
-                    expireAt = newExpiration;
-            }
-
-            if (expireAt != -1 && expireAt <= System.currentTimeMillis()) // Expire here
+            DeathChestSnapshot deserialize = DeathChestSnapshotImpl.deserialize((Map<String, Object>) chest);
+            if (deserialize == null)
                 continue;
 
-            Location location = (Location) map.get("location");
-            if (location == null)
-                continue;
-
-            String player = (String) map.get("player");
-            UUID playerId = player == null ? null : UUID.fromString(player);
-
-            List<ItemStack> stacks = (List<ItemStack>) map.get("items");
-            if (stacks == null)
-                continue;
-
-            list.add(createDeathChest(location, createdAt, expireAt, playerId == null ? null : Bukkit.getOfflinePlayer(playerId), stacks.toArray(ItemStack[]::new)));
+            list.add(deserialize.createChest(this));
         }
         return list;
     }
@@ -243,6 +228,11 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
     @Override
     public @NotNull DeathChest createDeathChest(@NotNull Location location, long expireAt, @Nullable OfflinePlayer player, ItemStack @NotNull ... stacks) {
         return createDeathChest(location, System.currentTimeMillis(), expireAt, player, stacks);
+    }
+
+    @Override
+    public @NotNull DeathChest createDeathChest(@NotNull DeathChestSnapshot snapshot) {
+        return snapshot.createChest(this);
     }
 
     @Override
