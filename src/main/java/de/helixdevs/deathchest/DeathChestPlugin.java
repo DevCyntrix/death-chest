@@ -72,7 +72,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         try {
             saveChests();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
 
         // Reset all death chests
@@ -197,7 +197,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
             if (!(chest instanceof Map<?, ?> map))
                 continue;
 
-            DeathChestSnapshot deserialize = DeathChestSnapshotImpl.deserialize((Map<String, Object>) chest);
+            DeathChestSnapshot deserialize = DeathChestSnapshotImpl.deserialize((Map<String, Object>) map);
             if (deserialize == null)
                 continue;
 
@@ -213,6 +213,11 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         saveDefaultConfig();
         reloadConfig();
         this.deathChestConfig = DeathChestConfig.load(getConfig());
+    }
+
+    @Override
+    public boolean canPlaceChest(@NotNull Location location) {
+        return this.deathChests.stream().noneMatch(chest -> chest.getLocation().equals(location));
     }
 
     @Override

@@ -14,6 +14,8 @@ import java.util.Set;
 
 public interface DeathChestService {
 
+    boolean canPlaceChest(@NotNull Location location);
+
     @NotNull DeathChest createDeathChest(@NotNull Location location, ItemStack @NotNull ... stacks);
 
     @NotNull DeathChest createDeathChest(@NotNull Location location, @Nullable OfflinePlayer player, ItemStack @NotNull ... stacks);
