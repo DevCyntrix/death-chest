@@ -366,11 +366,12 @@ public class DeathChestImpl implements DeathChest {
      */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onBlockExplode(BlockExplodeEvent event) {
-        if (plugin.getDeathChestConfig().blastProtection())
+        if (event.blockList().stream().noneMatch(block -> block.getLocation().equals(location)))
             return;
-        if (!event.blockList().removeIf(block -> block.getLocation().equals(getLocation())))
+        if (plugin.getDeathChestConfig().blastProtection()) {
+            event.blockList().removeIf(block -> block.getLocation().equals(getLocation()));
             return;
-
+        }
         for (ItemStack content : this.inventory.getContents()) {
             if (content == null)
                 continue;
@@ -386,11 +387,12 @@ public class DeathChestImpl implements DeathChest {
      */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onBlockExplode(EntityExplodeEvent event) {
-        if (plugin.getDeathChestConfig().blastProtection())
+        if (event.blockList().stream().noneMatch(block -> block.getLocation().equals(location)))
             return;
-        if (!event.blockList().removeIf(block -> block.getLocation().equals(getLocation())))
+        if (plugin.getDeathChestConfig().blastProtection()) {
+            event.blockList().removeIf(block -> block.getLocation().equals(getLocation()));
             return;
-
+        }
         for (ItemStack content : this.inventory.getContents()) {
             if (content == null)
                 continue;
