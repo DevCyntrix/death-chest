@@ -2,11 +2,16 @@ package de.helixdevs.deathchest;
 
 import de.helixdevs.deathchest.api.DeathChest;
 import de.helixdevs.deathchest.api.DeathChestSnapshot;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public final class DeathChestSnapshotImpl implements DeathChestSnapshot {
 
@@ -24,7 +29,7 @@ public final class DeathChestSnapshotImpl implements DeathChestSnapshot {
         this.items = chest.getInventory().getContents();
     }
 
-    private DeathChestSnapshotImpl(Location location, long createdAt, long expireAt, OfflinePlayer owner, ItemStack... items) {
+    private DeathChestSnapshotImpl(Location location, long createdAt, long expireAt, OfflinePlayer owner, ItemStack[] items) {
         this.location = location;
         this.createdAt = createdAt;
         this.expireAt = expireAt;
@@ -58,5 +63,28 @@ public final class DeathChestSnapshotImpl implements DeathChestSnapshot {
     @Override
     public ItemStack @NotNull [] getItems() {
         return items;
+    }
+
+    public static DeathChestSnapshot deserialize(Map<String, Object> map) {
+        long createdAt = Long.parseLong(map.get("createdAt").toString());
+        long expireAt = Long.parseLong(map.get("expireAt").toString());
+
+        if (expireAt != -1 && expireAt <= System.currentTimeMillis()) // Expire here
+            return null;
+
+        Location location = (Location) map.get("location");
+        if (location == null)
+            return null;
+
+        String player = (String) map.get("player");
+        UUID playerId = player == null ? null : UUID.fromString(player);
+        OfflinePlayer owner = playerId != null ? Bukkit.getOfflinePlayer(playerId) : null;
+
+        List<ItemStack> stacks = (List<ItemStack>) map.get("items");
+        if (stacks == null)
+            return null;
+        ItemStack[] itemStacks = stacks.toArray(ItemStack[]::new);
+
+        return new DeathChestSnapshotImpl(location, createdAt, expireAt, owner, itemStacks);
     }
 }

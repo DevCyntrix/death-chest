@@ -75,6 +75,14 @@ public class DeathChestImpl implements DeathChest {
 
     private int breakingEntityId;
 
+    public DeathChestImpl(DeathChestSnapshot snapshot) {
+        this(snapshot.getLocation(), DeathChestBuilder.builder()
+                .setCreatedAt(snapshot.getCreatedAt())
+                .setExpireAt(snapshot.getExpireAt())
+                .setItems(snapshot.getItems())
+                .setPlayer(snapshot.getOwner()));
+    }
+
     public DeathChestImpl(@NotNull Location location, @NotNull DeathChestBuilder builder) {
         this.location = location;
         if (!location.isWorldLoaded())
@@ -107,7 +115,7 @@ public class DeathChestImpl implements DeathChest {
         this.inventory.setContents(stacks);
 
         // Creates hologram
-        IHologramService hologramService = plugin.getHologramService();
+        IHologramService hologramService = builder.hologramService();
         HologramOptions hologramOptions = builder.hologramOptions();
         if (hologramService != null && hologramOptions != null && hologramOptions.enabled()) {
             this.hologram = hologramService.spawnHologram(getLocation().clone().add(0.5, hologramOptions.height(), 0.5));
@@ -124,7 +132,7 @@ public class DeathChestImpl implements DeathChest {
         }
 
 
-        IAnimationService animationService = plugin.getAnimationService();
+        IAnimationService animationService = builder.animationService();
         BreakEffectOptions breakEffectOptions = builder.breakEffectOptions();
         // Spawns the block break animation
         if (animationService != null && isExpiring() && breakEffectOptions.enabled()) {
@@ -421,7 +429,6 @@ public class DeathChestImpl implements DeathChest {
             Stream<Player> playerStream = getWorld().
                     getNearbyEntities(getLocation(), 20, 20, 20, entity -> entity.getType() == EntityType.PLAYER).stream()
                     .map(entity -> (Player) entity);
-            Bukkit.broadcastMessage("Resetting the block break animation");
             animationService.spawnBlockBreakAnimation(breakingEntityId, block.getLocation().toVector(), -1, playerStream);
         }
 

@@ -20,6 +20,8 @@ public interface DeathChestService {
 
     @NotNull DeathChest createDeathChest(@NotNull Location location, long expireAt, @Nullable OfflinePlayer player, ItemStack @NotNull ... stacks);
 
+    @NotNull DeathChest createDeathChest(@NotNull DeathChestSnapshot snapshot);
+
     @NotNull DeathChest createDeathChest(@NotNull Location location, long createdAt, long expireAt, @Nullable OfflinePlayer player, ItemStack @NotNull ... stacks);
 
     @NotNull Set<@NotNull DeathChest> getChests();
