@@ -18,6 +18,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.time.Duration;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class SpawnChestListener implements Listener {
 
@@ -72,8 +73,19 @@ public class SpawnChestListener implements Listener {
             expireAt = -1; // Permanent
         }
 
+        ThreadLocalRandom random = ThreadLocalRandom.current();
+
+        Location loc = deathLocation.getBlock().getLocation();
+
+        while (!plugin.canPlaceChest(loc)) {
+            int x = random.nextInt(10) - 5;
+            int z = random.nextInt(10) - 5;
+            loc.add(x, 0, z);
+        }
+
+
         try {
-            plugin.createDeathChest(deathLocation.getBlock().getLocation(), createdAt, expireAt, player, event.getDrops().toArray(new ItemStack[0]));
+            plugin.createDeathChest(loc, createdAt, expireAt, player, event.getDrops().toArray(new ItemStack[0]));
 
             // Clears the drops
             event.getDrops().clear();
