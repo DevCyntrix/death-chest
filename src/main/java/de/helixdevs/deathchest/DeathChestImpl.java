@@ -18,7 +18,6 @@ import org.apache.commons.text.StringSubstitutor;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
-import org.bukkit.block.Container;
 import org.bukkit.block.Lidded;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.HumanEntity;
@@ -35,6 +34,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.BlockInventoryHolder;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -76,17 +76,12 @@ public class DeathChestImpl implements DeathChest {
     private int breakingEntityId;
 
     public DeathChestImpl(DeathChestSnapshot snapshot) {
-        this(snapshot.getLocation(), DeathChestBuilder.builder()
-                .setCreatedAt(snapshot.getCreatedAt())
-                .setExpireAt(snapshot.getExpireAt())
-                .setItems(snapshot.getItems())
-                .setPlayer(snapshot.getOwner()));
+        this(snapshot.getLocation(), DeathChestBuilder.builder().setCreatedAt(snapshot.getCreatedAt()).setExpireAt(snapshot.getExpireAt()).setItems(snapshot.getItems()).setPlayer(snapshot.getOwner()));
     }
 
     public DeathChestImpl(@NotNull Location location, @NotNull DeathChestBuilder builder) {
         this.location = location;
-        if (!location.isWorldLoaded())
-            throw new IllegalArgumentException("The world cannot be null");
+        if (!location.isWorldLoaded()) throw new IllegalArgumentException("The world cannot be null");
 
         this.plugin = JavaPlugin.getPlugin(DeathChestPlugin.class);
         this.previousState = location.getBlock().getState();
@@ -99,11 +94,9 @@ public class DeathChestImpl implements DeathChest {
         this.expireAt = builder.expireAt();
         this.player = builder.player();
         this.durationSupplier = () -> {
-            if (!isExpiring())
-                return DurationFormatUtils.formatDuration(0, builder.durationFormat());
+            if (!isExpiring()) return DurationFormatUtils.formatDuration(0, builder.durationFormat());
             long duration = expireAt - System.currentTimeMillis();
-            if (duration <= 0)
-                duration = 0;
+            if (duration <= 0) duration = 0;
             return DurationFormatUtils.formatDuration(duration, builder.durationFormat());
         };
 
@@ -122,8 +115,7 @@ public class DeathChestImpl implements DeathChest {
 
             Map<String, IHologramTextLine> blueprints = new LinkedHashMap<>(hologramOptions.lines().size());
             substitutor = new StringSubstitutor(new PlayerStringLookup(builder.player(), durationSupplier));
-            hologramOptions.lines()
-                    .forEach(line -> blueprints.put(line, hologram.appendLine(substitutor.replace(line)))); // A map of blueprints
+            hologramOptions.lines().forEach(line -> blueprints.put(line, hologram.appendLine(substitutor.replace(line)))); // A map of blueprints
 
             // Start task
             if (!blueprints.isEmpty()) {
@@ -158,10 +150,8 @@ public class DeathChestImpl implements DeathChest {
             public void run() {
                 // Updates the hologram lines
                 blueprints.forEach((s, line) -> {
-                    if (substitutor != null)
-                        s = substitutor.replace(s);
-                    if (DeathChestPlugin.isPlaceholderAPIEnabled())
-                        s = PlaceholderAPI.setPlaceholders(player, s);
+                    if (substitutor != null) s = substitutor.replace(s);
+                    if (DeathChestPlugin.isPlaceholderAPIEnabled()) s = PlaceholderAPI.setPlaceholders(player, s);
                     line.rename(s);
                 });
             }
@@ -171,11 +161,8 @@ public class DeathChestImpl implements DeathChest {
     private BukkitTask runParticleTask(ParticleOptions particleOptions) {
         return new ParticleScheduler(getLocation(), particleOptions.count(), particleOptions.radius(), particleLocation -> {
             Particle.DustOptions options = new Particle.DustOptions(Color.ORANGE, 0.75f);
-            getWorld().spawnParticle(
-                    Particle.REDSTONE,
-                    particleLocation.clone().add(0.5, 0.5, 0.5), // Centred particle location
-                    1,
-                    options);
+            getWorld().spawnParticle(Particle.REDSTONE, particleLocation.clone().add(0.5, 0.5, 0.5), // Centred particle location
+                    1, options);
             Particle.DustOptions options1 = new Particle.DustOptions(Color.AQUA, 0.75f);
             getWorld().spawnParticle(Particle.REDSTONE, particleLocation.clone().add(0.5, 0.4, 0.5), 1, options1);
         }).runTaskTimerAsynchronously(this.plugin, 0, (long) (20 / particleOptions.speed()));
@@ -189,15 +176,7 @@ public class DeathChestImpl implements DeathChest {
                 double process = (double) (System.currentTimeMillis() - createdAt) / (expireAt - createdAt);
 
                 try {
-                    Stream<Player> playerStream = Bukkit.getScheduler().callSyncMethod(plugin, () ->
-                            getWorld().
-                                    getNearbyEntities(
-                                            getLocation(),
-                                            breakEffectOptions.viewDistance(),
-                                            breakEffectOptions.viewDistance(),
-                                            breakEffectOptions.viewDistance(),
-                                            entity -> entity.getType() == EntityType.PLAYER).stream()
-                                    .map(entity -> (Player) entity)).get(1, TimeUnit.SECONDS);
+                    Stream<Player> playerStream = Bukkit.getScheduler().callSyncMethod(plugin, () -> getWorld().getNearbyEntities(getLocation(), breakEffectOptions.viewDistance(), breakEffectOptions.viewDistance(), breakEffectOptions.viewDistance(), entity -> entity.getType() == EntityType.PLAYER).stream().map(entity -> (Player) entity)).get(1, TimeUnit.SECONDS);
                     animationService.spawnBlockBreakAnimation(breakingEntityId, getLocation().toVector(), (int) (9 * process), playerStream);
                 } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
@@ -232,12 +211,10 @@ public class DeathChestImpl implements DeathChest {
      */
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
-        if (!inventory.equals(event.getInventory()))
-            return;
+        if (!inventory.equals(event.getInventory())) return;
 
         DeathChestHolder holder = (DeathChestHolder) inventory.getHolder();
-        if (holder == null)
-            return;
+        if (holder == null) return;
         DeathChest chest = holder.getChest();
         BlockState state = chest.getState();
 
@@ -260,16 +237,12 @@ public class DeathChestImpl implements DeathChest {
      */
     @EventHandler
     public void onOpenInventory(PlayerInteractEvent event) {
-        if (!event.hasBlock())
-            return;
-        if (event.getAction() != Action.RIGHT_CLICK_BLOCK)
-            return;
+        if (!event.hasBlock()) return;
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 
         Block block = event.getClickedBlock();
-        if (block == null)
-            return;
-        if (!this.getLocation().equals(block.getLocation()))
-            return;
+        if (block == null) return;
+        if (!this.getLocation().equals(block.getLocation())) return;
 
         Player player = event.getPlayer();
         if (event.isBlockInHand() && player.isSneaking()) // That maintains the natural minecraft feeling
@@ -279,12 +252,7 @@ public class DeathChestImpl implements DeathChest {
         // Chest Protection (Vault is required)
         Permission permission = getPlugin().getPermission();
         ChestProtectionOptions protectionOptions = getPlugin().getDeathChestConfig().chestProtectionOptions();
-        if (protectionOptions.enabled() &&
-                getPlugin().getPermission() != null &&
-                getPlayer() != null &&
-                player != getPlayer() &&
-                permission.playerHas(getWorld().getName(), getPlayer(), protectionOptions.permission()) &&
-                !permission.playerHas(getWorld().getName(), player, protectionOptions.bypassPermission())) {
+        if (protectionOptions.enabled() && getPlugin().getPermission() != null && getPlayer() != null && player != getPlayer() && permission.playerHas(getWorld().getName(), getPlayer(), protectionOptions.permission()) && !permission.playerHas(getWorld().getName(), player, protectionOptions.bypassPermission())) {
             protectionOptions.playSound(player, block.getLocation());
             protectionOptions.sendMessage(player);
             return;
@@ -304,8 +272,7 @@ public class DeathChestImpl implements DeathChest {
      */
     @EventHandler
     public void onClick(InventoryClickEvent event) {
-        if (!inventory.equals(event.getView().getTopInventory()))
-            return;
+        if (!inventory.equals(event.getView().getTopInventory())) return;
         if (inventory.isEmpty()) {
             event.getWhoClicked().closeInventory();
         }
@@ -318,8 +285,7 @@ public class DeathChestImpl implements DeathChest {
      */
     @EventHandler
     public void onDrag(InventoryDragEvent event) {
-        if (!inventory.equals(event.getInventory()))
-            return;
+        if (!inventory.equals(event.getInventory())) return;
         if (inventory.isEmpty()) {
             event.getWhoClicked().closeInventory();
         }
@@ -332,13 +298,14 @@ public class DeathChestImpl implements DeathChest {
      */
     @EventHandler(ignoreCancelled = true)
     public void onHopperMoveItem(InventoryMoveItemEvent event) {
-        if (!(state instanceof Container))
-            return;
-        Container container = (Container) this.state;
 
-        if (!container.getInventory().equals(event.getDestination()))
-            return;
-        event.setCancelled(true);
+        var inv = event.getDestination();
+        var holder = inv.getHolder();
+        if (holder == null) return;
+
+        if (holder instanceof BlockInventoryHolder bh && bh.getBlock().getLocation().equals(location)) {
+            event.setCancelled(true);
+        }
     }
 
     /**
@@ -348,11 +315,9 @@ public class DeathChestImpl implements DeathChest {
      */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onBlockBreak(BlockBreakEvent event) {
-        if (!event.getBlock().getLocation().equals(getLocation()))
-            return;
+        if (!event.getBlock().getLocation().equals(getLocation())) return;
         for (ItemStack content : this.inventory.getContents()) {
-            if (content == null)
-                continue;
+            if (content == null) continue;
             getWorld().dropItemNaturally(getLocation(), content);
         }
         event.setCancelled(true);
@@ -366,15 +331,13 @@ public class DeathChestImpl implements DeathChest {
      */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onBlockExplode(BlockExplodeEvent event) {
-        if (event.blockList().stream().noneMatch(block -> block.getLocation().equals(location)))
-            return;
+        if (event.blockList().stream().noneMatch(block -> block.getLocation().equals(location))) return;
         if (plugin.getDeathChestConfig().blastProtection()) {
             event.blockList().removeIf(block -> block.getLocation().equals(getLocation()));
             return;
         }
         for (ItemStack content : this.inventory.getContents()) {
-            if (content == null)
-                continue;
+            if (content == null) continue;
             getWorld().dropItemNaturally(getLocation(), content);
         }
         close();
@@ -387,15 +350,13 @@ public class DeathChestImpl implements DeathChest {
      */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onBlockExplode(EntityExplodeEvent event) {
-        if (event.blockList().stream().noneMatch(block -> block.getLocation().equals(location)))
-            return;
+        if (event.blockList().stream().noneMatch(block -> block.getLocation().equals(location))) return;
         if (plugin.getDeathChestConfig().blastProtection()) {
             event.blockList().removeIf(block -> block.getLocation().equals(getLocation()));
             return;
         }
         for (ItemStack content : this.inventory.getContents()) {
-            if (content == null)
-                continue;
+            if (content == null) continue;
             getWorld().dropItemNaturally(getLocation(), content);
         }
         close();
@@ -406,8 +367,7 @@ public class DeathChestImpl implements DeathChest {
      */
     @Override
     public void close() {
-        if (closed)
-            return;
+        if (closed) return;
         closed = true;
         if (this.inventory != null) {
             List<HumanEntity> humanEntities = new LinkedList<>(inventory.getViewers()); // Copies the list to avoid a concurrent modification exception
@@ -428,9 +388,7 @@ public class DeathChestImpl implements DeathChest {
         // Resets the breaking animation if the service is available
         IAnimationService animationService = plugin.getAnimationService();
         if (animationService != null && isExpiring()) {
-            Stream<Player> playerStream = getWorld().
-                    getNearbyEntities(getLocation(), 20, 20, 20, entity -> entity.getType() == EntityType.PLAYER).stream()
-                    .map(entity -> (Player) entity);
+            Stream<Player> playerStream = getWorld().getNearbyEntities(getLocation(), 20, 20, 20, entity -> entity.getType() == EntityType.PLAYER).stream().map(entity -> (Player) entity);
             animationService.spawnBlockBreakAnimation(breakingEntityId, block.getLocation().toVector(), -1, playerStream);
         }
 
