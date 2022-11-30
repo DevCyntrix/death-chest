@@ -29,10 +29,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.event.inventory.InventoryMoveItemEvent;
+import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.BlockInventoryHolder;
 import org.bukkit.inventory.Inventory;
@@ -149,22 +146,29 @@ public class DeathChestImpl implements DeathChest {
             @Override
             public void run() {
                 // Updates the hologram lines
-                blueprints.forEach((s, line) -> {
-                    if (substitutor != null) s = substitutor.replace(s);
-                    if (DeathChestPlugin.isPlaceholderAPIEnabled()) s = PlaceholderAPI.setPlaceholders(player, s);
-                    line.rename(s);
+                blueprints.forEach((text, line) -> {
+                    if (substitutor != null) text = substitutor.replace(text);
+                    if (DeathChestPlugin.isPlaceholderAPIEnabled()) text = PlaceholderAPI.setPlaceholders(player, text);
+                    String finalText = text;
+                    Bukkit.getScheduler().runTask(plugin, () -> line.rename(finalText));
                 });
             }
         }.runTaskTimerAsynchronously(plugin, 20, 20);
     }
 
     private BukkitTask runParticleTask(ParticleOptions particleOptions) {
+        Particle.DustOptions orangeDustOptions = new Particle.DustOptions(Color.ORANGE, 0.75f);
+        Particle.DustOptions aquaDustOptions = new Particle.DustOptions(Color.AQUA, 0.75f);
+
         return new ParticleScheduler(getLocation(), particleOptions.count(), particleOptions.radius(), particleLocation -> {
-            Particle.DustOptions options = new Particle.DustOptions(Color.ORANGE, 0.75f);
-            getWorld().spawnParticle(Particle.REDSTONE, particleLocation.clone().add(0.5, 0.5, 0.5), // Centred particle location
-                    1, options);
-            Particle.DustOptions options1 = new Particle.DustOptions(Color.AQUA, 0.75f);
-            getWorld().spawnParticle(Particle.REDSTONE, particleLocation.clone().add(0.5, 0.4, 0.5), 1, options1);
+            // Orange dust
+            Location orangeDust = particleLocation.clone().add(0.5, 0.5, 0.5); // Center the particle location
+            Bukkit.getScheduler().runTask(plugin, () -> getWorld().spawnParticle(Particle.REDSTONE, orangeDust, 1, orangeDustOptions));
+
+            // Aqua dust
+            Location aquaDust = orangeDust.clone().subtract(0, 0.1, 0);
+            Bukkit.getScheduler().runTask(plugin, () -> getWorld().spawnParticle(Particle.REDSTONE, aquaDust, 1, aquaDustOptions));
+
         }).runTaskTimerAsynchronously(this.plugin, 0, (long) (20 / particleOptions.speed()));
     }
 
@@ -181,7 +185,7 @@ public class DeathChestImpl implements DeathChest {
                 } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 } catch (TimeoutException e) {
-                    plugin.getLogger().info("Warning get nearby entities takes longer than 1 second.");
+                    plugin.getLogger().warning("Warning get nearby entities takes longer than 1 second.");
                 }
             }
         }.runTaskTimerAsynchronously(plugin, 20, 20);
@@ -300,6 +304,8 @@ public class DeathChestImpl implements DeathChest {
     public void onHopperMoveItem(InventoryMoveItemEvent event) {
 
         var inv = event.getDestination();
+        if (inv.getType() != InventoryType.CHEST) return;
+
         var holder = inv.getHolder();
         if (holder == null) return;
 

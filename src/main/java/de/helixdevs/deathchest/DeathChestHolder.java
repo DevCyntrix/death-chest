@@ -16,8 +16,7 @@ public class DeathChestHolder implements InventoryHolder {
 
     @Override
     public @NotNull Inventory getInventory() {
-        //noinspection ConstantConditions
-        return null;
+        return chest.getInventory();
     }
 
     public @NotNull DeathChest getChest() {
