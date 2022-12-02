@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "de.helixdevs"
-version = "1.5.9"
+version = "1.5.10"
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(17))
@@ -43,6 +43,7 @@ dependencies {
     compileOnly("com.github.sainttx.Holograms:holograms-api:0f5b027")
     compileOnly("com.github.decentsoftware-eu:decentholograms:2.5.2")
     compileOnly("com.gmail.filoghost.holographicdisplays:holographicdisplays-api:2.4.9")
+    compileOnly(files("./lib/CMIAPI8.7.8.2.jar"))
 
     // Placeholder API
     compileOnly("me.clip:placeholderapi:2.11.2")

@@ -4,6 +4,7 @@ import de.helixdevs.deathchest.api.animation.IAnimationService;
 import de.helixdevs.deathchest.api.hologram.IHologramService;
 import de.helixdevs.deathchest.api.protection.IProtectionService;
 import de.helixdevs.deathchest.support.animation.ProtocolLibAnimation;
+import de.helixdevs.deathchest.support.hologram.cmi.CMIService;
 import de.helixdevs.deathchest.support.hologram.decentholograms.DHService;
 import de.helixdevs.deathchest.support.hologram.holograms.HologramsService;
 import de.helixdevs.deathchest.support.hologram.holographicdisplays.HDService;
@@ -21,7 +22,8 @@ public final class SupportServices {
     private static final Map<String, Function<Plugin, IHologramService>> hologramServiceMap = Map.of(
             "HolographicDisplays", HDService::new,
             "DecentHolograms", DHService::new,
-            "Holograms", HologramsService::new
+            "Holograms", HologramsService::new,
+            "CMI", CMIService::new
     );
 
     private static final Map<String, Function<Plugin, IAnimationService>> animationServiceMap = Map.of(
