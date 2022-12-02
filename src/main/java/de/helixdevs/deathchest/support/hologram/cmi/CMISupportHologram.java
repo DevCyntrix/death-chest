@@ -25,7 +25,7 @@ public class CMISupportHologram implements IHologram {
     @Override
     public void teleport(@NotNull Location location) {
         this.hologram.setLoc(location);
-        this.hologram.refresh();
+        this.hologram.update();
     }
 
     @Override

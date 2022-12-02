@@ -24,8 +24,17 @@ public class CMIService implements IHologramService {
     @Override
     public @NotNull IHologram spawnHologram(@NotNull Location location) {
         plugin.getLogger().info("Spawning holograms with DecentHolograms");
-        CMIHologram hologram = new CMIHologram(UUID.randomUUID().toString(), new CMILocation(location));
+
+        CMIHologram hologram;
+        try {
+            Class.forName("com.Zrips.CMI.Containers.CMILocation");
+            hologram = new CMIHologram(UUID.randomUUID().toString(), new CMILocation(location));
+        } catch (ClassNotFoundException e) {
+            //noinspection deprecation
+            hologram = new CMIHologram(UUID.randomUUID().toString(), location);
+        }
         CMI.getInstance().getHologramManager().addHologram(hologram);
+        hologram.update();
         return new CMISupportHologram(this, hologram);
     }
 }

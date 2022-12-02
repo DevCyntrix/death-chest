@@ -92,7 +92,8 @@ bukkit {
         "DecentHolograms",
         "GriefPrevention",
         "PlaceholderAPI",
-        "Vault"
+        "Vault",
+        "CMI"
     )
     libraries = listOf(
         "org.apache.commons:commons-text:1.9",

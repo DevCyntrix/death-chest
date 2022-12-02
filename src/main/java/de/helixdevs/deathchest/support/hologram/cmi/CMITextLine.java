@@ -17,7 +17,7 @@ public class CMITextLine implements IHologramTextLine {
     @Override
     public void rename(@NotNull String text) {
         hologram.setLine(index, text);
-        hologram.refresh();
+        hologram.update();
     }
 
     @Override
