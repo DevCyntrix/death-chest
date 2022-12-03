@@ -124,7 +124,7 @@ public class SpawnChestListener implements Listener {
 
         // Player notification
         PlayerNotificationOptions playerNotificationOptions = deathChestConfig.playerNotificationOptions();
-        if (playerNotificationOptions != null && playerNotificationOptions.enabled() && playerNotificationOptions.messages() != null) {
+        if (playerNotificationOptions.enabled() && playerNotificationOptions.messages() != null) {
             if (deathLocation.getWorld() == null) {
                 return; // Invalid location
             }
@@ -133,19 +133,12 @@ public class SpawnChestListener implements Listener {
                     "y", deathLocation.getBlockY(),
                     "z", deathLocation.getBlockZ(),
                     "world", deathLocation.getWorld().getName()));
-            for (String message : playerNotificationOptions.messages()) {
-                message = substitutor.replace(message);
-
-                if (DeathChestPlugin.isPlaceholderAPIEnabled())
-                    message = PlaceholderAPI.setPlaceholders(player, message);
-
-                player.sendMessage(message);
-            }
+            playerNotificationOptions.showNotification(player, substitutor);
         }
 
         // Global notification
         GlobalNotificationOptions globalNotificationOptions = deathChestConfig.globalNotificationOptions();
-        if (globalNotificationOptions != null && globalNotificationOptions.enabled() && globalNotificationOptions.messages() != null) {
+        if (globalNotificationOptions.enabled() && globalNotificationOptions.messages() != null) {
             if (deathLocation.getWorld() == null) {
                 return; // Invalid location
             }

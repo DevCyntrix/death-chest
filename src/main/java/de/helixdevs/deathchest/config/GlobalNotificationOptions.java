@@ -7,13 +7,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public record GlobalNotificationOptions(boolean enabled, String[] messages) {
 
-    public static @Nullable GlobalNotificationOptions load(@Nullable ConfigurationSection section) {
+    public static @NotNull GlobalNotificationOptions load(@Nullable ConfigurationSection section) {
         if (section == null)
-            return null;
+            return new GlobalNotificationOptions(false, null);
 
         boolean enabled = section.getBoolean("enabled", false);
         String message = section.getString("message");
