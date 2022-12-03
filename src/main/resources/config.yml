@@ -90,7 +90,7 @@ world-filter:
   worlds:
     - disabled_world
 
-# Set this option to true if you don't want explosions to be able to destroy the death chests.
+# Set this option to true if you want to protect the death chests against explosions.
 blast-protection: false
 
 # This option protects the death chest against thieves if the player has the specific permission and the thief
