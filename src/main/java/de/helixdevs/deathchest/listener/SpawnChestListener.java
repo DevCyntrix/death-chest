@@ -7,7 +7,6 @@ import de.helixdevs.deathchest.config.GlobalNotificationOptions;
 import de.helixdevs.deathchest.config.PlayerNotificationOptions;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.apache.commons.text.StringSubstitutor;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -158,15 +157,6 @@ public class SpawnChestListener implements Listener {
                     "player_name", player.getName(),
                     "player_displayname", player.getDisplayName()));
             globalNotificationOptions.showNotification(player, substitutor);
-
-            for (String message : globalNotificationOptions.messages()) {
-                message = substitutor.replace(message);
-
-                if (DeathChestPlugin.isPlaceholderAPIEnabled())
-                    message = PlaceholderAPI.setPlaceholders(player, message);
-
-                Bukkit.broadcastMessage(message);
-            }
         }
 
 
