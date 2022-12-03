@@ -21,7 +21,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("org.spigotmc:spigot-api:1.18-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT")
 
     // Protection Support
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.7")
