@@ -6,11 +6,7 @@ plugins {
 }
 
 group = "de.helixdevs"
-version = "1.5.10"
-
-java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(17))
-}
+version = "1.5.11"
 
 repositories {
     mavenCentral()
@@ -82,7 +78,7 @@ tasks {
 bukkit {
     name = "DeathChest"
     main = "de.helixdevs.deathchest.DeathChestPlugin"
-    apiVersion = "1.18"
+    apiVersion = "1.17"
     website = "https://www.spigotmc.org/resources/death-chest.101066/"
     authors = listOf("CyntrixAlgorithm")
     softDepend = listOf(

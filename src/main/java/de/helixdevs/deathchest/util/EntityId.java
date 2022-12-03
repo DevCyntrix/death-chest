@@ -1,6 +1,7 @@
 package de.helixdevs.deathchest.util;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class EntityId {
@@ -18,12 +19,16 @@ public final class EntityId {
         if (entityClass == null)
             return -1;
         try {
-            Field c = entityClass.getDeclaredField("c");
-            if (!c.trySetAccessible())
+            Field entityCounter = Arrays.stream(entityClass.getDeclaredFields()).filter(field -> field.getType().equals(AtomicInteger.class))
+                    .findFirst().orElse(null);
+            if (entityCounter == null) {
                 return -1;
-            AtomicInteger integer = (AtomicInteger) c.get(null);
+            }
+            if (!entityCounter.trySetAccessible())
+                return -1;
+            AtomicInteger integer = (AtomicInteger) entityCounter.get(null);
             return integer.incrementAndGet();
-        } catch (NoSuchFieldException | IllegalAccessException ignored) {
+        } catch (IllegalAccessException ignored) {
         }
         return -1;
     }
