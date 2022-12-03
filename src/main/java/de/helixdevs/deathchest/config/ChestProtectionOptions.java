@@ -4,15 +4,17 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public record ChestProtectionOptions(boolean enabled, String permission, String bypassPermission, Sound sound,
                                      float volume, float pitch, String[] message) {
 
-    public static @Nullable ChestProtectionOptions load(@Nullable ConfigurationSection section) {
+    public static @NotNull ChestProtectionOptions load(@Nullable ConfigurationSection section) {
         if (section == null)
-            return null;
+            section = new MemoryConfiguration();
 
         boolean enabled = section.getBoolean("enabled", false);
         String permission = section.getString("permission", "deathchest.thiefprotected");

@@ -64,11 +64,24 @@ player-notification:
   message: |-
     &7You died. Your items were put into a chest which disappears after &c10 minutes&7! ${x} ${y} ${z}
 
-# ${player_name}, ${player_displayname} ${x}, ${y}, ${z}, ${world}
+# Available Placeholders:
+# ${player_name} : shows the player name
+# ${player_displayname} : shows the player display name (Maybe with prefix)
+# ${x}, ${y}, ${z}, ${world} : shows the coordinates of the death location
 global-notification:
   enabled: false
   message: |-
-    &7${player_name} dies at ${x} ${y} ${z} in ${world}
+    &7${player_name} died at ${x} ${y} ${z} in ${world}
+
+# Available Placeholders:
+# ${player_name} : shows the player name
+# ${player_displayname} : shows the player display name (Maybe with prefix)
+# ${x}, ${y}, ${z}, ${world} : shows the coordinates of the death location
+# To disable the death message change "enabled" to true and remove the message option.
+change-death-message:
+  enabled: false
+  message: |-
+    &7${player_name} died at ${x} ${y} ${z} in ${world}
 
 # This section configures the activation of this plugin for specific worlds.
 world-filter:
@@ -87,6 +100,8 @@ chest-protection:
   enabled: false
   permission: deathchest.thiefprotected
   bypass-permission: deathchest.thiefprotected.bypass
+  # On this website you can find a list of all sounds which is implemented in SpigotMC
+  # @see https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html
   # If you want to disable the sound or the message, you can delete this options
   sound: BLOCK_CHEST_LOCKED;1.0;1.0
   message: |-

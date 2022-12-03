@@ -1,6 +1,7 @@
 package de.helixdevs.deathchest.listener;
 
 import de.helixdevs.deathchest.DeathChestPlugin;
+import de.helixdevs.deathchest.config.ChangeDeathMessageOptions;
 import de.helixdevs.deathchest.config.DeathChestConfig;
 import de.helixdevs.deathchest.config.GlobalNotificationOptions;
 import de.helixdevs.deathchest.config.PlayerNotificationOptions;
@@ -17,8 +18,10 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 public class SpawnChestListener implements Listener {
 
@@ -37,6 +40,35 @@ public class SpawnChestListener implements Listener {
      */
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onDeath(PlayerDeathEvent event) {
+
+        ChangeDeathMessageOptions changeDeathMessageOptions = plugin.getDeathChestConfig().changeDeathMessageOptions();
+        if (changeDeathMessageOptions.enabled()) {
+            if (changeDeathMessageOptions.message() == null) {
+                event.setDeathMessage(null);
+                return;
+            }
+            Player player = event.getEntity();
+            Location location = player.getLocation();
+            if (location.getWorld() == null) {
+                return; // Invalid location
+            }
+
+            StringSubstitutor substitutor = new StringSubstitutor(Map.of(
+                    "x", location.getBlockX(),
+                    "y", location.getBlockY(),
+                    "z", location.getBlockZ(),
+                    "world", location.getWorld().getName(),
+                    "player_name", player.getName(),
+                    "player_displayname", player.getDisplayName()));
+            event.setDeathMessage(Arrays.stream(changeDeathMessageOptions.message()).map(substitutor::replace).map(s -> {
+                if (DeathChestPlugin.isPlaceholderAPIEnabled()) {
+                    return PlaceholderAPI.setPlaceholders(player, s);
+                }
+                return s;
+            }).collect(Collectors.joining("\n")));
+        }
+
+
         if (event.getKeepInventory())
             return;
         if (event.getDrops().isEmpty())
@@ -83,10 +115,8 @@ public class SpawnChestListener implements Listener {
             loc.add(x, 0, z);
         }
 
-
         try {
             plugin.createDeathChest(loc, createdAt, expireAt, player, event.getDrops().toArray(new ItemStack[0]));
-
             // Clears the drops
             event.getDrops().clear();
         } catch (Exception e) {
@@ -96,6 +126,9 @@ public class SpawnChestListener implements Listener {
         // Player notification
         PlayerNotificationOptions playerNotificationOptions = deathChestConfig.playerNotificationOptions();
         if (playerNotificationOptions != null && playerNotificationOptions.enabled() && playerNotificationOptions.messages() != null) {
+            if (deathLocation.getWorld() == null) {
+                return; // Invalid location
+            }
             StringSubstitutor substitutor = new StringSubstitutor(Map.of(
                     "x", deathLocation.getBlockX(),
                     "y", deathLocation.getBlockY(),
@@ -114,6 +147,9 @@ public class SpawnChestListener implements Listener {
         // Global notification
         GlobalNotificationOptions globalNotificationOptions = deathChestConfig.globalNotificationOptions();
         if (globalNotificationOptions != null && globalNotificationOptions.enabled() && globalNotificationOptions.messages() != null) {
+            if (deathLocation.getWorld() == null) {
+                return; // Invalid location
+            }
             StringSubstitutor substitutor = new StringSubstitutor(Map.of(
                     "x", deathLocation.getBlockX(),
                     "y", deathLocation.getBlockY(),

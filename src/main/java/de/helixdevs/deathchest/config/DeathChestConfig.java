@@ -16,6 +16,7 @@ public record DeathChestConfig(int configVersion,
                                @Nullable BreakEffectOptions breakEffectOptions,
                                @Nullable PlayerNotificationOptions playerNotificationOptions,
                                @Nullable GlobalNotificationOptions globalNotificationOptions,
+                               @NotNull ChangeDeathMessageOptions changeDeathMessageOptions,
                                @NotNull WorldFilterConfig worldFilterConfig,
                                boolean blastProtection,
                                @NotNull ChestProtectionOptions chestProtectionOptions,
@@ -56,6 +57,8 @@ public record DeathChestConfig(int configVersion,
         PlayerNotificationOptions playerNotificationOptions = PlayerNotificationOptions.load(config.getConfigurationSection("player-notification"));
         GlobalNotificationOptions globalNotificationOptions = GlobalNotificationOptions.load(config.getConfigurationSection("global-notification"));
 
+        ChangeDeathMessageOptions changeDeathMessageOptions = ChangeDeathMessageOptions.load(config.getConfigurationSection("change-death-message"));
+
         WorldFilterConfig worldFilterConfig = WorldFilterConfig.load(config.getConfigurationSection("world-filter"));
 
         boolean blastProtection = config.getBoolean("blast-protection", false);
@@ -76,6 +79,7 @@ public record DeathChestConfig(int configVersion,
                 breakEffectOptions,
                 playerNotificationOptions,
                 globalNotificationOptions,
+                changeDeathMessageOptions,
                 worldFilterConfig,
                 blastProtection,
                 chestProtectionOptions,
