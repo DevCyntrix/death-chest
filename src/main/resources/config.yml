@@ -68,7 +68,15 @@ player-notification:
 global-notification:
   enabled: false
   message: |-
-    &7${player_name} dies at ${x} ${y} ${z} in ${world}
+    &7${player_name} died at ${x} ${y} ${z} in ${world}
+
+# Placeholders:
+# ${player_name}, ${player_displayname} ${x}, ${y}, ${z}, ${world}
+# To disable the death message change "enabled" to true and remove the message option.
+change-death-message:
+  enabled: false
+  message: |-
+    &7${player_name} died at ${x} ${y} ${z} in ${world}
 
 # This section configures the activation of this plugin for specific worlds.
 world-filter:
