@@ -10,6 +10,7 @@ import de.helixdevs.deathchest.api.protection.IProtectionService;
 import de.helixdevs.deathchest.command.DeathChestCommand;
 import de.helixdevs.deathchest.config.ChestProtectionOptions;
 import de.helixdevs.deathchest.config.DeathChestConfig;
+import de.helixdevs.deathchest.hologram.NativeHologramService;
 import de.helixdevs.deathchest.listener.SpawnChestListener;
 import de.helixdevs.deathchest.listener.UpdateNotificationListener;
 import de.helixdevs.deathchest.util.Metrics;
@@ -102,7 +103,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         checkConfigVersion();
         reload();
 
-        this.hologramService = SupportServices.getHologramService(this, this.deathChestConfig.preferredHologramService());
+        this.hologramService = new NativeHologramService();
         this.animationService = SupportServices.getAnimationService(this, this.deathChestConfig.preferredAnimationService());
         this.protectionService = SupportServices.getProtectionService(this);
         // Standard protection service: No service

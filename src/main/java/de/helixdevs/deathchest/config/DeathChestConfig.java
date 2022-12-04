@@ -20,7 +20,6 @@ public record DeathChestConfig(int configVersion,
                                @NotNull WorldFilterConfig worldFilterConfig,
                                boolean blastProtection,
                                @NotNull ChestProtectionOptions chestProtectionOptions,
-                               @Nullable String preferredHologramService,
                                @Nullable String preferredAnimationService) {
 
     public static final int CONFIG_VERSION = 2;
@@ -65,7 +64,6 @@ public record DeathChestConfig(int configVersion,
 
         ChestProtectionOptions chestProtectionOptions = ChestProtectionOptions.load(config.getConfigurationSection("chest-protection"));
 
-        String preferredHologramService = config.getString("preferred-hologram-service");
         String preferredAnimationService = config.getString("preferred-animation-service");
 
         return new DeathChestConfig(
@@ -83,7 +81,6 @@ public record DeathChestConfig(int configVersion,
                 worldFilterConfig,
                 blastProtection,
                 chestProtectionOptions,
-                preferredHologramService,
                 preferredAnimationService);
     }
 }
