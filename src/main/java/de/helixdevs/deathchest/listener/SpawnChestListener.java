@@ -37,7 +37,7 @@ public class SpawnChestListener implements Listener {
      *
      * @param event the event from the bukkit api
      */
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onDeath(PlayerDeathEvent event) {
 
         ChangeDeathMessageOptions changeDeathMessageOptions = plugin.getDeathChestConfig().changeDeathMessageOptions();
@@ -96,17 +96,10 @@ public class SpawnChestListener implements Listener {
             expiration = Duration.ofSeconds(-1);
 
         long createdAt = System.currentTimeMillis();
-
-        long expireAt;
-        if (!expiration.isNegative() && !expiration.isZero()) {
-            expireAt = createdAt + expiration.toMillis();
-        } else {
-            expireAt = -1; // Permanent
-        }
-
-        ThreadLocalRandom random = ThreadLocalRandom.current();
+        long expireAt = !expiration.isNegative() && !expiration.isZero() ? createdAt + expiration.toMillis() : -1;
 
         Location loc = deathLocation.getBlock().getLocation();
+        ThreadLocalRandom random = ThreadLocalRandom.current();
 
         while (!plugin.canPlaceChest(loc)) {
             int x = random.nextInt(10) - 5;
