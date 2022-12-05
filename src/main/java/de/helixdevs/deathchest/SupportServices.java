@@ -1,13 +1,8 @@
 package de.helixdevs.deathchest;
 
 import de.helixdevs.deathchest.api.animation.IAnimationService;
-import de.helixdevs.deathchest.api.hologram.IHologramService;
 import de.helixdevs.deathchest.api.protection.IProtectionService;
 import de.helixdevs.deathchest.support.animation.ProtocolLibAnimation;
-import de.helixdevs.deathchest.support.hologram.cmi.CMIService;
-import de.helixdevs.deathchest.support.hologram.decentholograms.DHService;
-import de.helixdevs.deathchest.support.hologram.holograms.HologramsService;
-import de.helixdevs.deathchest.support.hologram.holographicdisplays.HDService;
 import de.helixdevs.deathchest.support.protection.*;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -19,13 +14,6 @@ import java.util.function.Function;
 
 public final class SupportServices {
 
-    private static final Map<String, Function<Plugin, IHologramService>> hologramServiceMap = Map.of(
-            "HolographicDisplays", HDService::new,
-            "DecentHolograms", DHService::new,
-            "Holograms", HologramsService::new,
-            "CMI", CMIService::new
-    );
-
     private static final Map<String, Function<Plugin, IAnimationService>> animationServiceMap = Map.of(
             "ProtocolLib", plugin -> new ProtocolLibAnimation()
     );
@@ -36,10 +24,6 @@ public final class SupportServices {
             "GriefPrevention", plugin -> new GriefPreventionProtection(),
             "RedProtect", plugin -> new RedProtection()
     );
-
-    public static @Nullable IHologramService getHologramService(@NotNull Plugin plugin, @Nullable String preferred) {
-        return getService(hologramServiceMap, plugin, preferred);
-    }
 
     public static @Nullable IAnimationService getAnimationService(@NotNull Plugin plugin, @Nullable String preferred) {
         return getService(animationServiceMap, plugin, preferred);
