@@ -19,11 +19,11 @@ currently you can only customize the radius, particle count and the speed.
 You can customize the inventory which opens by right-clicking the chest. Properties like title and size are customizable
 in the configuration file.
 
-## Compability
+## Compatibility
 
 ### Hologram
 
-This plugin has a support for Holographic Displays and Decent Holograms for spawning a hologram above the chest which is
+This plugin has a native hologram support for spawning a hologram above the chest which is
 fully customizable in the configuration file. It has also a support with specific placeholders like `{player_name}`
 , `{player_displayname}` and `{duration}`.
 
