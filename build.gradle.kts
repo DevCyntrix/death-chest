@@ -72,7 +72,7 @@ tasks {
         filteringCharset = Charsets.UTF_8.name()
     }
     runServer {
-        minecraftVersion("1.19.2")
+         minecraftVersion("1.19.3")
     }
     test {
         useJUnitPlatform()
@@ -87,11 +87,10 @@ bukkit {
     authors = listOf("CyntrixAlgorithm")
     softDepend = listOf(
         "WorldGuard",
-        "HolographicDisplays",
         "ProtocolLib",
-        "DecentHolograms",
         "GriefPrevention",
         "PlaceholderAPI",
+        "RedProtect",
         "Vault",
         "CMI"
     )
