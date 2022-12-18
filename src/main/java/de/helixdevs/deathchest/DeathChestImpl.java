@@ -321,12 +321,25 @@ public class DeathChestImpl implements DeathChest {
      */
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onBlockBreak(BlockBreakEvent event) {
-        if (!event.getBlock().getLocation().equals(getLocation())) return;
+        Block block = event.getBlock();
+        if (!block.getLocation().equals(getLocation())) return;
+        Player player = event.getPlayer();
+
+        event.setCancelled(true);
+        // Chest Protection (Vault is required)
+        Permission permission = getPlugin().getPermission();
+        ChestProtectionOptions protectionOptions = getPlugin().getDeathChestConfig().chestProtectionOptions();
+        if (protectionOptions.enabled() && getPlugin().getPermission() != null && getPlayer() != null && player != getPlayer() && permission.playerHas(getWorld().getName(), getPlayer(), protectionOptions.permission()) && !permission.playerHas(getWorld().getName(), player, protectionOptions.bypassPermission())) {
+            protectionOptions.playSound(player, block.getLocation());
+            protectionOptions.sendMessage(player);
+            return;
+        }
+
         for (ItemStack content : this.inventory.getContents()) {
             if (content == null) continue;
             getWorld().dropItemNaturally(getLocation(), content);
         }
-        event.setCancelled(true);
+
         close();
     }
 
