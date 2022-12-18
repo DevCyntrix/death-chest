@@ -22,6 +22,9 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Currently not used but will be implemented soon.
+ */
 public class YamlStorage implements DeathChestStorage {
 
     private File file;
