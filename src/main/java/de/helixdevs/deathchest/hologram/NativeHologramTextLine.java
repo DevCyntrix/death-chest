@@ -30,6 +30,8 @@ public class NativeHologramTextLine implements IHologramTextLine {
 
     @Override
     public void rename(@NotNull String text) {
+        if (this.armorStand.isDead())
+            return;
         this.armorStand.setCustomName(text);
     }
 
