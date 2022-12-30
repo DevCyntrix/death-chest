@@ -389,35 +389,74 @@ public class DeathChestImpl implements DeathChest {
     public void close() {
         if (closed) return;
         closed = true;
-        List<HumanEntity> humanEntities = new LinkedList<>(inventory.getViewers()); // Copies the list to avoid a concurrent modification exception
-        humanEntities.forEach(HumanEntity::closeInventory);
 
-        if (this.plugin.getDeathChestConfig().dropItemsAfterExpiration()) {
-            for (ItemStack itemStack : inventory) {
-                //noinspection DataFlowIssue
-                location.getWorld().dropItemNaturally(location, itemStack); // World won't be null
-            }
+        try {
+            List<HumanEntity> humanEntities = new LinkedList<>(inventory.getViewers()); // Copies the list to avoid a concurrent modification exception
+            humanEntities.forEach(HumanEntity::closeInventory);
+        } catch (Exception e) {
+            System.err.println("Failed to close inventories of viewers.");
+            e.printStackTrace();
         }
+
+        try {
+            if (this.plugin.getDeathChestConfig().dropItemsAfterExpiration()) {
+                for (ItemStack itemStack : inventory) {
+                    if (itemStack == null) continue;
+                    //noinspection DataFlowIssue
+                    location.getWorld().dropItemNaturally(location, itemStack); // World won't be null
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to drop items of the expired death chest");
+            e.printStackTrace();
+        }
+
         Block block = getLocation().getBlock();
         getWorld().spawnParticle(Particle.BLOCK_CRACK, getLocation().clone().add(0.5, 0.5, 0.5), 10, block.getBlockData());
-        this.previousState.update(true, false);
 
-        if (this.hologram != null) {
-            this.hologram.delete();
-            this.hologram = null;
+        try {
+            this.previousState.update(true, false);
+        } catch (Exception e) {
+            System.err.println("Failed to replace the block with the previous block.");
+            e.printStackTrace();
         }
 
-        this.tasks.forEach(BukkitTask::cancel);
-        this.tasks.clear();
-
-        // Resets the breaking animation if the service is available
-        IAnimationService animationService = plugin.getAnimationService();
-        if (animationService != null && isExpiring()) {
-            Stream<Player> playerStream = getWorld().getNearbyEntities(getLocation(), 20, 20, 20, entity -> entity.getType() == EntityType.PLAYER).stream().map(entity -> (Player) entity);
-            animationService.spawnBlockBreakAnimation(breakingEntityId, block.getLocation().toVector(), -1, playerStream);
+        try {
+            if (this.hologram != null) {
+                this.hologram.delete();
+                this.hologram = null;
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to delete the hologram");
+            e.printStackTrace();
         }
 
-        HandlerList.unregisterAll(this);
+        try {
+            this.tasks.forEach(BukkitTask::cancel);
+            this.tasks.clear();
+        } catch (Exception e) {
+            System.err.println("Failed to cancel the bukkit tasks");
+            e.printStackTrace();
+        }
+
+        try {
+            // Resets the breaking animation if the service is available
+            IAnimationService animationService = plugin.getAnimationService();
+            if (animationService != null && isExpiring()) {
+                Stream<Player> playerStream = getWorld().getNearbyEntities(getLocation(), 20, 20, 20, entity -> entity.getType() == EntityType.PLAYER).stream().map(entity -> (Player) entity);
+                animationService.spawnBlockBreakAnimation(breakingEntityId, block.getLocation().toVector(), -1, playerStream);
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to reset the block animation of all players in the area");
+            e.printStackTrace();
+        }
+
+        try {
+            HandlerList.unregisterAll(this);
+        } catch (Exception e) {
+            System.err.println("Failed to unregister the listener of the death chest.");
+            e.printStackTrace();
+        }
         this.plugin.deathChests.remove(this);
     }
 

@@ -35,7 +35,7 @@ public class DeathChestCommand implements TabExecutor {
 
             plugin.onDisable();
             plugin.onEnable();
-            sender.sendMessage(plugin.getPrefix() + "§cThe plugin has been reloaded successfully");
+            sender.sendMessage(plugin.getPrefix() + "§cThe plugin has been successfully reloaded");
             return true;
         }
 
