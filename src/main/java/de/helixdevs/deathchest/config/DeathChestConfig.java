@@ -10,6 +10,7 @@ public record DeathChestConfig(int configVersion,
                                boolean updateChecker,
                                @NotNull String durationFormat,
                                @Nullable Duration expiration,
+                               boolean dropItemsAfterExpiration,
                                @NotNull InventoryOptions inventoryOptions,
                                @NotNull HologramOptions hologramOptions,
                                @NotNull ParticleOptions particleOptions,
@@ -36,6 +37,8 @@ public record DeathChestConfig(int configVersion,
                 expiration = Duration.ofSeconds(expirationInSeconds);
             }
         }
+
+        boolean dropItemsAfterExpiration = config.getBoolean("drop-items-after-expiration", false);
 
         // Inventory
         InventoryOptions inventoryOptions = InventoryOptions.load(config.getConfigurationSection("inventory"));
@@ -71,6 +74,7 @@ public record DeathChestConfig(int configVersion,
                 updateCheck,
                 durationFormat,
                 expiration,
+                dropItemsAfterExpiration,
                 inventoryOptions,
                 hologramOptions,
                 particleOptions,

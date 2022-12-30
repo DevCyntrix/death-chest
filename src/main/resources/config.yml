@@ -12,6 +12,8 @@ duration-format: 'mm:ss'
 # The expiration of the chest in seconds.
 # You can deactivate the expiration by setting the value to -1
 expiration: 600
+# If this feature is enabled all caught items will be dropped if the chest is expired.
+drop-items-after-expiration: false
 
 # Here you can modify the inventory which opens when you right-click the death chest. You can use color codes with '&'
 # in the title and change the inventory size by changing the size value.

@@ -56,6 +56,7 @@ public class DeathChestImpl implements DeathChest {
     private final BlockState previousState;
     private final BlockState state;
 
+    @NotNull
     private final Inventory inventory;
     private final long createdAt;
     private final long expireAt;
@@ -388,9 +389,14 @@ public class DeathChestImpl implements DeathChest {
     public void close() {
         if (closed) return;
         closed = true;
-        if (this.inventory != null) {
-            List<HumanEntity> humanEntities = new LinkedList<>(inventory.getViewers()); // Copies the list to avoid a concurrent modification exception
-            humanEntities.forEach(HumanEntity::closeInventory);
+        List<HumanEntity> humanEntities = new LinkedList<>(inventory.getViewers()); // Copies the list to avoid a concurrent modification exception
+        humanEntities.forEach(HumanEntity::closeInventory);
+
+        if (this.plugin.getDeathChestConfig().dropItemsAfterExpiration()) {
+            for (ItemStack itemStack : inventory) {
+                //noinspection DataFlowIssue
+                location.getWorld().dropItemNaturally(location, itemStack); // World won't be null
+            }
         }
         Block block = getLocation().getBlock();
         getWorld().spawnParticle(Particle.BLOCK_CRACK, getLocation().clone().add(0.5, 0.5, 0.5), 10, block.getBlockData());
