@@ -1,11 +1,11 @@
-package de.helixdevs.deathchest.util;
+package de.helixdevs.deathchest.tasks;
 
 import org.bukkit.Location;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.function.Consumer;
 
-public class ParticleScheduler extends BukkitRunnable {
+public class ParticleRunnable extends BukkitRunnable {
 
     private final Location center;
     private final int segments;
@@ -13,7 +13,7 @@ public class ParticleScheduler extends BukkitRunnable {
 
     private final Consumer<Location> consumer;
 
-    public ParticleScheduler(Location center, int segments, double radius, Consumer<Location> consumer) {
+    public ParticleRunnable(Location center, int segments, double radius, Consumer<Location> consumer) {
         this.center = center;
         this.segments = segments;
         this.radius = radius;

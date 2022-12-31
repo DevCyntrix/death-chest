@@ -1,5 +1,6 @@
 package de.helixdevs.deathchest;
 
+import com.google.common.base.Preconditions;
 import de.helixdevs.deathchest.api.DeathChest;
 import de.helixdevs.deathchest.api.DeathChestSnapshot;
 import de.helixdevs.deathchest.api.animation.IAnimationService;
@@ -7,11 +8,13 @@ import de.helixdevs.deathchest.api.hologram.IHologram;
 import de.helixdevs.deathchest.api.hologram.IHologramService;
 import de.helixdevs.deathchest.api.hologram.IHologramTextLine;
 import de.helixdevs.deathchest.config.*;
+import de.helixdevs.deathchest.tasks.AnimationRunnable;
+import de.helixdevs.deathchest.tasks.ExpirationRunnable;
+import de.helixdevs.deathchest.tasks.HologramRunnable;
+import de.helixdevs.deathchest.tasks.ParticleRunnable;
 import de.helixdevs.deathchest.util.EntityId;
-import de.helixdevs.deathchest.util.ParticleScheduler;
 import de.helixdevs.deathchest.util.PlayerStringLookup;
 import lombok.Getter;
-import me.clip.placeholderapi.PlaceholderAPI;
 import net.milkbowl.vault.permission.Permission;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.text.StringSubstitutor;
@@ -35,15 +38,11 @@ import org.bukkit.inventory.BlockInventoryHolder;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -67,7 +66,6 @@ public class DeathChestImpl implements DeathChest {
     private final List<BukkitTask> tasks = new LinkedList<>();
 
     private IHologram hologram;
-    private StringSubstitutor substitutor;
 
     private boolean closed;
 
@@ -112,12 +110,12 @@ public class DeathChestImpl implements DeathChest {
             this.hologram = hologramService.spawnHologram(getLocation().clone().add(0.5, hologramOptions.height(), 0.5));
 
             Map<String, IHologramTextLine> blueprints = new LinkedHashMap<>(hologramOptions.lines().size());
-            substitutor = new StringSubstitutor(new PlayerStringLookup(builder.player(), durationSupplier));
+            StringSubstitutor substitutor = new StringSubstitutor(new PlayerStringLookup(builder.player(), durationSupplier));
             hologramOptions.lines().forEach(line -> blueprints.put(line, hologram.appendLine(substitutor.replace(line)))); // A map of blueprints
 
             // Start task
             if (!blueprints.isEmpty()) {
-                this.tasks.add(runHologramUpdateTask(blueprints));
+                this.tasks.add(new HologramRunnable(this, blueprints, substitutor).runTaskTimerAsynchronously(plugin, 20, 20));
             }
         }
 
@@ -127,7 +125,7 @@ public class DeathChestImpl implements DeathChest {
         // Spawns the block break animation
         if (animationService != null && isExpiring() && breakEffectOptions.enabled()) {
             this.breakingEntityId = EntityId.increaseAndGet();
-            tasks.add(runAnimationTask(animationService, breakEffectOptions));
+            tasks.add(new AnimationRunnable(this, animationService, breakEffectOptions, breakingEntityId).runTaskTimerAsynchronously(plugin, 20, 20));
         }
 
         ParticleOptions particleOptions = builder.particleOptions();
@@ -136,32 +134,16 @@ public class DeathChestImpl implements DeathChest {
         }
 
         if (isExpiring()) {
-            this.tasks.add(runExpirationTask());
+            this.tasks.add(new ExpirationRunnable(this).runTaskTimerAsynchronously(plugin, 20, 20));
         }
         Bukkit.getPluginManager().registerEvents(this, plugin);
-    }
-
-    private BukkitTask runHologramUpdateTask(Map<String, IHologramTextLine> blueprints) {
-        return new BukkitRunnable() {
-
-            @Override
-            public void run() {
-                // Updates the hologram lines
-                blueprints.forEach((text, line) -> {
-                    if (substitutor != null) text = substitutor.replace(text);
-                    if (DeathChestPlugin.isPlaceholderAPIEnabled()) text = PlaceholderAPI.setPlaceholders(player, text);
-                    String finalText = text;
-                    Bukkit.getScheduler().runTask(plugin, () -> line.rename(finalText));
-                });
-            }
-        }.runTaskTimerAsynchronously(plugin, 20, 20);
     }
 
     private BukkitTask runParticleTask(ParticleOptions particleOptions) {
         Particle.DustOptions orangeDustOptions = new Particle.DustOptions(Color.ORANGE, 0.75f);
         Particle.DustOptions aquaDustOptions = new Particle.DustOptions(Color.AQUA, 0.75f);
 
-        return new ParticleScheduler(getLocation(), particleOptions.count(), particleOptions.radius(), particleLocation -> {
+        return new ParticleRunnable(getLocation(), particleOptions.count(), particleOptions.radius(), particleLocation -> {
             // Orange dust
             Location orangeDust = particleLocation.clone().add(0.5, 0.5, 0.5); // Center the particle location
             Bukkit.getScheduler().runTask(plugin, () -> getWorld().spawnParticle(Particle.REDSTONE, orangeDust, 1, orangeDustOptions));
@@ -173,40 +155,6 @@ public class DeathChestImpl implements DeathChest {
         }).runTaskTimerAsynchronously(this.plugin, 0, (long) (20 / particleOptions.speed()));
     }
 
-    private BukkitTask runAnimationTask(@NotNull IAnimationService animationService, BreakEffectOptions breakEffectOptions) {
-        return new BukkitRunnable() {
-
-            @Override
-            public void run() {
-                double process = (double) (System.currentTimeMillis() - createdAt) / (expireAt - createdAt);
-
-                try {
-                    Stream<Player> playerStream = Bukkit.getScheduler().callSyncMethod(plugin, () -> getWorld().getNearbyEntities(getLocation(), breakEffectOptions.viewDistance(), breakEffectOptions.viewDistance(), breakEffectOptions.viewDistance(), entity -> entity.getType() == EntityType.PLAYER).stream().map(entity -> (Player) entity)).get(1, TimeUnit.SECONDS);
-                    animationService.spawnBlockBreakAnimation(breakingEntityId, getLocation().toVector(), (int) (9 * process), playerStream);
-                } catch (InterruptedException | ExecutionException e) {
-                    e.printStackTrace();
-                } catch (TimeoutException e) {
-                    plugin.getLogger().warning("Warning get nearby entities takes longer than 1 second.");
-                }
-            }
-        }.runTaskTimerAsynchronously(plugin, 20, 20);
-    }
-
-    private BukkitTask runExpirationTask() {
-        return new BukkitRunnable() {
-
-            @Override
-            public void run() {
-                // Stops the scheduler when the chest expired
-                if (isExpiring() && !isClosed()) {
-                    long duration = expireAt - System.currentTimeMillis();
-                    if (duration <= 0) {
-                        Bukkit.getScheduler().runTask(plugin, () -> close());
-                    }
-                }
-            }
-        }.runTaskTimerAsynchronously(plugin, 20, 20);
-    }
 
     /**
      * Closes the chest if the player was the last viewer and
@@ -398,19 +346,6 @@ public class DeathChestImpl implements DeathChest {
             e.printStackTrace();
         }
 
-        try {
-            if (this.plugin.getDeathChestConfig().dropItemsAfterExpiration()) {
-                for (ItemStack itemStack : inventory) {
-                    if (itemStack == null) continue;
-                    //noinspection DataFlowIssue
-                    location.getWorld().dropItemNaturally(location, itemStack); // World won't be null
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("Failed to drop items of the expired death chest");
-            e.printStackTrace();
-        }
-
         Block block = getLocation().getBlock();
         getWorld().spawnParticle(Particle.BLOCK_CRACK, getLocation().clone().add(0.5, 0.5, 0.5), 10, block.getBlockData());
 
@@ -458,6 +393,20 @@ public class DeathChestImpl implements DeathChest {
             e.printStackTrace();
         }
         this.plugin.deathChests.remove(this);
+    }
+
+    @Override
+    public void dropItems(@NotNull Location location) {
+        Preconditions.checkNotNull(location.getWorld(), "invalid location");
+        for (ItemStack itemStack : getInventory()) {
+            if (itemStack == null) continue;
+            getWorld().dropItemNaturally(location, itemStack); // World won't be null
+        }
+    }
+
+    @Override
+    public @NotNull DeathChestConfig getConfig() {
+        return plugin.getDeathChestConfig();
     }
 
     @Override
