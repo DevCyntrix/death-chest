@@ -133,8 +133,8 @@ public class DeathChestImpl implements DeathChest {
             this.tasks.add(runParticleTask(particleOptions));
         }
 
-        if (isExpiring()) {
-            this.tasks.add(new ExpirationRunnable(this).runTaskTimerAsynchronously(plugin, 20, 20));
+        if (isExpiring() && !isClosed()) {
+            this.tasks.add(new ExpirationRunnable(this).runTaskLater(plugin, (getExpireAt() - System.currentTimeMillis()) / 50));
         }
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
