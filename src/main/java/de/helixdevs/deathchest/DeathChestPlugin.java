@@ -112,10 +112,17 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
 
         PluginManager pluginManager = getServer().getPluginManager();
 
-        ChestProtectionOptions protectionOptions = getDeathChestConfig().chestProtectionOptions();
-        if (protectionOptions.enabled()) {
-            pluginManager.addPermission(new org.bukkit.permissions.Permission(protectionOptions.permission()));
-            pluginManager.addPermission(new org.bukkit.permissions.Permission(protectionOptions.bypassPermission()));
+        try {
+            ChestProtectionOptions protectionOptions = getDeathChestConfig().chestProtectionOptions();
+            if (protectionOptions.enabled()) {
+                if (pluginManager.getPermission(protectionOptions.permission()) == null)
+                    pluginManager.addPermission(new org.bukkit.permissions.Permission(protectionOptions.permission()));
+                if (pluginManager.getPermission(protectionOptions.bypassPermission()) == null)
+                    pluginManager.addPermission(new org.bukkit.permissions.Permission(protectionOptions.bypassPermission()));
+            }
+        } catch (Exception e) {
+            getLogger().warning("Failed to register the permission of the chest-protection");
+            e.printStackTrace();
         }
 
         pluginManager.registerEvents(new UpdateNotificationListener(this), this);
