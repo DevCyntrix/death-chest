@@ -3,6 +3,7 @@ package de.helixdevs.deathchest.hologram;
 import de.helixdevs.deathchest.api.hologram.IHologram;
 import de.helixdevs.deathchest.api.hologram.IHologramService;
 import de.helixdevs.deathchest.api.hologram.IHologramTextLine;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
 
@@ -47,7 +48,13 @@ public class NativeHologram implements IHologram {
 
     @Override
     public void delete() {
+        Chunk chunk = location.getChunk();
+        boolean loaded = location.getChunk().isLoaded();
+        if (!loaded)
+            chunk.load(); // load
         this.list.forEach(NativeHologramTextLine::remove);
         this.list.clear();
+        if (!loaded)
+            chunk.unload(); // unload
     }
 }
