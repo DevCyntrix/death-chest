@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "de.helixdevs"
-version = "1.5.15"
+version = "1.5.16"
 
 repositories {
     mavenCentral()
