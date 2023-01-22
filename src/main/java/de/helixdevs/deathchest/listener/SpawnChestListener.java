@@ -101,7 +101,13 @@ public class SpawnChestListener implements Listener {
         Location loc = deathLocation.getBlock().getLocation();
         ThreadLocalRandom random = ThreadLocalRandom.current();
 
+        long start = System.currentTimeMillis();
         while (!plugin.canPlaceChest(loc)) {
+            if (System.currentTimeMillis() - start > 1000) {
+                loc.setY(loc.getWorld().getHighestBlockYAt(loc.getBlockX(), loc.getBlockZ()));
+                break;
+            }
+
             int x = random.nextInt(10) - 5;
             int z = random.nextInt(10) - 5;
             loc.add(x, 0, z);
