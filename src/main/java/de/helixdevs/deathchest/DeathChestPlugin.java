@@ -23,6 +23,7 @@ import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
@@ -85,6 +86,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
             }
         });
         this.deathChests.clear();
+        HandlerList.unregisterAll((Listener) this);
     }
 
     @Override
@@ -225,7 +227,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
 
     @Override
     public boolean canPlaceChest(@NotNull Location location) {
-        return this.deathChests.stream().noneMatch(chest -> chest.getLocation().equals(location));
+        return this.deathChests.stream().noneMatch(chest -> chest.getLocation().equals(location)) && !location.getBlock().getType().isSolid();
     }
 
     @Override
