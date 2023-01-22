@@ -213,7 +213,14 @@ public class DeathChestImpl implements DeathChest {
         // Chest Protection (Vault is required)
         Permission permission = getPlugin().getPermission();
         ChestProtectionOptions protectionOptions = getPlugin().getDeathChestConfig().chestProtectionOptions();
-        if (protectionOptions.enabled() && getPlugin().getPermission() != null && getPlayer() != null && player != getPlayer() && permission.playerHas(getWorld().getName(), getPlayer(), protectionOptions.permission()) && !permission.playerHas(getWorld().getName(), player, protectionOptions.bypassPermission())) {
+        Long expiration = protectionOptions.expiration() == null ? null : protectionOptions.expiration().toMillis() + createdAt - System.currentTimeMillis();
+
+        if (protectionOptions.enabled() &&
+                getPlugin().getPermission() != null &&
+                getPlayer() != null && player != getPlayer() &&
+                permission.playerHas(getWorld().getName(), getPlayer(), protectionOptions.permission()) &&
+                !permission.playerHas(getWorld().getName(), player, protectionOptions.bypassPermission()) &&
+                (expiration == null || expiration < 0)) {
             protectionOptions.playSound(player, block.getLocation());
             protectionOptions.sendMessage(player);
             return;

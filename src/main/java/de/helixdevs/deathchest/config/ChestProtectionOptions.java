@@ -9,16 +9,22 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public record ChestProtectionOptions(boolean enabled, String permission, String bypassPermission, Sound sound,
-                                     float volume, float pitch, String[] message) {
+import java.time.Duration;
+
+public record ChestProtectionOptions(boolean enabled, String permission, String bypassPermission, Duration expiration,
+                                     Sound sound, float volume, float pitch, String[] message) {
 
     public static @NotNull ChestProtectionOptions load(@Nullable ConfigurationSection section) {
-        if (section == null)
-            section = new MemoryConfiguration();
+        if (section == null) section = new MemoryConfiguration();
 
         boolean enabled = section.getBoolean("enabled", false);
         String permission = section.getString("permission", "deathchest.thiefprotected");
         String bypassPermission = section.getString("bypass-permission", "deathchest.thiefprotected.bypass");
+        long expirationInSeconds = section.getLong("expiration", 0);
+        Duration expiration = null;
+        if (expirationInSeconds > 0) {
+            expiration = Duration.ofSeconds(expirationInSeconds);
+        }
         String soundString = section.getString("sound");
         Sound sound = null;
         float volume = 1.0F;
@@ -37,18 +43,16 @@ public record ChestProtectionOptions(boolean enabled, String permission, String 
             messageArray = message.split(System.lineSeparator());
         }
 
-        return new ChestProtectionOptions(enabled, permission, bypassPermission, sound, volume, pitch, messageArray);
+        return new ChestProtectionOptions(enabled, permission, bypassPermission, expiration, sound, volume, pitch, messageArray);
     }
 
     public void playSound(Player player, Location location) {
-        if (sound == null)
-            return;
+        if (sound == null) return;
         player.playSound(location, sound, volume, pitch);
     }
 
     public void sendMessage(Player player) {
-        if (message == null)
-            return;
+        if (message == null) return;
         player.sendMessage(message);
     }
 
