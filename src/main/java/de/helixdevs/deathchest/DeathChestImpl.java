@@ -222,7 +222,7 @@ public class DeathChestImpl implements DeathChest {
                 !permission.playerHas(getWorld().getName(), player, protectionOptions.bypassPermission()) &&
                 (expiration == null || expiration < 0)) {
             protectionOptions.playSound(player, block.getLocation());
-            protectionOptions.sendMessage(player);
+            protectionOptions.notify(player);
             return;
         }
 
@@ -295,7 +295,7 @@ public class DeathChestImpl implements DeathChest {
         ChestProtectionOptions protectionOptions = getPlugin().getDeathChestConfig().chestProtectionOptions();
         if (protectionOptions.enabled() && getPlugin().getPermission() != null && getPlayer() != null && player != getPlayer() && permission.playerHas(getWorld().getName(), getPlayer(), protectionOptions.permission()) && !permission.playerHas(getWorld().getName(), player, protectionOptions.bypassPermission())) {
             protectionOptions.playSound(player, block.getLocation());
-            protectionOptions.sendMessage(player);
+            protectionOptions.notify(player);
             return;
         }
 

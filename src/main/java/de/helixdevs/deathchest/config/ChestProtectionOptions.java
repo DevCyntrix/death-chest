@@ -51,7 +51,7 @@ public record ChestProtectionOptions(boolean enabled, String permission, String 
         player.playSound(location, sound, volume, pitch);
     }
 
-    public void sendMessage(Player player) {
+    public void notify(Player player) {
         if (message == null) return;
         player.sendMessage(message);
     }
