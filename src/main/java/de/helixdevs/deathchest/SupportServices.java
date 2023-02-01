@@ -1,5 +1,6 @@
 package de.helixdevs.deathchest;
 
+import com.comphenix.protocol.ProtocolLibrary;
 import de.helixdevs.deathchest.api.animation.IAnimationService;
 import de.helixdevs.deathchest.api.protection.IProtectionService;
 import de.helixdevs.deathchest.support.animation.ProtocolLibAnimation;
@@ -15,7 +16,7 @@ import java.util.function.Function;
 public final class SupportServices {
 
     private static final Map<String, Function<Plugin, IAnimationService>> animationServiceMap = Map.of(
-            "ProtocolLib", plugin -> new ProtocolLibAnimation()
+            "ProtocolLib", plugin -> ProtocolLibrary.getProtocolManager() != null ? new ProtocolLibAnimation() : null
     );
 
     private static final Map<String, Function<Plugin, IProtectionService>> protectionServiceMap = Map.of(
