@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
@@ -25,11 +26,11 @@ public class NativeHologramTextLine implements IHologramTextLine {
         }).getUniqueId();
     }
 
-    public Location getLocation() {
+    public @NotNull Location getLocation() {
         return location;
     }
 
-    public ArmorStand getArmorStand() {
+    public @Nullable ArmorStand getArmorStand() {
         return (ArmorStand) Bukkit.getEntity(armorStand);
     }
 
@@ -43,6 +44,9 @@ public class NativeHologramTextLine implements IHologramTextLine {
 
     @Override
     public void remove() {
-        getArmorStand().remove();
+        ArmorStand stand = getArmorStand();
+        if (stand == null)
+            return;
+        stand.remove();
     }
 }
