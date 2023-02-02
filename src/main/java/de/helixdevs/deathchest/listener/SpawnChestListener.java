@@ -67,9 +67,9 @@ public class SpawnChestListener implements Listener {
             }).collect(Collectors.joining("\n")));
         }
 
-
         if (event.getKeepInventory())
             return;
+        event.getDrops().removeIf(itemStack -> itemStack.getType() == Material.AIR); // Prevent spawning an empty chest
         if (event.getDrops().isEmpty())
             return;
 
