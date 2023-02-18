@@ -106,7 +106,7 @@ public class SpawnChestListener implements Listener {
         ThreadLocalRandom random = ThreadLocalRandom.current();
 
         long start = System.currentTimeMillis();
-        while (!plugin.canPlaceChest(loc)) {
+        while (!plugin.canPlaceChestAt(loc)) {
             if (System.currentTimeMillis() - start > 1000) {
                 loc.setY(loc.getWorld().getHighestBlockYAt(loc.getBlockX(), loc.getBlockZ()));
                 break;

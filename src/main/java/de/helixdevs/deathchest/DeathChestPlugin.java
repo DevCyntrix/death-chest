@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 
 /**
  * This plugin creates chests if a player dies and will destroy them after a specific time.
- * You can download this plugin on SpigotMC: https://www.spigotmc.org/resources/death-chest.101066/
+ * You can download this plugin on SpigotMC: <a href="https://www.spigotmc.org/resources/death-chest.101066/">https://www.spigotmc.org/resources/death-chest.101066/</a>
  * You are welcome to contribute to this plugin!
  */
 @Getter
@@ -228,7 +228,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
      * @return true if the chest can be placed at the position
      */
     @Override
-    public boolean canPlaceChest(@NotNull Location location) {
+    public boolean canPlaceChestAt(@NotNull Location location) {
         return this.deathChests.stream().noneMatch(chest -> chest.getLocation().equals(location)) && !location.getBlock().getType().isSolid();
     }
 
