@@ -52,7 +52,7 @@ public final class SupportServices {
                         return service;
                 }
             }
-            plugin.getLogger().warning("Cannot use the preferred hologram service \"%s\"".formatted(preferred));
+            plugin.getLogger().warning("Cannot use the preferred service \"%s\"".formatted(preferred));
         }
 
         for (Map.Entry<String, Function<Plugin, T>> entry : map.entrySet()) {
@@ -62,7 +62,7 @@ public final class SupportServices {
             Function<Plugin, T> value = entry.getValue();
             T apply = value.apply(plugin);
             if (apply == null) {
-                plugin.getLogger().warning("Failed to initialize the hologram service \"%s\"".formatted(entry.getKey()));
+                plugin.getLogger().warning("Failed to initialize the service \"%s\"".formatted(entry.getKey()));
                 continue;
             }
             return apply;

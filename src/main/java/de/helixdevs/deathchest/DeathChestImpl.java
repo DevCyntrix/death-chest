@@ -45,6 +45,9 @@ import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+/**
+ * This is an implementation of the {@link DeathChest} interface.
+ */
 @Getter
 public class DeathChestImpl implements DeathChest {
 

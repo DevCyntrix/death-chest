@@ -22,6 +22,10 @@ import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
+/**
+ * This class is only for handling if a player dies. Here is the spawning of a death chest written and some checks if a
+ * chest should spawn. Additionally, here is the death message, custom info and broadcast message implemented.
+ */
 public class SpawnChestListener implements Listener {
 
     private final DeathChestPlugin plugin;

@@ -41,14 +41,15 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.stream.Collectors;
 
 /**
- * This plugin will create chests on death and will destroy them in after a specific time.
+ * This plugin creates chests if a player dies and will destroy them after a specific time.
+ * You can download this plugin on SpigotMC: https://www.spigotmc.org/resources/death-chest.101066/
+ * You are welcome to contribute to this plugin!
  */
 @Getter
 public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChestService {
 
     public static final int RESOURCE_ID = 101066;
     public static final int BSTATS_ID = 14866;
-
 
     protected final Set<DeathChest> deathChests = new CopyOnWriteArraySet<>();
 
@@ -115,6 +116,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
 
         PluginManager pluginManager = getServer().getPluginManager();
 
+        // Registers the protection permissions if they are not registered
         try {
             ChestProtectionOptions protectionOptions = getDeathChestConfig().chestProtectionOptions();
             if (protectionOptions.enabled()) {
@@ -135,6 +137,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         ServicesManager servicesManager = getServer().getServicesManager();
         servicesManager.register(DeathChestService.class, this, this, ServicePriority.Normal);
 
+        // Registers the deathchest command
         PluginCommand deathChestCommand = getCommand("deathchest");
         if (deathChestCommand != null) {
             DeathChestCommand command = new DeathChestCommand(this);
@@ -142,35 +145,48 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
             deathChestCommand.setTabCompleter(command);
         }
 
-        this.storage = new YamlStorage();
+        // Initialize the storage system
         try {
+            this.storage = new YamlStorage();
             this.storage.init(this, new MemoryConfiguration());
         } catch (IOException e) {
+            getLogger().severe("Failed to initialize the storage system. Please check your configuration file.");
             throw new RuntimeException(e);
         }
 
+        // Recreates the deathchests
         Set<DeathChestSnapshot> chests = this.storage.getChests();
         chests.forEach(deathChestSnapshot -> this.deathChests.add(deathChestSnapshot.createChest(this)));
         getLogger().info(this.deathChests.size() + " death chests loaded.");
 
+        // Checks for updates
         if (this.deathChestConfig.updateChecker()) {
-            checkUpdates();
+            startUpdateChecker();
         }
 
         new Metrics(this, BSTATS_ID);
     }
 
-    private void checkUpdates() {
+    /**
+     * Checks for the newest version by using the SpigotMC api
+     */
+    private void startUpdateChecker() {
         UpdateChecker checker = new UpdateChecker(this, RESOURCE_ID);
-        checker.getVersion(version -> {
-            if (getDescription().getVersion().equals(version))
-                return;
-            this.newerVersion = version;
-            getLogger().warning("New version " + version + " is out. You are still running " + getDescription().getVersion());
-            getLogger().warning("Update the plugin at https://www.spigotmc.org/resources/death-chest.101066/");
-        });
+        Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
+            checker.getVersion(version -> {
+                if (getDescription().getVersion().equals(version))
+                    return;
+                this.newerVersion = version;
+                getLogger().warning("New version " + version + " is out. You are still running " + getDescription().getVersion());
+                getLogger().warning("Please update the plugin at https://www.spigotmc.org/resources/death-chest.101066/");
+            });
+        }, 0, 20 * 60 * 30); // Every 30 minutes
     }
 
+    /**
+     * Checks for the current config version to avoid conflicts if the user updates the plugin. The config will
+     * recreate and the old config file will rename to config.yml.old.
+     */
     private void checkConfigVersion() {
         // Recreate the config when the config version is too old.
         if (getConfig().getInt("config-version", 0) != DeathChestConfig.CONFIG_VERSION) {
@@ -185,6 +201,11 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         }
     }
 
+    /**
+     * Creates snapshots of all current valid chests and hand over the snapshots to the storage system which saves them.
+     *
+     * @throws IOException depends on the storage system
+     */
     @Override
     public void saveChests() throws IOException {
         this.storage.putAll(this.deathChests.stream().map(DeathChest::createSnapshot).collect(Collectors.toSet()));
@@ -200,6 +221,12 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         this.deathChestConfig = DeathChestConfig.load(getConfig());
     }
 
+    /**
+     * Checks if a chest can place on a certain position in the world.
+     *
+     * @param location the location where the chest should be placed.
+     * @return true if the chest can be placed at the position
+     */
     @Override
     public boolean canPlaceChest(@NotNull Location location) {
         return this.deathChests.stream().noneMatch(chest -> chest.getLocation().equals(location)) && !location.getBlock().getType().isSolid();
