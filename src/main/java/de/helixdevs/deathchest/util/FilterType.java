@@ -1,6 +1,6 @@
 package de.helixdevs.deathchest.util;
 
-public enum Filter {
+public enum FilterType {
 
     BLACKLIST,
     WHITELIST

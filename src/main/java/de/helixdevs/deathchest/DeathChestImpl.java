@@ -12,7 +12,7 @@ import de.helixdevs.deathchest.tasks.AnimationRunnable;
 import de.helixdevs.deathchest.tasks.ExpirationRunnable;
 import de.helixdevs.deathchest.tasks.HologramRunnable;
 import de.helixdevs.deathchest.tasks.ParticleRunnable;
-import de.helixdevs.deathchest.util.EntityId;
+import de.helixdevs.deathchest.util.EntityIdHelper;
 import de.helixdevs.deathchest.util.PlayerStringLookup;
 import lombok.Getter;
 import org.apache.commons.lang3.time.DurationFormatUtils;
@@ -72,7 +72,7 @@ public class DeathChestImpl implements DeathChest {
     private boolean closed;
 
     private int breakingEntityId;
-    private boolean isProtected;
+    private final boolean isProtected;
 
     public DeathChestImpl(DeathChestSnapshot snapshot) {
         this(snapshot.getLocation(), DeathChestBuilder.builder().setCreatedAt(snapshot.getCreatedAt()).setExpireAt(snapshot.getExpireAt()).setItems(snapshot.getItems()).setPlayer(snapshot.getOwner()));
@@ -132,7 +132,7 @@ public class DeathChestImpl implements DeathChest {
             BreakEffectOptions breakEffectOptions = builder.breakEffectOptions();
             // Spawns the block break animation
             if (animationService != null && isExpiring() && breakEffectOptions.enabled()) {
-                this.breakingEntityId = EntityId.increaseAndGet();
+                this.breakingEntityId = EntityIdHelper.increaseAndGet();
                 tasks.add(new AnimationRunnable(this, animationService, breakEffectOptions, breakingEntityId).runTaskTimerAsynchronously(plugin, 20, 20));
             }
 

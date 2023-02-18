@@ -7,7 +7,6 @@ public final class WorldGuardDeathChestFlag {
 
     public static StateFlag FLAG;
 
-
     public static void register() {
         WorldGuard instance = WorldGuard.getInstance();
         if (instance == null)

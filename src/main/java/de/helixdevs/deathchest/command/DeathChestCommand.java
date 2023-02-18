@@ -71,7 +71,6 @@ public class DeathChestCommand implements TabExecutor {
             });
 
             sender.sendMessage(plugin.getPrefix() + "§cAll chests in the world \"" + world.getName() + "\" were deleted.");
-
             return true;
         }
 

@@ -43,14 +43,39 @@ public interface DeathChest extends Listener, Closeable {
 
     void dropItems(@NotNull Location location);
 
+    /**
+     * Gets the unix time when the chest was created
+     *
+     * @return the unix time
+     */
     long getCreatedAt();
 
+    /**
+     * Gets the unix time when the chest will disappear
+     *
+     * @return the unix time
+     */
     long getExpireAt();
 
+    /**
+     * Gets weather the chest will expire.
+     *
+     * @return true if the expiration time is set to a larger number than 0
+     */
     boolean isExpiring();
 
+    /**
+     * Gets weather the chest is protected against thieves.
+     *
+     * @return true if the player dies and has a certain permission.
+     */
     boolean isProtected();
 
+    /**
+     * Creates a snapshot of the chest which can be saved.
+     *
+     * @return a snapshot of the chest
+     */
     DeathChestSnapshot createSnapshot();
 
     boolean isClosed();

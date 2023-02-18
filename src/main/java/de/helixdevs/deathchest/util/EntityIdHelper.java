@@ -4,7 +4,7 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public final class EntityId {
+public final class EntityIdHelper {
 
     private static Class<?> entityClass = null;
     private static final Field entityCounter;
@@ -14,8 +14,10 @@ public final class EntityId {
             entityClass = Class.forName("net.minecraft.world.entity.Entity");
         } catch (ClassNotFoundException ignored) {
         }
-        entityCounter = Arrays.stream(entityClass.getDeclaredFields()).filter(field -> field.getType().equals(AtomicInteger.class))
-                .findFirst().orElse(null);
+        entityCounter = Arrays.stream(entityClass.getDeclaredFields())
+                .filter(field -> field.getType().equals(AtomicInteger.class))
+                .findFirst()
+                .orElse(null);
     }
 
     public static int increaseAndGet() {

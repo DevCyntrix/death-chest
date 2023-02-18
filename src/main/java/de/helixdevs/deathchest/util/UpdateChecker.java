@@ -19,6 +19,7 @@ public record UpdateChecker(JavaPlugin plugin, int resourceId) {
                 }
             } catch (IOException exception) {
                 plugin.getLogger().info("Unable to check for updates: " + exception.getMessage());
+                plugin.getLogger().info("To disable this message set the update checker to false in the config.yml");
             }
         });
     }
