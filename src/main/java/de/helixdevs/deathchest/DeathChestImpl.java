@@ -63,7 +63,7 @@ public class DeathChestImpl implements DeathChest {
     private final OfflinePlayer player;
     private final Supplier<String> durationSupplier;
 
-    private final List<BukkitTask> tasks = new LinkedList<>();
+    private final List<BukkitTask> tasks = new ArrayList<>();
 
     private IHologram hologram;
 
@@ -355,7 +355,7 @@ public class DeathChestImpl implements DeathChest {
 
         try {
             if (inventory != null) {
-                List<HumanEntity> humanEntities = new LinkedList<>(inventory.getViewers()); // Copies the list to avoid a concurrent modification exception
+                List<HumanEntity> humanEntities = new ArrayList<>(inventory.getViewers()); // Copies the list to avoid a concurrent modification exception
                 humanEntities.forEach(HumanEntity::closeInventory);
             }
         } catch (Exception e) {

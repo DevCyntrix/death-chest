@@ -13,8 +13,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 public class DeathChestCommand implements TabExecutor {
@@ -125,11 +125,11 @@ public class DeathChestCommand implements TabExecutor {
             return ImmutableList.of("reload", "deleteInWorld");
         }
         if (args.length == 1) {
-            return StringUtil.copyPartialMatches(args[0], ImmutableList.of("reload", "deleteInWorld"), new LinkedList<>());
+            return StringUtil.copyPartialMatches(args[0], ImmutableList.of("reload", "deleteInWorld"), new ArrayList<>());
         }
 
         if (args.length == 2 && args[0].equalsIgnoreCase("deleteInWorld")) {
-            return StringUtil.copyPartialMatches(args[1], Bukkit.getWorlds().stream().map(WorldInfo::getName).toList(), new LinkedList<>());
+            return StringUtil.copyPartialMatches(args[1], Bukkit.getWorlds().stream().map(WorldInfo::getName).toList(), new ArrayList<>());
         }
         return Collections.emptyList();
     }

@@ -1,6 +1,6 @@
 plugins {
     `java-library`
-    id("xyz.jpenilla.run-paper") version "1.0.6"
+    id("xyz.jpenilla.run-paper") version "2.0.1"
     id("net.minecrell.plugin-yml.bukkit") version "0.5.1"
     id("com.github.johnrengelman.shadow") version "7.1.2"
 }
@@ -17,6 +17,7 @@ repositories {
     maven("https://repo.dmulloy2.net/repository/public/")
     maven("https://raw.githubusercontent.com/FabioZumbi12/RedProtect/mvn-repo/")
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
+    maven("https://repo.glaremasters.me/repository/bloodshot")
     maven("https://jitpack.io")
 }
 
@@ -25,28 +26,29 @@ dependencies {
 
     // Protection Support
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.7")
-    compileOnly("com.plotsquared:PlotSquared-Core:6.8.1")
+    compileOnly("com.plotsquared:PlotSquared-Core:6.8.1") { isTransitive = false }
     compileOnly("com.plotsquared:PlotSquared-Bukkit:6.8.1") { isTransitive = false }
-    compileOnly("com.github.TechFortress:GriefPrevention:16.18")
+    compileOnly("com.github.TechFortress:GriefPrevention:16.18") { isTransitive = false }
     compileOnly("br.net.fabiozumbi12.RedProtect:RedProtect-Core:7.7.3") { isTransitive = false }
     compileOnly("br.net.fabiozumbi12.RedProtect:RedProtect-Spigot:7.7.3") { isTransitive = false }
 
+    compileOnly("com.griefdefender:api:2.1.0-SNAPSHOT")
 
     // Animation Support
-    compileOnly("com.comphenix.protocol:ProtocolLib:4.7.0")
+    compileOnly("com.comphenix.protocol:ProtocolLib:4.7.0") { isTransitive = false }
 
     // Hologram Support
-    compileOnly("com.github.sainttx.Holograms:holograms-api:0f5b027")
-    compileOnly("com.github.decentsoftware-eu:decentholograms:2.5.2")
-    compileOnly("com.gmail.filoghost.holographicdisplays:holographicdisplays-api:2.4.9")
+    compileOnly("com.github.sainttx.Holograms:holograms-api:0f5b027") { isTransitive = false }
+    compileOnly("com.github.decentsoftware-eu:decentholograms:2.5.2") { isTransitive = false }
+    compileOnly("com.gmail.filoghost.holographicdisplays:holographicdisplays-api:2.4.9") { isTransitive = false }
 
     // Placeholder API
-    compileOnly("me.clip:placeholderapi:2.11.2")
+    compileOnly("me.clip:placeholderapi:2.11.2") { isTransitive = false }
 
     //implementation("com.github.MP-MC:Canvas:941db8c981")
     compileOnly("org.apache.commons:commons-text:1.10.0")
     compileOnly("org.jetbrains:annotations:23.0.0")
-    compileOnly("com.github.MilkBowl:VaultAPI:1.7")
+    compileOnly("com.github.MilkBowl:VaultAPI:1.7") { isTransitive = false }
 
     compileOnly("org.projectlombok:lombok:1.18.24")
     annotationProcessor("org.projectlombok:lombok:1.18.24")

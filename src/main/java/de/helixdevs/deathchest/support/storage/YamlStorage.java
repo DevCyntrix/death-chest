@@ -43,7 +43,7 @@ public class YamlStorage implements DeathChestStorage {
         this.file = new File(plugin.getDataFolder(), filename);
         if (!this.file.isFile()) {
             this.file.createNewFile();
-            this.deathChests = new LinkedList<>();
+            this.deathChests = new ArrayList<>();
             return;
         }
         YamlConfiguration configuration = YamlConfiguration.loadConfiguration(this.file);

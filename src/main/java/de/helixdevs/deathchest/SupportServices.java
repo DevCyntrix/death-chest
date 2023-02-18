@@ -23,7 +23,8 @@ public final class SupportServices {
             "WorldGuard", plugin -> new WorldGuardProtection(),
             "PlotSquared", plugin -> new PlotSquaredProtection(),
             "GriefPrevention", plugin -> new GriefPreventionProtection(),
-            "RedProtect", plugin -> new RedProtection()
+            "RedProtect", plugin -> new RedProtection(),
+            "GriefDefender", plugin -> new GriefDefenderProtectionService()
     );
 
     public static @Nullable IAnimationService getAnimationService(@NotNull Plugin plugin, @Nullable String preferred) {
