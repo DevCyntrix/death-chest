@@ -49,9 +49,10 @@ public interface DeathChest extends Listener, Closeable {
 
     boolean isExpiring();
 
+    boolean isProtected();
+
     DeathChestSnapshot createSnapshot();
 
     boolean isClosed();
-
 
 }

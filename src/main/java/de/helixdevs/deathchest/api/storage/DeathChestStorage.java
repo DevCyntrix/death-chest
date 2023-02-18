@@ -1,12 +1,13 @@
 package de.helixdevs.deathchest.api.storage;
 
-import de.helixdevs.deathchest.api.DeathChest;
+import de.helixdevs.deathchest.api.DeathChestSnapshot;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Set;
 
 public interface DeathChestStorage extends Closeable {
 
@@ -14,12 +15,14 @@ public interface DeathChestStorage extends Closeable {
 
     void init(JavaPlugin plugin, ConfigurationSection section) throws IOException;
 
-    void put(DeathChest chest);
+    void put(DeathChestSnapshot chest);
 
-    Collection<DeathChest> getChests();
+    void putAll(Collection<DeathChestSnapshot> chests);
 
-    void remove(DeathChest chest);
+    Set<DeathChestSnapshot> getChests();
 
-    void save();
+    void remove(DeathChestSnapshot chest);
+
+    void save() throws IOException;
 
 }

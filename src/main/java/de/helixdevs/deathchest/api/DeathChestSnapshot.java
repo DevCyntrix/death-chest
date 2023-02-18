@@ -22,8 +22,10 @@ public interface DeathChestSnapshot extends ConfigurationSerializable {
 
     long getExpireAt();
 
+    boolean isProtected();
+
     default DeathChest createChest(DeathChestService service) {
-        return service.createDeathChest(getLocation(), getCreatedAt(), getExpireAt(), getOwner(), getItems());
+        return service.createDeathChest(getLocation(), getCreatedAt(), getExpireAt(), getOwner(), isProtected(), getItems());
     }
 
     @NotNull
@@ -35,6 +37,7 @@ public interface DeathChestSnapshot extends ConfigurationSerializable {
         map.put("expireAt", getExpireAt());
         if (getOwner() != null)
             map.put("player", getOwner().getUniqueId().toString());
+        map.put("protected", isProtected());
         map.put("items", getItems());
         return map;
     }

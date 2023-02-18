@@ -1,28 +1,28 @@
 package de.helixdevs.deathchest;
 
-import com.google.common.collect.Lists;
 import de.helixdevs.deathchest.api.DeathChest;
 import de.helixdevs.deathchest.api.DeathChestService;
 import de.helixdevs.deathchest.api.DeathChestSnapshot;
 import de.helixdevs.deathchest.api.animation.IAnimationService;
 import de.helixdevs.deathchest.api.hologram.IHologramService;
 import de.helixdevs.deathchest.api.protection.IProtectionService;
+import de.helixdevs.deathchest.api.storage.DeathChestStorage;
 import de.helixdevs.deathchest.command.DeathChestCommand;
 import de.helixdevs.deathchest.config.ChestProtectionOptions;
 import de.helixdevs.deathchest.config.DeathChestConfig;
 import de.helixdevs.deathchest.hologram.NativeHologramService;
 import de.helixdevs.deathchest.listener.SpawnChestListener;
 import de.helixdevs.deathchest.listener.UpdateNotificationListener;
+import de.helixdevs.deathchest.support.storage.YamlStorage;
 import de.helixdevs.deathchest.util.Metrics;
 import de.helixdevs.deathchest.util.UpdateChecker;
 import de.helixdevs.deathchest.util.WorldGuardDeathChestFlag;
 import lombok.Getter;
-import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.PluginCommand;
-import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
@@ -36,9 +36,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * This plugin will create chests on death and will destroy them in after a specific time.
@@ -49,6 +49,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
     public static final int RESOURCE_ID = 101066;
     public static final int BSTATS_ID = 14866;
 
+
     protected final Set<DeathChest> deathChests = new CopyOnWriteArraySet<>();
 
     private DeathChestConfig deathChestConfig;
@@ -58,16 +59,16 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
     private IProtectionService protectionService;
 
     @Getter
-    private Permission permission;
-
-    @Getter
     private String newerVersion;
 
     @Getter
     private static boolean placeholderAPIEnabled;
 
-    private File savedChests;
+    private DeathChestStorage storage;
 
+    /**
+     * This method cleanups the whole plugin
+     */
     @Override
     public void onDisable() {
         // Save all chests
@@ -132,9 +133,6 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         //getServer().getPluginManager().registerEvents(new MenuFunctionListener(), this);
 
         ServicesManager servicesManager = getServer().getServicesManager();
-        if (pluginManager.isPluginEnabled("Vault")) {
-            this.permission = servicesManager.load(Permission.class);
-        }
         servicesManager.register(DeathChestService.class, this, this, ServicePriority.Normal);
 
         PluginCommand deathChestCommand = getCommand("deathchest");
@@ -144,10 +142,16 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
             deathChestCommand.setTabCompleter(command);
         }
 
-        this.savedChests = new File(getDataFolder(), "saved-chests.yml");
-        int size = loadChests().size();
-        getLogger().info(size + " death chests loaded.");
+        this.storage = new YamlStorage();
+        try {
+            this.storage.init(this, new MemoryConfiguration());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
+        Set<DeathChestSnapshot> chests = this.storage.getChests();
+        chests.forEach(deathChestSnapshot -> this.deathChests.add(deathChestSnapshot.createChest(this)));
+        getLogger().info(this.deathChests.size() + " death chests loaded.");
 
         if (this.deathChestConfig.updateChecker()) {
             checkUpdates();
@@ -183,37 +187,8 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
 
     @Override
     public void saveChests() throws IOException {
-        YamlConfiguration configuration = new YamlConfiguration();
-        List<Map<String, Object>> collect = deathChests.stream()
-                .map(DeathChest::createSnapshot)
-                .map(DeathChestSnapshot::serialize)
-                .collect((Supplier<List<Map<String, Object>>>) Lists::newArrayList, List::add, List::addAll);
-        configuration.set("chests", collect);
-        configuration.save(savedChests);
-    }
-
-    private Collection<DeathChest> loadChests() {
-        if (!savedChests.isFile())
-            return Collections.emptyList();
-
-        YamlConfiguration configuration = YamlConfiguration.loadConfiguration(savedChests);
-        List<?> chests = configuration.getList("chests");
-        if (chests == null)
-            return Collections.emptyList();
-
-        List<DeathChest> list = new ArrayList<>(chests.size());
-
-        for (Object chest : chests) {
-            if (!(chest instanceof Map<?, ?> map))
-                continue;
-
-            DeathChestSnapshot deserialize = DeathChestSnapshotImpl.deserialize((Map<String, Object>) map);
-            if (deserialize == null)
-                continue;
-
-            list.add(deserialize.createChest(this));
-        }
-        return list;
+        this.storage.putAll(this.deathChests.stream().map(DeathChest::createSnapshot).collect(Collectors.toSet()));
+        this.storage.save();
     }
 
     /**
@@ -231,32 +206,33 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
     }
 
     @Override
-    public @NotNull DeathChest createDeathChest(@NotNull Location location, ItemStack @NotNull ... stacks) {
-        return createDeathChest(location, null, stacks);
+    public @NotNull DeathChest createDeathChest(@NotNull Location location, ItemStack @NotNull ... items) {
+        return createDeathChest(location, null, items);
     }
 
     @Override
-    public @NotNull DeathChest createDeathChest(@NotNull Location location, @Nullable OfflinePlayer player, ItemStack @NotNull ... stacks) {
-        return createDeathChest(location, -1, player, stacks);
+    public @NotNull DeathChest createDeathChest(@NotNull Location location, @Nullable OfflinePlayer player, ItemStack @NotNull ... items) {
+        return createDeathChest(location, -1, player, items);
     }
 
     @Override
-    public @NotNull DeathChest createDeathChest(@NotNull Location location, long expireAt, @Nullable OfflinePlayer player, ItemStack @NotNull ... stacks) {
-        return createDeathChest(location, System.currentTimeMillis(), expireAt, player, stacks);
+    public @NotNull DeathChest createDeathChest(@NotNull Location location, long expireAt, @Nullable OfflinePlayer player, ItemStack @NotNull ... items) {
+        return createDeathChest(location, System.currentTimeMillis(), expireAt, player, items);
     }
 
     @Override
     public @NotNull DeathChest createDeathChest(@NotNull DeathChestSnapshot snapshot) {
-        return snapshot.createChest(this);
+        return createDeathChest(snapshot.getLocation(), snapshot.getCreatedAt(), snapshot.getExpireAt(), snapshot.getOwner(), snapshot.isProtected(), snapshot.getItems());
     }
 
     @Override
-    public @NotNull DeathChest createDeathChest(@NotNull Location location, long createdAt, long expireAt, @Nullable OfflinePlayer player, ItemStack @NotNull ... stacks) {
+    public @NotNull DeathChest createDeathChest(@NotNull Location location, long createdAt, long expireAt, @Nullable OfflinePlayer player, boolean isProtected, ItemStack @NotNull ... items) {
         DeathChest build = DeathChestBuilder.builder()
                 .setCreatedAt(createdAt)
                 .setExpireAt(expireAt)
                 .setPlayer(player)
-                .setItems(stacks)
+                .setItems(items)
+                .setProtected(isProtected)
                 .setAnimationService(animationService)
                 .setHologramService(hologramService)
                 .setBreakEffectOptions(deathChestConfig.breakEffectOptions())

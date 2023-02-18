@@ -48,7 +48,6 @@ dependencies {
     //implementation("com.github.MP-MC:Canvas:941db8c981")
     compileOnly("org.apache.commons:commons-text:1.10.0")
     compileOnly("org.jetbrains:annotations:23.0.0")
-    compileOnly("com.github.MilkBowl:VaultAPI:1.7") { isTransitive = false }
 
     compileOnly("org.projectlombok:lombok:1.18.24")
     annotationProcessor("org.projectlombok:lombok:1.18.24")
@@ -90,9 +89,9 @@ bukkit {
         "WorldGuard",
         "ProtocolLib",
         "GriefPrevention",
+        "GriefDefender",
         "PlaceholderAPI",
-        "RedProtect",
-        "Vault"
+        "RedProtect"
     )
     libraries = listOf(
         "org.apache.commons:commons-text:1.9",

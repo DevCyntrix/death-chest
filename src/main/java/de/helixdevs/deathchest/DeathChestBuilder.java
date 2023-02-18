@@ -22,9 +22,11 @@ public final class DeathChestBuilder {
 
     private String durationFormat = "mm:ss";
 
+    private OfflinePlayer player;
+
     private ItemStack[] items;
 
-    private OfflinePlayer player;
+    private boolean isProtected;
 
     private IHologramService hologramService;
     private IAnimationService animationService;
@@ -76,6 +78,15 @@ public final class DeathChestBuilder {
 
     public DeathChestBuilder setPlayer(OfflinePlayer player) {
         this.player = player;
+        return this;
+    }
+
+    public boolean isProtected() {
+        return isProtected;
+    }
+
+    public DeathChestBuilder setProtected(boolean isProtected) {
+        this.isProtected = isProtected;
         return this;
     }
 

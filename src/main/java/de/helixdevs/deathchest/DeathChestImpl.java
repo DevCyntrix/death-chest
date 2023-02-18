@@ -15,7 +15,6 @@ import de.helixdevs.deathchest.tasks.ParticleRunnable;
 import de.helixdevs.deathchest.util.EntityId;
 import de.helixdevs.deathchest.util.PlayerStringLookup;
 import lombok.Getter;
-import net.milkbowl.vault.permission.Permission;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.bukkit.*;
@@ -70,6 +69,7 @@ public class DeathChestImpl implements DeathChest {
     private boolean closed;
 
     private int breakingEntityId;
+    private boolean isProtected;
 
     public DeathChestImpl(DeathChestSnapshot snapshot) {
         this(snapshot.getLocation(), DeathChestBuilder.builder().setCreatedAt(snapshot.getCreatedAt()).setExpireAt(snapshot.getExpireAt()).setItems(snapshot.getItems()).setPlayer(snapshot.getOwner()));
@@ -92,6 +92,7 @@ public class DeathChestImpl implements DeathChest {
         this.createdAt = builder.createdAt();
         this.expireAt = builder.expireAt();
         this.player = builder.player();
+        this.isProtected = builder.isProtected();
         this.durationSupplier = () -> {
             if (!isExpiring()) return DurationFormatUtils.formatDuration(0, builder.durationFormat());
             long duration = expireAt - System.currentTimeMillis();
@@ -210,16 +211,14 @@ public class DeathChestImpl implements DeathChest {
             return;
         event.setCancelled(true);
 
-        // Chest Protection (Vault is required)
-        Permission permission = getPlugin().getPermission();
+        // Chest Protection
         ChestProtectionOptions protectionOptions = getPlugin().getDeathChestConfig().chestProtectionOptions();
         Long expiration = protectionOptions.expiration() == null ? null : protectionOptions.expiration().toMillis() + createdAt - System.currentTimeMillis();
 
         if (protectionOptions.enabled() &&
-                getPlugin().getPermission() != null &&
                 getPlayer() != null && player != getPlayer() &&
-                permission.playerHas(getWorld().getName(), getPlayer(), protectionOptions.permission()) &&
-                !permission.playerHas(getWorld().getName(), player, protectionOptions.bypassPermission()) &&
+                isProtected() &&
+                !player.hasPermission(protectionOptions.bypassPermission()) &&
                 (expiration == null || expiration < 0)) {
             protectionOptions.playSound(player, block.getLocation());
             protectionOptions.notify(player);
@@ -291,9 +290,12 @@ public class DeathChestImpl implements DeathChest {
 
         event.setCancelled(true);
         // Chest Protection (Vault is required)
-        Permission permission = getPlugin().getPermission();
         ChestProtectionOptions protectionOptions = getPlugin().getDeathChestConfig().chestProtectionOptions();
-        if (protectionOptions.enabled() && getPlugin().getPermission() != null && getPlayer() != null && player != getPlayer() && permission.playerHas(getWorld().getName(), getPlayer(), protectionOptions.permission()) && !permission.playerHas(getWorld().getName(), player, protectionOptions.bypassPermission())) {
+        if (protectionOptions.enabled() &&
+                isProtected() &&
+                getPlayer() != null &&
+                player != getPlayer() &&
+                !player.hasPermission(protectionOptions.bypassPermission())) {
             protectionOptions.playSound(player, block.getLocation());
             protectionOptions.notify(player);
             return;
@@ -451,6 +453,11 @@ public class DeathChestImpl implements DeathChest {
     @Override
     public boolean isExpiring() {
         return this.expireAt > 0;
+    }
+
+    @Override
+    public boolean isProtected() {
+        return isProtected;
     }
 
     @Override

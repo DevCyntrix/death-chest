@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 public final class DeathChestSnapshotImpl implements DeathChestSnapshot {
@@ -19,6 +20,7 @@ public final class DeathChestSnapshotImpl implements DeathChestSnapshot {
     private final long createdAt;
     private final long expireAt;
     private final OfflinePlayer owner;
+    private final boolean isProtected;
     private final ItemStack[] items;
 
     DeathChestSnapshotImpl(DeathChest chest) {
@@ -26,14 +28,16 @@ public final class DeathChestSnapshotImpl implements DeathChestSnapshot {
         this.createdAt = chest.getCreatedAt();
         this.expireAt = chest.getExpireAt();
         this.owner = chest.getPlayer();
+        this.isProtected = chest.isProtected();
         this.items = chest.getInventory().getContents();
     }
 
-    private DeathChestSnapshotImpl(Location location, long createdAt, long expireAt, OfflinePlayer owner, ItemStack[] items) {
+    private DeathChestSnapshotImpl(Location location, long createdAt, long expireAt, OfflinePlayer owner, boolean isProtected, ItemStack[] items) {
         this.location = location;
         this.createdAt = createdAt;
         this.expireAt = expireAt;
         this.owner = owner;
+        this.isProtected = isProtected;
         this.items = items;
     }
 
@@ -59,6 +63,11 @@ public final class DeathChestSnapshotImpl implements DeathChestSnapshot {
         return owner;
     }
 
+    @Override
+    public boolean isProtected() {
+        return isProtected;
+    }
+
     @NotNull
     @Override
     public ItemStack @NotNull [] getItems() {
@@ -80,11 +89,30 @@ public final class DeathChestSnapshotImpl implements DeathChestSnapshot {
         UUID playerId = player == null ? null : UUID.fromString(player);
         OfflinePlayer owner = playerId != null ? Bukkit.getOfflinePlayer(playerId) : null;
 
+        boolean isProtected = false;
+        Object o = map.get("protected");
+        if (o != null) {
+            isProtected = Boolean.parseBoolean(o.toString());
+        }
+
         List<ItemStack> stacks = (List<ItemStack>) map.get("items");
         if (stacks == null)
             return null;
         ItemStack[] itemStacks = stacks.toArray(ItemStack[]::new);
 
-        return new DeathChestSnapshotImpl(location, createdAt, expireAt, owner, itemStacks);
+        return new DeathChestSnapshotImpl(location, createdAt, expireAt, owner, isProtected, itemStacks);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DeathChestSnapshotImpl that = (DeathChestSnapshotImpl) o;
+        return createdAt == that.createdAt && expireAt == that.expireAt && Objects.equals(location, that.location) && Objects.equals(owner, that.owner);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(location, createdAt, expireAt, owner);
     }
 }
