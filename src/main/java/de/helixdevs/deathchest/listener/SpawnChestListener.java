@@ -118,7 +118,8 @@ public class SpawnChestListener implements Listener {
         }
 
         try {
-            plugin.createDeathChest(loc, createdAt, expireAt, player, event.getDrops().toArray(new ItemStack[0]));
+            boolean protectedChest = player.hasPermission(deathChestConfig.chestProtectionOptions().permission());
+            plugin.createDeathChest(loc, createdAt, expireAt, player, protectedChest, event.getDrops().toArray(new ItemStack[0]));
             // Clears the drops
             event.getDrops().clear();
         } catch (Exception e) {
