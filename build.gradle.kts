@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "de.helixdevs"
-version = "1.5.18"
+version = "1.5.19"
 
 repositories {
     mavenCentral()
@@ -72,7 +72,7 @@ tasks {
         filteringCharset = Charsets.UTF_8.name()
     }
     runServer {
-        minecraftVersion("1.19.4")
+        minecraftVersion("1.19.3")
     }
     test {
         useJUnitPlatform()

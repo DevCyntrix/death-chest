@@ -222,7 +222,7 @@ public class DeathChestImpl implements DeathChest {
                 getPlayer() != null && player != getPlayer() &&
                 isProtected() &&
                 !player.hasPermission(protectionOptions.bypassPermission()) &&
-                (expiration == null || expiration < 0)) {
+                (expiration == null || expiration >= 0)) {
             protectionOptions.playSound(player, block.getLocation());
             protectionOptions.notify(player);
             return;
