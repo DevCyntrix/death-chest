@@ -15,6 +15,7 @@ import com.github.devcyntrix.deathchest.tasks.AnimationRunnable;
 import com.github.devcyntrix.deathchest.tasks.ExpirationRunnable;
 import com.github.devcyntrix.deathchest.tasks.HologramRunnable;
 import com.github.devcyntrix.deathchest.tasks.ParticleRunnable;
+import com.github.devcyntrix.deathchest.util.EntityIdHelper;
 import com.github.devcyntrix.deathchest.util.PlayerStringLookup;
 import com.google.common.base.Preconditions;
 import com.google.gson.annotations.Expose;
@@ -47,7 +48,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -144,8 +144,8 @@ public class DeathChestImpl implements DeathChest {
             BreakEffectOptions breakEffectOptions = builder.breakEffectOptions();
             // Spawns the block break animation
             if (animationService != null && isExpiring() && breakEffectOptions.enabled()) {
-                this.breakingEntityId = ThreadLocalRandom.current().nextInt();
-                tasks.add(new AnimationRunnable(this, animationService, breakEffectOptions, breakingEntityId).runTaskTimerAsynchronously(plugin, 10, 10));
+                this.breakingEntityId = EntityIdHelper.increaseAndGet();
+                tasks.add(new AnimationRunnable(this, animationService, breakEffectOptions, breakingEntityId).runTaskTimerAsynchronously(plugin, 20, 20));
             }
 
             ParticleOptions particleOptions = builder.particleOptions();
