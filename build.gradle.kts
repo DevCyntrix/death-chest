@@ -81,7 +81,7 @@ tasks {
 
 bukkit {
     name = "DeathChest"
-    main = "de.helixdevs.deathchest.DeathChestPlugin"
+    main = "com.github.devcyntrix.deathchest.DeathChestPlugin"
     apiVersion = "1.17"
     website = "https://www.spigotmc.org/resources/death-chest.101066/"
     authors = listOf("CyntrixAlgorithm")
