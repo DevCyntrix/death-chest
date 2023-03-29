@@ -2,14 +2,14 @@ package com.github.devcyntrix.deathchest;
 
 import com.github.devcyntrix.deathchest.api.DeathChest;
 import com.github.devcyntrix.deathchest.api.DeathChestSnapshot;
-import com.github.devcyntrix.deathchest.api.animation.IAnimationService;
+import com.github.devcyntrix.deathchest.api.animation.AnimationService;
 import com.github.devcyntrix.deathchest.api.audit.AuditAction;
 import com.github.devcyntrix.deathchest.api.audit.AuditItem;
 import com.github.devcyntrix.deathchest.api.audit.info.DestroyChestInfo;
 import com.github.devcyntrix.deathchest.api.audit.info.DestroyReason;
-import com.github.devcyntrix.deathchest.api.hologram.IHologram;
-import com.github.devcyntrix.deathchest.api.hologram.IHologramService;
-import com.github.devcyntrix.deathchest.api.hologram.IHologramTextLine;
+import com.github.devcyntrix.deathchest.api.hologram.Hologram;
+import com.github.devcyntrix.deathchest.api.hologram.HologramService;
+import com.github.devcyntrix.deathchest.api.hologram.HologramTextLine;
 import com.github.devcyntrix.deathchest.config.*;
 import com.github.devcyntrix.deathchest.tasks.AnimationRunnable;
 import com.github.devcyntrix.deathchest.tasks.ExpirationRunnable;
@@ -79,7 +79,7 @@ public class DeathChestImpl implements DeathChest {
 
     private final List<BukkitTask> tasks = new ArrayList<>();
 
-    private IHologram hologram;
+    private Hologram hologram;
 
     private boolean closed;
 
@@ -124,12 +124,12 @@ public class DeathChestImpl implements DeathChest {
             this.inventory.setContents(stacks);
 
             // Creates hologram
-            IHologramService hologramService = builder.hologramService();
+            HologramService hologramService = builder.hologramService();
             HologramOptions hologramOptions = builder.hologramOptions();
             if (hologramService != null && hologramOptions != null && hologramOptions.enabled()) {
                 this.hologram = hologramService.spawnHologram(getLocation().clone().add(0.5, hologramOptions.height(), 0.5));
 
-                Map<String, IHologramTextLine> blueprints = new LinkedHashMap<>(hologramOptions.lines().size());
+                Map<String, HologramTextLine> blueprints = new LinkedHashMap<>(hologramOptions.lines().size());
                 StringSubstitutor substitutor = new StringSubstitutor(new PlayerStringLookup(builder.player(), durationSupplier));
                 hologramOptions.lines().forEach(line -> blueprints.put(line, hologram.appendLine(substitutor.replace(line)))); // A map of blueprints
 
@@ -140,7 +140,7 @@ public class DeathChestImpl implements DeathChest {
             }
 
 
-            IAnimationService animationService = builder.animationService();
+            AnimationService animationService = builder.animationService();
             BreakEffectOptions breakEffectOptions = builder.breakEffectOptions();
             // Spawns the block break animation
             if (animationService != null && isExpiring() && breakEffectOptions.enabled()) {
@@ -426,7 +426,7 @@ public class DeathChestImpl implements DeathChest {
 
         try {
             // Resets the breaking animation if the service is available
-            IAnimationService animationService = plugin.getAnimationService();
+            AnimationService animationService = plugin.getAnimationService();
             if (animationService != null && isExpiring()) {
                 Stream<Player> playerStream = getWorld().getNearbyEntities(getLocation(), 20, 20, 20, entity -> entity.getType() == EntityType.PLAYER).stream().map(entity -> (Player) entity);
                 animationService.spawnBlockBreakAnimation(breakingEntityId, getLocation().toVector(), -1, playerStream);

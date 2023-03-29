@@ -3,13 +3,13 @@ package com.github.devcyntrix.deathchest;
 import com.github.devcyntrix.deathchest.api.DeathChest;
 import com.github.devcyntrix.deathchest.api.DeathChestService;
 import com.github.devcyntrix.deathchest.api.DeathChestSnapshot;
-import com.github.devcyntrix.deathchest.api.animation.IAnimationService;
+import com.github.devcyntrix.deathchest.api.animation.AnimationService;
 import com.github.devcyntrix.deathchest.api.audit.AuditAction;
 import com.github.devcyntrix.deathchest.api.audit.AuditItem;
 import com.github.devcyntrix.deathchest.api.audit.AuditManager;
 import com.github.devcyntrix.deathchest.api.audit.info.CreateChestInfo;
-import com.github.devcyntrix.deathchest.api.hologram.IHologramService;
-import com.github.devcyntrix.deathchest.api.protection.IProtectionService;
+import com.github.devcyntrix.deathchest.api.hologram.HologramService;
+import com.github.devcyntrix.deathchest.api.protection.ProtectionService;
 import com.github.devcyntrix.deathchest.api.report.ReportManager;
 import com.github.devcyntrix.deathchest.api.storage.DeathChestStorage;
 import com.github.devcyntrix.deathchest.audit.GsonAuditManager;
@@ -63,9 +63,9 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
 
     private DeathChestConfig deathChestConfig;
 
-    private IHologramService hologramService;
-    private IAnimationService animationService;
-    private IProtectionService protectionService;
+    private HologramService hologramService;
+    private AnimationService animationService;
+    private ProtectionService protectionService;
 
     @Getter
     private String newerVersion;
@@ -302,17 +302,17 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
     }
 
     @Override
-    public IHologramService getHologramService() {
+    public HologramService getHologramService() {
         return hologramService;
     }
 
     @Override
-    public IAnimationService getAnimationService() {
+    public AnimationService getAnimationService() {
         return animationService;
     }
 
     @Override
-    public @NotNull IProtectionService getProtectionService() {
+    public @NotNull ProtectionService getProtectionService() {
         return protectionService;
     }
 

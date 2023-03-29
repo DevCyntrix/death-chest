@@ -3,13 +3,13 @@ package com.github.devcyntrix.deathchest.api.hologram;
 import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
 
-public interface IHologram {
+public interface Hologram {
 
-    @NotNull IHologramService getService();
+    @NotNull HologramService getService();
 
     void teleport(@NotNull Location location);
 
-    IHologramTextLine appendLine(@NotNull String line);
+    HologramTextLine appendLine(@NotNull String line);
 
     void delete();
 }

@@ -88,23 +88,31 @@ public class DeathChestCommand implements TabExecutor {
             return true;
         }
 
-         if (args[0].equalsIgnoreCase("report") && sender.hasPermission("deathchest.command.report")) {
+        if (args[0].equalsIgnoreCase("report") && sender.hasPermission("deathchest.command.report")) {
 
-             if (args[1].equalsIgnoreCase("create")) {
-                 plugin.getReportManager().createReport();
-                 sender.sendMessage(plugin.getPrefix() + "§7A new report was created successfully.");
-                 return true;
-             }
+            if (args.length == 1) {
+                return true;
+            }
 
-             if (args[1].equalsIgnoreCase("list")) {
-                 Set<@NotNull Report> reports = plugin.getReportManager().getReports();
-                 sender.sendMessage(plugin.getPrefix() + "§7" + reports.stream().map(Report::date).map(Date::toString).collect(Collectors.joining(", ")));
+            if (args[1].equalsIgnoreCase("create")) {
+                plugin.getReportManager().createReport();
+                sender.sendMessage(plugin.getPrefix() + "§7A new report was created successfully.");
+                return true;
+            }
+
+            if (args[1].equalsIgnoreCase("list")) {
+                Set<@NotNull Report> reports = plugin.getReportManager().getReports();
+                sender.sendMessage(plugin.getPrefix() + "§7" + reports.stream().map(Report::date).map(Date::toString).collect(Collectors.joining(", ")));
                 return true;
             }
 
             if (args[1].equalsIgnoreCase("latest")) {
                 Report latestReport = plugin.getReportManager().getLatestReport();
-                sender.sendMessage(plugin.getPrefix() + "§7" + latestReport);
+                if (latestReport == null) {
+                    sender.sendMessage(plugin.getPrefix() + "§cNo report found");
+                    return true;
+                }
+                sender.sendMessage(plugin.getPrefix() + "§7" + ReportManager.formatISO(latestReport.date()));
                 return true;
             }
 

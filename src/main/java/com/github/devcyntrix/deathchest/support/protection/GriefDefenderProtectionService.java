@@ -1,6 +1,6 @@
 package com.github.devcyntrix.deathchest.support.protection;
 
-import com.github.devcyntrix.deathchest.api.protection.IProtectionService;
+import com.github.devcyntrix.deathchest.api.protection.ProtectionService;
 import com.griefdefender.api.GriefDefender;
 import com.griefdefender.api.claim.Claim;
 import org.bukkit.Location;
@@ -9,7 +9,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class GriefDefenderProtectionService implements IProtectionService {
+public class GriefDefenderProtectionService implements ProtectionService {
 
     @Override
     public boolean canBuild(@NotNull Player player, @NotNull Location location, @NotNull Material material) {

@@ -1,6 +1,6 @@
 package com.github.devcyntrix.deathchest.hologram;
 
-import com.github.devcyntrix.deathchest.api.hologram.IHologramTextLine;
+import com.github.devcyntrix.deathchest.api.hologram.HologramTextLine;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
-public class NativeHologramTextLine implements IHologramTextLine {
+public class NativeHologramTextLine implements HologramTextLine {
 
     private final Location location;
     private final UUID armorStand;
