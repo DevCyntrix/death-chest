@@ -78,7 +78,12 @@ public class SpawnChestListener implements Listener {
             return;
 
         Player player = event.getEntity();
-        Location deathLocation = player.getLocation();
+        Location deathLocation = new Location(
+                player.getWorld(),
+                player.getLocation().getX(),
+                Math.round(player.getLocation().getY()),
+                player.getLocation().getZ()
+        );
 
         if (!plugin.getDeathChestConfig().worldFilterConfig().test(deathLocation.getWorld()))
             return;
