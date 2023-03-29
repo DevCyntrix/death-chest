@@ -1,7 +1,10 @@
 package de.helixdevs.deathchest.command;
 
 import com.google.common.collect.ImmutableList;
+import com.google.gson.internal.bind.util.ISO8601Utils;
 import de.helixdevs.deathchest.DeathChestPlugin;
+import de.helixdevs.deathchest.api.report.Report;
+import de.helixdevs.deathchest.api.report.ReportManager;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.Command;
@@ -13,9 +16,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class DeathChestCommand implements TabExecutor {
 
@@ -74,6 +76,50 @@ public class DeathChestCommand implements TabExecutor {
             return true;
         }
 
+        if (args[0].equalsIgnoreCase("report")) {
+
+            if (args[1].equalsIgnoreCase("create")) {
+                plugin.getReportManager().createReport();
+                sender.sendMessage(plugin.getPrefix() + "§7A new report was created successfully.");
+                return true;
+            }
+
+            if (args[1].equalsIgnoreCase("list")) {
+                Set<@NotNull Report> reports = plugin.getReportManager().getReports();
+                sender.sendMessage(plugin.getPrefix() + "§7" + reports.stream().map(Report::date).map(Date::toString).collect(Collectors.joining(", ")));
+                return true;
+            }
+
+            if (args[1].equalsIgnoreCase("latest")) {
+                Report latestReport = plugin.getReportManager().getLatestReport();
+                sender.sendMessage(plugin.getPrefix() + "§7" + latestReport);
+                return true;
+            }
+
+            if (args.length == 3 && args[1].equalsIgnoreCase("delete")) {
+                Date date = ReportManager.parseISO(args[2]);
+                if (date == null) {
+                    sender.sendMessage(plugin.getPrefix() + "§cCannot parse given date format");
+                    return true;
+                }
+                System.out.println(date);
+                boolean b = plugin.getReportManager().deleteReport(date);
+                if (b) {
+                    sender.sendMessage(plugin.getPrefix() + "§7You deleted the report successfully");
+                } else {
+                    sender.sendMessage(plugin.getPrefix() + "§cCannot find report");
+                }
+                return true;
+            }
+
+            if (args[1].equalsIgnoreCase("deleteAll")) {
+                plugin.getReportManager().deleteReports();
+                sender.sendMessage(plugin.getPrefix() + "§7You deleted all reports successfully");
+                return true;
+            }
+
+        }
+
 //        if (args.length == 1 && args[0].equalsIgnoreCase("chests")) {
 //            if (!(sender.hasPermission("deathchest.command.chests"))) {
 //                return true;
@@ -121,15 +167,22 @@ public class DeathChestCommand implements TabExecutor {
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
         if (args.length == 0) {
-            return ImmutableList.of("reload", "deleteInWorld");
+            return ImmutableList.of("reload", "deleteInWorld", "report");
         }
         if (args.length == 1) {
-            return StringUtil.copyPartialMatches(args[0], ImmutableList.of("reload", "deleteInWorld"), new ArrayList<>());
+            return StringUtil.copyPartialMatches(args[0], ImmutableList.of("reload", "deleteInWorld", "report"), new ArrayList<>());
         }
 
         if (args.length == 2 && args[0].equalsIgnoreCase("deleteInWorld")) {
             return StringUtil.copyPartialMatches(args[1], Bukkit.getWorlds().stream().map(WorldInfo::getName).toList(), new ArrayList<>());
         }
+        if (args.length == 2 && args[0].equalsIgnoreCase("report")) {
+            return StringUtil.copyPartialMatches(args[1], ImmutableList.of("create", "list", "latest", "delete", "deleteAll"), new ArrayList<>());
+        }
+        if (args.length == 3 && args[0].equalsIgnoreCase("report") && args[1].equalsIgnoreCase("delete")) {
+            return StringUtil.copyPartialMatches(args[2], plugin.getReportManager().getReportDates().stream().map(ISO8601Utils::format).toList(), new ArrayList<>());
+        }
+
         return Collections.emptyList();
     }
 }

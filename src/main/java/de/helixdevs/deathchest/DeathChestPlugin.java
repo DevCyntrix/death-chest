@@ -6,6 +6,7 @@ import de.helixdevs.deathchest.api.DeathChestSnapshot;
 import de.helixdevs.deathchest.api.animation.IAnimationService;
 import de.helixdevs.deathchest.api.hologram.IHologramService;
 import de.helixdevs.deathchest.api.protection.IProtectionService;
+import de.helixdevs.deathchest.api.report.ReportManager;
 import de.helixdevs.deathchest.api.storage.DeathChestStorage;
 import de.helixdevs.deathchest.command.DeathChestCommand;
 import de.helixdevs.deathchest.config.ChestProtectionOptions;
@@ -13,6 +14,7 @@ import de.helixdevs.deathchest.config.DeathChestConfig;
 import de.helixdevs.deathchest.hologram.NativeHologramService;
 import de.helixdevs.deathchest.listener.SpawnChestListener;
 import de.helixdevs.deathchest.listener.UpdateNotificationListener;
+import de.helixdevs.deathchest.report.GsonReportManager;
 import de.helixdevs.deathchest.support.storage.YamlStorage;
 import de.helixdevs.deathchest.util.Metrics;
 import de.helixdevs.deathchest.util.UpdateChecker;
@@ -66,6 +68,8 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
     private static boolean placeholderAPIEnabled;
 
     private DeathChestStorage storage;
+
+    private ReportManager reportManager;
 
     /**
      * This method cleanups the whole plugin
@@ -158,6 +162,8 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         Set<DeathChestSnapshot> chests = this.storage.getChests();
         chests.forEach(deathChestSnapshot -> this.deathChests.add(deathChestSnapshot.createChest(this)));
         getLogger().info(this.deathChests.size() + " death chests loaded.");
+
+        this.reportManager = new GsonReportManager(new File(getDataFolder(), "reports"));
 
         // Checks for updates
         if (this.deathChestConfig.updateChecker()) {
