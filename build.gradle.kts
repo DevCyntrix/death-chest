@@ -94,14 +94,33 @@ bukkit {
         "RedProtect"
     )
     libraries = listOf(
-        "org.apache.commons:commons-text:1.9",
-        "org.jetbrains:annotations:23.0.0"
+        "org.apache.commons:commons-text:1.9"
     )
     commands {
         register("deathchest") {
             description = "The admin command for reloading the plugin's configuration"
-            permission = "deathchest.admin"
+            permission = "deathchest.command.deathchest"
             usage = "§c/<command> <reload|deleteInWorld [<world>]>"
+        }
+    }
+
+    permissions {
+        register("deathchest.command.report") {
+            description = "The permission to create, read and delete reports of the plugin"
+        }
+        register("deathchest.command.deleteInWorld") {
+            description = "The permission to delete all chests in all or a specific worlds"
+        }
+        register("deathchest.command.reload") {
+            description = "The permission to reload the configuration file of the DeathChest plugin"
+        }
+        register("deathchest.admin") {
+            children = listOf(
+                "deathchest.command.deathchest",
+                "deathchest.command.report",
+                "deathchest.command.deleteInWorld",
+                "deathchest.command.reload"
+            )
         }
     }
 }

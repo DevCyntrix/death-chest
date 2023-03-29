@@ -76,17 +76,17 @@ public class DeathChestCommand implements TabExecutor {
             return true;
         }
 
-        if (args[0].equalsIgnoreCase("report")) {
+         if (args[0].equalsIgnoreCase("report") && sender.hasPermission("deathchest.command.report")) {
 
-            if (args[1].equalsIgnoreCase("create")) {
-                plugin.getReportManager().createReport();
-                sender.sendMessage(plugin.getPrefix() + "§7A new report was created successfully.");
-                return true;
-            }
+             if (args[1].equalsIgnoreCase("create")) {
+                 plugin.getReportManager().createReport();
+                 sender.sendMessage(plugin.getPrefix() + "§7A new report was created successfully.");
+                 return true;
+             }
 
-            if (args[1].equalsIgnoreCase("list")) {
-                Set<@NotNull Report> reports = plugin.getReportManager().getReports();
-                sender.sendMessage(plugin.getPrefix() + "§7" + reports.stream().map(Report::date).map(Date::toString).collect(Collectors.joining(", ")));
+             if (args[1].equalsIgnoreCase("list")) {
+                 Set<@NotNull Report> reports = plugin.getReportManager().getReports();
+                 sender.sendMessage(plugin.getPrefix() + "§7" + reports.stream().map(Report::date).map(Date::toString).collect(Collectors.joining(", ")));
                 return true;
             }
 
