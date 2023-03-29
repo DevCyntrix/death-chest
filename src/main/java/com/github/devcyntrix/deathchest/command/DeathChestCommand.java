@@ -1,6 +1,11 @@
 package com.github.devcyntrix.deathchest.command;
 
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
+import com.github.devcyntrix.deathchest.api.audit.AuditAction;
+import com.github.devcyntrix.deathchest.api.audit.AuditItem;
+import com.github.devcyntrix.deathchest.api.audit.info.DestroyChestInfo;
+import com.github.devcyntrix.deathchest.api.audit.info.DestroyReason;
+import com.github.devcyntrix.deathchest.api.audit.info.ReloadInfo;
 import com.github.devcyntrix.deathchest.api.report.Report;
 import com.github.devcyntrix.deathchest.api.report.ReportManager;
 import com.google.common.collect.ImmutableList;
@@ -37,6 +42,7 @@ public class DeathChestCommand implements TabExecutor {
 
             plugin.onDisable();
             plugin.onEnable();
+            plugin.getAuditManager().audit(new AuditItem(new Date(), AuditAction.RELOAD_PLUGIN, new ReloadInfo(sender)));
             sender.sendMessage(plugin.getPrefix() + "§cThe plugin has been successfully reloaded");
             return true;
         }
@@ -53,6 +59,12 @@ public class DeathChestCommand implements TabExecutor {
 
             if (world == null) { // Delete all chests
                 plugin.getChests().forEach(deathChest -> {
+                    plugin.getAuditManager().audit(new AuditItem(new Date(), AuditAction.DESTROY_CHEST, new DestroyChestInfo(
+                            deathChest,
+                            DestroyReason.COMMAND,
+                            Map.of("executor", sender,
+                                    "command", "/" + label + " " + String.join(" ", args))
+                    )));
                     try {
                         deathChest.close();
                     } catch (IOException e) {

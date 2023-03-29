@@ -4,10 +4,15 @@ import com.github.devcyntrix.deathchest.api.DeathChest;
 import com.github.devcyntrix.deathchest.api.DeathChestService;
 import com.github.devcyntrix.deathchest.api.DeathChestSnapshot;
 import com.github.devcyntrix.deathchest.api.animation.IAnimationService;
+import com.github.devcyntrix.deathchest.api.audit.AuditAction;
+import com.github.devcyntrix.deathchest.api.audit.AuditItem;
+import com.github.devcyntrix.deathchest.api.audit.AuditManager;
+import com.github.devcyntrix.deathchest.api.audit.info.CreateChestInfo;
 import com.github.devcyntrix.deathchest.api.hologram.IHologramService;
 import com.github.devcyntrix.deathchest.api.protection.IProtectionService;
 import com.github.devcyntrix.deathchest.api.report.ReportManager;
 import com.github.devcyntrix.deathchest.api.storage.DeathChestStorage;
+import com.github.devcyntrix.deathchest.audit.GsonAuditManager;
 import com.github.devcyntrix.deathchest.command.DeathChestCommand;
 import com.github.devcyntrix.deathchest.config.ChestProtectionOptions;
 import com.github.devcyntrix.deathchest.config.DeathChestConfig;
@@ -38,6 +43,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.stream.Collectors;
@@ -71,6 +77,8 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
 
     private ReportManager reportManager;
 
+    private AuditManager auditManager;
+
     /**
      * This method cleanups the whole plugin
      */
@@ -81,6 +89,15 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
             saveChests();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+
+        {
+            try {
+                auditManager.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            auditManager = null; // To prevent wrong auditing
         }
 
         // Reset all death chests
@@ -164,6 +181,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         getLogger().info(this.deathChests.size() + " death chests loaded.");
 
         this.reportManager = new GsonReportManager(new File(getDataFolder(), "reports"));
+        this.auditManager = new GsonAuditManager(new File(getDataFolder(), "audits"));
 
         // Checks for updates
         if (this.deathChestConfig.updateChecker()) {
@@ -272,6 +290,8 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
                 .setHologramOptions(deathChestConfig.hologramOptions())
                 .setParticleOptions(deathChestConfig.particleOptions())
                 .build(location, deathChestConfig.inventoryOptions());
+        if (auditManager != null)
+            auditManager.audit(new AuditItem(new Date(), AuditAction.CREATE_CHEST, new CreateChestInfo(build)));
         this.deathChests.add(build);
         return build;
     }

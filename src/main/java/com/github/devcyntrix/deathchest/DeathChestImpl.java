@@ -3,6 +3,10 @@ package com.github.devcyntrix.deathchest;
 import com.github.devcyntrix.deathchest.api.DeathChest;
 import com.github.devcyntrix.deathchest.api.DeathChestSnapshot;
 import com.github.devcyntrix.deathchest.api.animation.IAnimationService;
+import com.github.devcyntrix.deathchest.api.audit.AuditAction;
+import com.github.devcyntrix.deathchest.api.audit.AuditItem;
+import com.github.devcyntrix.deathchest.api.audit.info.DestroyChestInfo;
+import com.github.devcyntrix.deathchest.api.audit.info.DestroyReason;
 import com.github.devcyntrix.deathchest.api.hologram.IHologram;
 import com.github.devcyntrix.deathchest.api.hologram.IHologramService;
 import com.github.devcyntrix.deathchest.api.hologram.IHologramTextLine;
@@ -11,9 +15,9 @@ import com.github.devcyntrix.deathchest.tasks.AnimationRunnable;
 import com.github.devcyntrix.deathchest.tasks.ExpirationRunnable;
 import com.github.devcyntrix.deathchest.tasks.HologramRunnable;
 import com.github.devcyntrix.deathchest.tasks.ParticleRunnable;
-import com.github.devcyntrix.deathchest.util.EntityIdHelper;
 import com.github.devcyntrix.deathchest.util.PlayerStringLookup;
 import com.google.common.base.Preconditions;
+import com.google.gson.annotations.Expose;
 import lombok.Getter;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.text.StringSubstitutor;
@@ -21,6 +25,7 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Lidded;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -42,6 +47,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -52,15 +58,21 @@ import java.util.stream.Stream;
 public class DeathChestImpl implements DeathChest {
 
     private final DeathChestPlugin plugin;
+
+    @Expose
     private final Location location;
 
     private final BlockState previousState;
     private BlockState state;
 
+    @Expose(deserialize = false)
     @NotNull
     private final Inventory inventory;
+    @Expose
     private final long createdAt;
+    @Expose
     private final long expireAt;
+    @Expose
     @Nullable
     private final OfflinePlayer player;
     private final Supplier<String> durationSupplier;
@@ -132,8 +144,8 @@ public class DeathChestImpl implements DeathChest {
             BreakEffectOptions breakEffectOptions = builder.breakEffectOptions();
             // Spawns the block break animation
             if (animationService != null && isExpiring() && breakEffectOptions.enabled()) {
-                this.breakingEntityId = EntityIdHelper.increaseAndGet();
-                tasks.add(new AnimationRunnable(this, animationService, breakEffectOptions, breakingEntityId).runTaskTimerAsynchronously(plugin, 20, 20));
+                this.breakingEntityId = ThreadLocalRandom.current().nextInt();
+                tasks.add(new AnimationRunnable(this, animationService, breakEffectOptions, breakingEntityId).runTaskTimerAsynchronously(plugin, 10, 10));
             }
 
             ParticleOptions particleOptions = builder.particleOptions();
@@ -142,7 +154,7 @@ public class DeathChestImpl implements DeathChest {
             }
 
             if (isExpiring() && !isClosed()) {
-                this.tasks.add(new ExpirationRunnable(this).runTaskLater(plugin, (getExpireAt() - System.currentTimeMillis()) / 50));
+                this.tasks.add(new ExpirationRunnable(plugin.getAuditManager(), this).runTaskLater(plugin, (getExpireAt() - System.currentTimeMillis()) / 50));
             }
             Bukkit.getPluginManager().registerEvents(this, plugin);
         } catch (Exception e) {
@@ -190,6 +202,11 @@ public class DeathChestImpl implements DeathChest {
         }
 
         if (inventory.isEmpty()) {
+            DestroyReason reason = DestroyReason.PLAYER;
+            if (!human.equals(player))
+                reason = DestroyReason.THIEF;
+
+            this.plugin.getAuditManager().audit(new AuditItem(new Date(), AuditAction.DESTROY_CHEST, new DestroyChestInfo(this, reason, Map.of("player", human))));
             close();
         }
     }
@@ -311,6 +328,7 @@ public class DeathChestImpl implements DeathChest {
             getWorld().dropItemNaturally(getLocation(), content);
         }
 
+        this.plugin.getAuditManager().audit(new AuditItem(new Date(), AuditAction.DESTROY_CHEST, new DestroyChestInfo(this, DestroyReason.BREAK, Map.of("player", player))));
         close();
     }
 
@@ -330,6 +348,8 @@ public class DeathChestImpl implements DeathChest {
             if (content == null) continue;
             getWorld().dropItemNaturally(getLocation(), content);
         }
+        Block block = event.getBlock();
+        this.plugin.getAuditManager().audit(new AuditItem(new Date(), AuditAction.DESTROY_CHEST, new DestroyChestInfo(this, DestroyReason.BLOCK_EXPLOSION, Map.of("block", block))));
         close();
     }
 
@@ -349,6 +369,10 @@ public class DeathChestImpl implements DeathChest {
             if (content == null) continue;
             getWorld().dropItemNaturally(getLocation(), content);
         }
+
+        Entity entity = event.getEntity();
+
+        this.plugin.getAuditManager().audit(new AuditItem(new Date(), AuditAction.DESTROY_CHEST, new DestroyChestInfo(this, DestroyReason.ENTITY_EXPLOSION, Map.of("entity", entity))));
         close();
     }
 
