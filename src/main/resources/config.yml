@@ -61,6 +61,7 @@ break-effect:
 # or you set the 'enabled' option to false.
 # This feature sends a message to the dead player. Here you can inform the player about the chest and their expiration.
 # You can send the death coordination by using the placeholders: ${x} ${y}, ${z} and ${world}
+# Also you can send the chest coordination by using the placeholders: ${chest_x}, ${chest_y} and ${chest_z}
 player-notification:
   enabled: true
   message: |-
@@ -70,6 +71,7 @@ player-notification:
 # ${player_name} : shows the player name
 # ${player_displayname} : shows the player display name (Maybe with prefix)
 # ${x}, ${y}, ${z}, ${world} : shows the coordinates of the death location
+# ${chest_x}, ${chest_y}, ${chest_z} : shows the coordinates of the chest
 global-notification:
   enabled: false
   message: |-
@@ -79,6 +81,7 @@ global-notification:
 # ${player_name} : shows the player name
 # ${player_displayname} : shows the player display name (Maybe with prefix)
 # ${x}, ${y}, ${z}, ${world} : shows the coordinates of the death location
+# (coordinates of the chest isn't available for here)
 # To disable the death message change "enabled" to true and remove the message option.
 change-death-message:
   enabled: false

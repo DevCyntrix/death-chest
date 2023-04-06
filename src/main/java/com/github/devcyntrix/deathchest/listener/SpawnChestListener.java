@@ -141,6 +141,9 @@ public class SpawnChestListener implements Listener {
                     "x", deathLocation.getBlockX(),
                     "y", deathLocation.getBlockY(),
                     "z", deathLocation.getBlockZ(),
+                    "chest_x", loc.getBlockX(),
+                    "chest_y", loc.getBlockY(),
+                    "chest_z", loc.getBlockZ(),
                     "world", deathLocation.getWorld().getName()));
             playerNotificationOptions.showNotification(player, substitutor);
         }
@@ -155,6 +158,9 @@ public class SpawnChestListener implements Listener {
                     "x", deathLocation.getBlockX(),
                     "y", deathLocation.getBlockY(),
                     "z", deathLocation.getBlockZ(),
+                    "chest_x", loc.getBlockX(),
+                    "chest_y", loc.getBlockY(),
+                    "chest_z", loc.getBlockZ(),
                     "world", deathLocation.getWorld().getName(),
                     "player_name", player.getName(),
                     "player_displayname", player.getDisplayName()));
