@@ -5,35 +5,26 @@ import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class EntityIdHelper {
-
-    private static Class<?> entityClass = null;
-    private static final Field entityCounter;
+    private static AtomicInteger counter;
 
     static {
         try {
-            entityClass = Class.forName("net.minecraft.world.entity.Entity");
-        } catch (ClassNotFoundException ignored) {
+            Class<?> entityClass = Class.forName("net.minecraft.world.entity.Entity");
+            Field entityCounter = Arrays.stream(entityClass.getDeclaredFields())
+                    .filter(field -> field.getType().equals(AtomicInteger.class))
+                    .findFirst()
+                    .orElse(null);
+            if (entityCounter != null) {
+                entityCounter.trySetAccessible();
+                counter = (AtomicInteger) entityCounter.get(null);
+            }
+        } catch (Exception e) {
+            counter = new AtomicInteger();
+            e.printStackTrace();
         }
-        entityCounter = Arrays.stream(entityClass.getDeclaredFields())
-                .filter(field -> field.getType().equals(AtomicInteger.class))
-                .findFirst()
-                .orElse(null);
     }
 
     public static int increaseAndGet() {
-        if (entityClass == null)
-            return -1;
-        try {
-            if (entityCounter == null) {
-                return -1;
-            }
-            if (!entityCounter.trySetAccessible())
-                return -1;
-            AtomicInteger integer = (AtomicInteger) entityCounter.get(null);
-            return integer.incrementAndGet();
-        } catch (IllegalAccessException ignored) {
-        }
-        return -1;
+        return counter.incrementAndGet();
     }
-
 }
