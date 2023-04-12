@@ -1,10 +1,21 @@
 package com.github.devcyntrix.deathchest.command;
 
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
+import com.github.devcyntrix.deathchest.api.audit.AuditAction;
+import com.github.devcyntrix.deathchest.api.audit.AuditItem;
+import com.github.devcyntrix.deathchest.api.audit.info.DestroyChestInfo;
+import com.github.devcyntrix.deathchest.api.audit.info.DestroyReason;
+import com.github.devcyntrix.deathchest.api.audit.info.ReloadInfo;
 import com.github.devcyntrix.deathchest.api.report.Report;
 import com.github.devcyntrix.deathchest.api.report.ReportManager;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.internal.bind.util.ISO8601Utils;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.Command;
@@ -16,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.text.DateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -37,6 +49,7 @@ public class DeathChestCommand implements TabExecutor {
 
             plugin.onDisable();
             plugin.onEnable();
+            plugin.getAuditManager().audit(new AuditItem(new Date(), AuditAction.RELOAD_PLUGIN, new ReloadInfo(sender)));
             sender.sendMessage(plugin.getPrefix() + "§cThe plugin has been successfully reloaded");
             return true;
         }
@@ -53,6 +66,12 @@ public class DeathChestCommand implements TabExecutor {
 
             if (world == null) { // Delete all chests
                 plugin.getChests().forEach(deathChest -> {
+                    plugin.getAuditManager().audit(new AuditItem(new Date(), AuditAction.DESTROY_CHEST, new DestroyChestInfo(
+                            deathChest,
+                            DestroyReason.COMMAND,
+                            Map.of("executor", sender,
+                                    "command", "/" + label + " " + String.join(" ", args))
+                    )));
                     try {
                         deathChest.close();
                     } catch (IOException e) {
@@ -76,23 +95,51 @@ public class DeathChestCommand implements TabExecutor {
             return true;
         }
 
-         if (args[0].equalsIgnoreCase("report") && sender.hasPermission("deathchest.command.report")) {
+        if (args[0].equalsIgnoreCase("report") && sender.hasPermission("deathchest.command.report")) {
 
-             if (args[1].equalsIgnoreCase("create")) {
-                 plugin.getReportManager().createReport();
-                 sender.sendMessage(plugin.getPrefix() + "§7A new report was created successfully.");
-                 return true;
-             }
+            if (args.length == 1) {
+                return true;
+            }
 
-             if (args[1].equalsIgnoreCase("list")) {
-                 Set<@NotNull Report> reports = plugin.getReportManager().getReports();
-                 sender.sendMessage(plugin.getPrefix() + "§7" + reports.stream().map(Report::date).map(Date::toString).collect(Collectors.joining(", ")));
+            if (args[1].equalsIgnoreCase("create")) {
+                plugin.getReportManager().createReport();
+                sender.sendMessage(plugin.getPrefix() + "§7A new report was created successfully.");
+                return true;
+            }
+
+            if (args[1].equalsIgnoreCase("list")) {
+                Set<@NotNull Report> reports = plugin.getReportManager().getReports();
+                sender.sendMessage(plugin.getPrefix() + "§7" + reports.stream().map(Report::date).map(Date::toString).collect(Collectors.joining(", ")));
                 return true;
             }
 
             if (args[1].equalsIgnoreCase("latest")) {
                 Report latestReport = plugin.getReportManager().getLatestReport();
-                sender.sendMessage(plugin.getPrefix() + "§7" + latestReport);
+                if (latestReport == null) {
+                    sender.sendMessage(plugin.getPrefix() + "§cNo report found");
+                    return true;
+                }
+
+                BaseComponent[] baseComponents = TextComponent.fromLegacyText(plugin.getPrefix() + "§7");
+                DateFormat dateTimeInstance = DateFormat.getDateTimeInstance();
+                TextComponent message = new TextComponent("The latest report you created is from " + dateTimeInstance.format(latestReport.date()) + " ");
+                message.setColor(ChatColor.GRAY);
+
+                TextComponent copy = new TextComponent("[Copy]");
+                copy.setColor(ChatColor.RED);
+                copy.setUnderlined(true);
+                copy.setClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, ReportManager.formatISO(latestReport.date())));
+                copy.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("§7Click to copy the file name")));
+
+
+                BaseComponent[] components = new BaseComponent[baseComponents.length + 2];
+
+                System.arraycopy(baseComponents, 0, components, 0, baseComponents.length);
+                components[baseComponents.length] = message;
+                components[baseComponents.length + 1] = copy;
+
+                sender.spigot().sendMessage(components);
+                //sender.sendMessage(plugin.getPrefix() + "§7" + ReportManager.formatISO(latestReport.date()));
                 return true;
             }
 

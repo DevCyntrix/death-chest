@@ -1,7 +1,7 @@
 package com.github.devcyntrix.deathchest.tasks;
 
 import com.github.devcyntrix.deathchest.api.DeathChest;
-import com.github.devcyntrix.deathchest.api.animation.IAnimationService;
+import com.github.devcyntrix.deathchest.api.animation.AnimationService;
 import com.github.devcyntrix.deathchest.config.BreakEffectOptions;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.EntityType;
@@ -16,11 +16,11 @@ import java.util.stream.Stream;
 public class AnimationRunnable extends BukkitRunnable {
 
     private final DeathChest chest;
-    private final IAnimationService animationService;
+    private final AnimationService animationService;
     private final BreakEffectOptions options;
     private final int breakingEntityId;
 
-    public AnimationRunnable(DeathChest chest, IAnimationService animationService, BreakEffectOptions options, int breakingEntityId) {
+    public AnimationRunnable(DeathChest chest, AnimationService animationService, BreakEffectOptions options, int breakingEntityId) {
         this.chest = chest;
         this.animationService = animationService;
         this.options = options;

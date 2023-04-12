@@ -1,14 +1,14 @@
 package com.github.devcyntrix.deathchest.hologram;
 
-import com.github.devcyntrix.deathchest.api.hologram.IHologram;
-import com.github.devcyntrix.deathchest.api.hologram.IHologramService;
+import com.github.devcyntrix.deathchest.api.hologram.Hologram;
+import com.github.devcyntrix.deathchest.api.hologram.HologramService;
 import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
 
-public class NativeHologramService implements IHologramService {
+public class NativeHologramService implements HologramService {
 
     @Override
-    public @NotNull IHologram spawnHologram(@NotNull Location location) {
+    public @NotNull Hologram spawnHologram(@NotNull Location location) {
         return new NativeHologram(this, location);
     }
 }

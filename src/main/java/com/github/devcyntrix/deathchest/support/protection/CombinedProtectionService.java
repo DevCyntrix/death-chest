@@ -1,6 +1,6 @@
 package com.github.devcyntrix.deathchest.support.protection;
 
-import com.github.devcyntrix.deathchest.api.protection.IProtectionService;
+import com.github.devcyntrix.deathchest.api.protection.ProtectionService;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -8,11 +8,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
-public class CombinedProtectionService implements IProtectionService {
+public class CombinedProtectionService implements ProtectionService {
 
-    private final IProtectionService[] services;
+    private final ProtectionService[] services;
 
-    public CombinedProtectionService(IProtectionService[] services) {
+    public CombinedProtectionService(ProtectionService[] services) {
         this.services = services;
     }
 

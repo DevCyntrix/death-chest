@@ -1,10 +1,12 @@
 package com.github.devcyntrix.deathchest;
 
 import com.comphenix.protocol.ProtocolLibrary;
-import com.github.devcyntrix.deathchest.api.animation.IAnimationService;
-import com.github.devcyntrix.deathchest.api.protection.IProtectionService;
+import com.github.devcyntrix.deathchest.api.animation.AnimationService;
+import com.github.devcyntrix.deathchest.api.protection.ProtectionService;
+import com.github.devcyntrix.deathchest.support.animation.PaperAnimation;
 import com.github.devcyntrix.deathchest.support.animation.ProtocolLibAnimation;
 import com.github.devcyntrix.deathchest.support.protection.*;
+import com.github.devcyntrix.deathchest.util.PaperTest;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
@@ -15,11 +17,11 @@ import java.util.function.Function;
 
 public final class SupportServices {
 
-    private static final Map<String, Function<Plugin, IAnimationService>> animationServiceMap = Map.of(
+    private static final Map<String, Function<Plugin, AnimationService>> animationServiceMap = Map.of(
             "ProtocolLib", plugin -> ProtocolLibrary.getProtocolManager() != null ? new ProtocolLibAnimation() : null
     );
 
-    private static final Map<String, Function<Plugin, IProtectionService>> protectionServiceMap = Map.of(
+    private static final Map<String, Function<Plugin, ProtectionService>> protectionServiceMap = Map.of(
             "WorldGuard", plugin -> new WorldGuardProtection(),
             "PlotSquared", plugin -> new PlotSquaredProtection(),
             "GriefPrevention", plugin -> new GriefPreventionProtection(),
@@ -27,16 +29,19 @@ public final class SupportServices {
             "GriefDefender", plugin -> new GriefDefenderProtectionService()
     );
 
-    public static @Nullable IAnimationService getAnimationService(@NotNull Plugin plugin, @Nullable String preferred) {
+    public static @Nullable AnimationService getAnimationService(@NotNull Plugin plugin, @Nullable String preferred) {
+        if (PaperTest.isPaper()) {
+            return new PaperAnimation();
+        }
         return getService(animationServiceMap, plugin, preferred);
     }
 
-    public static @Nullable IProtectionService getProtectionService(@NotNull Plugin plugin) {
-        IProtectionService[] services = protectionServiceMap.entrySet().stream()
+    public static @Nullable ProtectionService getProtectionService(@NotNull Plugin plugin) {
+        ProtectionService[] services = protectionServiceMap.entrySet().stream()
                 .filter(entry -> Bukkit.getPluginManager().isPluginEnabled(entry.getKey()))
                 .map(Map.Entry::getValue)
                 .map(f -> f.apply(plugin))
-                .toArray(IProtectionService[]::new);
+                .toArray(ProtectionService[]::new);
         return new CombinedProtectionService(services);
     }
 

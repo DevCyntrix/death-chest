@@ -1,6 +1,6 @@
 package com.github.devcyntrix.deathchest.support.protection;
 
-import com.github.devcyntrix.deathchest.api.protection.IProtectionService;
+import com.github.devcyntrix.deathchest.api.protection.ProtectionService;
 import com.github.devcyntrix.deathchest.util.WorldGuardDeathChestFlag;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.LocalPlayer;
@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * <a href="https://dev.bukkit.org/projects/worldguard">WorldGuard</a>
  */
-public class WorldGuardProtection implements IProtectionService {
+public class WorldGuardProtection implements ProtectionService {
 
     private final ProtectionQuery protectionQuery = WorldGuardPlugin.inst().createProtectionQuery();
     private final RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();

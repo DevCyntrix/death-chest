@@ -1,8 +1,8 @@
 package com.github.devcyntrix.deathchest;
 
 import com.github.devcyntrix.deathchest.api.DeathChest;
-import com.github.devcyntrix.deathchest.api.animation.IAnimationService;
-import com.github.devcyntrix.deathchest.api.hologram.IHologramService;
+import com.github.devcyntrix.deathchest.api.animation.AnimationService;
+import com.github.devcyntrix.deathchest.api.hologram.HologramService;
 import com.github.devcyntrix.deathchest.config.BreakEffectOptions;
 import com.github.devcyntrix.deathchest.config.HologramOptions;
 import com.github.devcyntrix.deathchest.config.InventoryOptions;
@@ -28,8 +28,8 @@ public final class DeathChestBuilder {
 
     private boolean isProtected;
 
-    private IHologramService hologramService;
-    private IAnimationService animationService;
+    private HologramService hologramService;
+    private AnimationService animationService;
 
     private HologramOptions hologramOptions;
     private BreakEffectOptions breakEffectOptions;
@@ -90,20 +90,20 @@ public final class DeathChestBuilder {
         return this;
     }
 
-    public IHologramService hologramService() {
+    public HologramService hologramService() {
         return hologramService;
     }
 
-    public DeathChestBuilder setHologramService(IHologramService hologramService) {
+    public DeathChestBuilder setHologramService(HologramService hologramService) {
         this.hologramService = hologramService;
         return this;
     }
 
-    public IAnimationService animationService() {
+    public AnimationService animationService() {
         return animationService;
     }
 
-    public DeathChestBuilder setAnimationService(IAnimationService animationService) {
+    public DeathChestBuilder setAnimationService(AnimationService animationService) {
         this.animationService = animationService;
         return this;
     }

@@ -3,8 +3,8 @@ package com.github.devcyntrix.deathchest.api.hologram;
 import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
 
-public interface IHologramService {
+public interface HologramService {
 
-    @NotNull IHologram spawnHologram(@NotNull Location location);
+    @NotNull Hologram spawnHologram(@NotNull Location location);
 
 }

@@ -1,6 +1,6 @@
 package com.github.devcyntrix.deathchest.support.protection;
 
-import com.github.devcyntrix.deathchest.api.protection.IProtectionService;
+import com.github.devcyntrix.deathchest.api.protection.ProtectionService;
 import com.plotsquared.bukkit.player.BukkitPlayer;
 import com.plotsquared.bukkit.util.BukkitUtil;
 import com.plotsquared.core.configuration.Settings;
@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * <a href="https://www.spigotmc.org/resources/plotsquared-v4-v6-out-now.1177/">PlotSquared</a>
  */
-public class PlotSquaredProtection implements IProtectionService {
+public class PlotSquaredProtection implements ProtectionService {
 
     @Override
     public boolean canBuild(@NotNull Player player, @NotNull org.bukkit.Location loc, @NotNull Material material) {

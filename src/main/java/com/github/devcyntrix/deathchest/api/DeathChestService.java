@@ -1,8 +1,8 @@
 package com.github.devcyntrix.deathchest.api;
 
-import com.github.devcyntrix.deathchest.api.animation.IAnimationService;
-import com.github.devcyntrix.deathchest.api.hologram.IHologramService;
-import com.github.devcyntrix.deathchest.api.protection.IProtectionService;
+import com.github.devcyntrix.deathchest.api.animation.AnimationService;
+import com.github.devcyntrix.deathchest.api.hologram.HologramService;
+import com.github.devcyntrix.deathchest.api.protection.ProtectionService;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
@@ -38,13 +38,13 @@ public interface DeathChestService {
         return getHologramService() != null;
     }
 
-    @Nullable IHologramService getHologramService();
+    @Nullable HologramService getHologramService();
 
     default boolean hasAnimation() {
         return getAnimationService() != null;
     }
 
-    @Nullable IAnimationService getAnimationService();
+    @Nullable AnimationService getAnimationService();
 
-    @NotNull IProtectionService getProtectionService();
+    @NotNull ProtectionService getProtectionService();
 }

@@ -1,8 +1,8 @@
 package com.github.devcyntrix.deathchest.hologram;
 
-import com.github.devcyntrix.deathchest.api.hologram.IHologram;
-import com.github.devcyntrix.deathchest.api.hologram.IHologramService;
-import com.github.devcyntrix.deathchest.api.hologram.IHologramTextLine;
+import com.github.devcyntrix.deathchest.api.hologram.Hologram;
+import com.github.devcyntrix.deathchest.api.hologram.HologramService;
+import com.github.devcyntrix.deathchest.api.hologram.HologramTextLine;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NativeHologram implements IHologram {
+public class NativeHologram implements Hologram {
 
     private final NativeHologramService service;
     private Location location;
@@ -24,7 +24,7 @@ public class NativeHologram implements IHologram {
     }
 
     @Override
-    public @NotNull IHologramService getService() {
+    public @NotNull HologramService getService() {
         return service;
     }
 
@@ -44,7 +44,7 @@ public class NativeHologram implements IHologram {
     }
 
     @Override
-    public IHologramTextLine appendLine(@NotNull String line) {
+    public HologramTextLine appendLine(@NotNull String line) {
         NativeHologramTextLine l = new NativeHologramTextLine(location.clone().subtract(0, list.size() * 0.25, 0), line);
         list.add(l);
         return l;
