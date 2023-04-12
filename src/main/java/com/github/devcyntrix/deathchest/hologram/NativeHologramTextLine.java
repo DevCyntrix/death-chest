@@ -1,10 +1,14 @@
 package com.github.devcyntrix.deathchest.hologram;
 
+import com.github.devcyntrix.deathchest.DeathChestPlugin;
+import com.github.devcyntrix.deathchest.api.hologram.Hologram;
 import com.github.devcyntrix.deathchest.api.hologram.HologramTextLine;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,6 +27,7 @@ public class NativeHologramTextLine implements HologramTextLine {
             stand.setInvisible(true);
             stand.setCustomName(text);
             stand.setCustomNameVisible(true);
+            stand.setMetadata(Hologram.METADATA_KEY, new FixedMetadataValue(JavaPlugin.getPlugin(DeathChestPlugin.class), true));
         }).getUniqueId();
     }
 

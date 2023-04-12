@@ -8,6 +8,7 @@ import com.github.devcyntrix.deathchest.api.audit.AuditAction;
 import com.github.devcyntrix.deathchest.api.audit.AuditItem;
 import com.github.devcyntrix.deathchest.api.audit.AuditManager;
 import com.github.devcyntrix.deathchest.api.audit.info.CreateChestInfo;
+import com.github.devcyntrix.deathchest.api.hologram.Hologram;
 import com.github.devcyntrix.deathchest.api.hologram.HologramService;
 import com.github.devcyntrix.deathchest.api.protection.ProtectionService;
 import com.github.devcyntrix.deathchest.api.report.ReportManager;
@@ -30,6 +31,7 @@ import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.MemoryConfiguration;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
@@ -91,16 +93,22 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
             e.printStackTrace();
         }
 
-        {
-            try {
-                auditManager.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            auditManager = null; // To prevent wrong auditing
-        }
+        unloadAuditManager();
+        resetDeathChests();
 
-        // Reset all death chests
+        // Try to remove all holograms
+        Bukkit.getWorlds().stream()
+                .flatMap(world -> world.getEntitiesByClass(ArmorStand.class).stream())
+                .forEach(armorStand -> {
+                    if (armorStand.hasMetadata(Hologram.METADATA_KEY)) {
+                        armorStand.remove();
+                    }
+                });
+
+        HandlerList.unregisterAll((Listener) this);
+    }
+
+    private void resetDeathChests() {
         this.deathChests.forEach(deathChest -> {
             try {
                 deathChest.close();
@@ -109,7 +117,15 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
             }
         });
         this.deathChests.clear();
-        HandlerList.unregisterAll((Listener) this);
+    }
+
+    private void unloadAuditManager() {
+        try {
+            auditManager.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        auditManager = null; // To prevent wrong auditing
     }
 
     @Override
