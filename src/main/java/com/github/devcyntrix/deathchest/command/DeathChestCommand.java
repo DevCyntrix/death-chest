@@ -10,6 +10,12 @@ import com.github.devcyntrix.deathchest.api.report.Report;
 import com.github.devcyntrix.deathchest.api.report.ReportManager;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.internal.bind.util.ISO8601Utils;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.Command;
@@ -21,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.text.DateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -112,7 +119,27 @@ public class DeathChestCommand implements TabExecutor {
                     sender.sendMessage(plugin.getPrefix() + "§cNo report found");
                     return true;
                 }
-                sender.sendMessage(plugin.getPrefix() + "§7" + ReportManager.formatISO(latestReport.date()));
+
+                BaseComponent[] baseComponents = TextComponent.fromLegacyText(plugin.getPrefix() + "§7");
+                DateFormat dateTimeInstance = DateFormat.getDateTimeInstance();
+                TextComponent message = new TextComponent("The latest report you created is from " + dateTimeInstance.format(latestReport.date()) + " ");
+                message.setColor(ChatColor.GRAY);
+
+                TextComponent copy = new TextComponent("[Copy]");
+                copy.setColor(ChatColor.RED);
+                copy.setUnderlined(true);
+                copy.setClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, ReportManager.formatISO(latestReport.date())));
+                copy.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("§7Click to copy the file name")));
+
+
+                BaseComponent[] components = new BaseComponent[baseComponents.length + 2];
+
+                System.arraycopy(baseComponents, 0, components, 0, baseComponents.length);
+                components[baseComponents.length] = message;
+                components[baseComponents.length + 1] = copy;
+
+                sender.spigot().sendMessage(components);
+                //sender.sendMessage(plugin.getPrefix() + "§7" + ReportManager.formatISO(latestReport.date()));
                 return true;
             }
 
