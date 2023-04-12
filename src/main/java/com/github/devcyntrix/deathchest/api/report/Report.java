@@ -7,10 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public record Report(
@@ -19,14 +16,21 @@ public record Report(
         @SerializedName("plugins")
         Set<PluginInfo> plugins,
         @SerializedName("config")
-        DeathChestConfig config
+        DeathChestConfig config,
+        @SerializedName("extra")
+        Map<String, Object> extra
 ) {
 
+    /**
+     * Creates a new report object
+     *
+     * @return the new report object
+     */
     public static Report create() {
         PluginManager pluginManager = Bukkit.getPluginManager();
         Set<PluginInfo> collect = Arrays.stream(pluginManager.getPlugins()).map(PluginInfo::of).collect(Collectors.toSet());
         DeathChestPlugin plugin = JavaPlugin.getPlugin(DeathChestPlugin.class);
-        return new Report(new Date(), collect, plugin.getDeathChestConfig());
+        return new Report(new Date(), collect, plugin.getDeathChestConfig(), new HashMap<>());
     }
 
     @Override

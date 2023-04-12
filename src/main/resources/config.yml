@@ -100,7 +100,6 @@ blast-protection: false
 
 # This option protects the death chest against thieves if the player has the specific permission and the thief
 # not the bypass permission.
-# For this option is Vault required.
 chest-protection:
   enabled: false
   permission: deathchest.thiefprotected
