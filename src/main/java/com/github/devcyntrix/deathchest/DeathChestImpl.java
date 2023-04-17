@@ -236,8 +236,8 @@ public class DeathChestImpl implements DeathChest {
         Long expiration = protectionOptions.expiration() == null ? null : protectionOptions.expiration().toMillis() + createdAt - System.currentTimeMillis();
 
         if (protectionOptions.enabled() &&
-                getPlayer() != null && player != getPlayer() &&
                 isProtected() &&
+                getPlayer() != null && !getPlayer().getUniqueId().equals(player.getUniqueId()) &&
                 !player.hasPermission(protectionOptions.bypassPermission()) &&
                 (expiration == null || expiration >= 0)) {
             protectionOptions.playSound(player, block.getLocation());
@@ -309,13 +309,11 @@ public class DeathChestImpl implements DeathChest {
         Player player = event.getPlayer();
 
         event.setCancelled(true);
-        // Chest Protection (Vault is required)
         ChestProtectionOptions protectionOptions = getPlugin().getDeathChestConfig().chestProtectionOptions();
         Long expiration = protectionOptions.expiration() == null ? null : protectionOptions.expiration().toMillis() + createdAt - System.currentTimeMillis();
         if (protectionOptions.enabled() &&
                 isProtected() &&
-                getPlayer() != null &&
-                player != getPlayer() &&
+                getPlayer() != null && !getPlayer().getUniqueId().equals(player.getUniqueId()) &&
                 !player.hasPermission(protectionOptions.bypassPermission()) &&
                 (expiration == null || expiration >= 0)) {
             protectionOptions.playSound(player, block.getLocation());
