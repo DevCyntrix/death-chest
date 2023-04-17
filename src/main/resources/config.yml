@@ -6,20 +6,20 @@
 # Do not touch this!
 config-version: 2
 
-# I recommend leaving this on true to receive notification when I have performance improvements.
+# I recommend leaving this on true to receive notification if I published an update.
 update-checker: true
 duration-format: 'mm:ss'
 # The expiration of the chest in seconds.
 # You can deactivate the expiration by setting the value to -1
 expiration: 600
-# If this feature is enabled all caught items will be dropped if the chest is expired.
+# If this feature is enabled all caught items will be dropped if the chest has expired.
 drop-items-after-expiration: false
 
 # Here you can modify the inventory which opens when you right-click the death chest. You can use color codes with '&'
 # in the title and change the inventory size by changing the size value.
 inventory:
   title: 'Death Chest'
-  # Possible values are: constant and flexible
+  # Possible values are: 'constant' and 'flexible'
   # constant: the size of the inventory is always 45 slots large
   # flexible: the size of the inventory depends on the items which had the player in the inventory.
   size: flexible
@@ -111,4 +111,4 @@ chest-protection:
   # If you want to disable the sound or the message, you can delete these options
   sound: BLOCK_CHEST_LOCKED;1.0;1.0
   message: |-
-    &cYour are not permitted to open this chest
+    &cYou are not permitted to open this chest
