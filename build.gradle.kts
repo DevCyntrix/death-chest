@@ -5,8 +5,8 @@ plugins {
     id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
-group = "de.helixdevs"
-version = "1.5.20"
+group = "com.github.devcyntrix"
+version = "1.5.21"
 
 repositories {
     mavenCentral()
