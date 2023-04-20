@@ -20,6 +20,7 @@ import com.github.devcyntrix.deathchest.util.PlayerStringLookup;
 import com.google.common.base.Preconditions;
 import com.google.gson.annotations.Expose;
 import lombok.Getter;
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.bukkit.*;
@@ -116,11 +117,14 @@ public class DeathChestImpl implements DeathChest {
         };
 
         ItemStack[] stacks = builder.items();
+        StringSubstitutor substitutor = new StringSubstitutor(new PlayerStringLookup(builder.player(), durationSupplier));
 
         try {
             // Creates inventory
             InventoryOptions inventoryOptions = builder.inventoryOptions();
-            this.inventory = Bukkit.createInventory(new DeathChestHolder(this), inventoryOptions.size().getSize(stacks.length), inventoryOptions.title());
+            String title = PlaceholderAPI.setPlaceholders(getPlayer(), substitutor.replace(inventoryOptions.title()));
+
+            this.inventory = Bukkit.createInventory(new DeathChestHolder(this), inventoryOptions.size().getSize(stacks.length), title);
             this.inventory.setContents(stacks);
 
             // Creates hologram
@@ -130,7 +134,6 @@ public class DeathChestImpl implements DeathChest {
                 this.hologram = hologramService.spawnHologram(getLocation().clone().add(0.5, hologramOptions.height(), 0.5));
 
                 Map<String, HologramTextLine> blueprints = new LinkedHashMap<>(hologramOptions.lines().size());
-                StringSubstitutor substitutor = new StringSubstitutor(new PlayerStringLookup(builder.player(), durationSupplier));
                 hologramOptions.lines().forEach(line -> blueprints.put(line, hologram.appendLine(substitutor.replace(line)))); // A map of blueprints
 
                 // Start task

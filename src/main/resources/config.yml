@@ -19,6 +19,10 @@ drop-items-after-expiration: false
 # Here you can modify the inventory which opens when you right-click the death chest. You can use color codes with '&'
 # in the title and change the inventory size by changing the size value.
 inventory:
+  # Here you can use the Placeholder API and
+  #   ${player_name}: Name
+  #   ${player_displayname}: Displayname
+  #   ${duration}: Time left
   title: 'Death Chest'
   # Possible values are: 'constant' and 'flexible'
   # constant: the size of the inventory is always 45 slots large
@@ -33,9 +37,9 @@ hologram:
   # If you add lines you have to increase this value. This values depends on the hologram
   # plugin and the distance between the plugin
   height: 2.3
-  # Support for {player_name}: Name
-  #             {player_displayname}: Displayname
-  #             {duration}: Time left
+  # Support for ${player_name}: Name
+  #             ${player_displayname}: Displayname
+  #             ${duration}: Time left
   lines:
     - '&7&lR.I.P'
     - '${player_name}'
