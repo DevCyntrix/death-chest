@@ -100,7 +100,7 @@ public class DeathChestImpl implements DeathChest {
         // Creates the chest in the next tick because if you try to sleep in the nether the explosion spawns after the player dies. That means the chest would be destroyed by the explosion.
         Bukkit.getScheduler().runTask(plugin, () -> {
             Block block = location.getBlock();
-            block.setType(Material.CHEST);
+            block.setType(Material.CHEST, false);
             this.state = block.getState();
         });
 
