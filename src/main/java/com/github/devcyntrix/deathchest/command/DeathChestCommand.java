@@ -82,7 +82,7 @@ public class DeathChestCommand implements TabExecutor {
             }
 
             World finalWorld = world;
-            plugin.getChests().stream().filter(deathChest -> finalWorld.equals(deathChest.getWorld())).forEach(deathChest -> {
+            plugin.getChests().filter(deathChest -> finalWorld.equals(deathChest.getWorld())).forEach(deathChest -> {
                 try {
                     deathChest.close();
                 } catch (IOException e) {

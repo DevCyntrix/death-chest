@@ -5,14 +5,17 @@ import com.github.devcyntrix.deathchest.api.hologram.HologramService;
 import com.github.devcyntrix.deathchest.api.protection.ProtectionService;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.Set;
+import java.util.stream.Stream;
 
 public interface DeathChestService {
+
+    @Nullable DeathChest getLastChest(@NotNull Player player);
 
     boolean canPlaceChestAt(@NotNull Location location);
 
@@ -30,7 +33,7 @@ public interface DeathChestService {
 
     @NotNull DeathChest createDeathChest(@NotNull Location location, long createdAt, long expireAt, @Nullable OfflinePlayer player, boolean isProtected, ItemStack @NotNull ... items);
 
-    @NotNull Set<@NotNull DeathChest> getChests();
+    @NotNull Stream<@NotNull DeathChest> getChests();
 
     void saveChests() throws IOException;
 
