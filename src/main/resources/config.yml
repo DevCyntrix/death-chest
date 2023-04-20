@@ -12,7 +12,9 @@ duration-format: 'mm:ss'
 # The expiration of the chest in seconds.
 # You can deactivate the expiration by setting the value to -1
 expiration: 600
-no-expiration-permission: 'deathchest.stays-forever'
+no-expiration-permission:
+  enabled: false
+  permission: 'deathchest.stays-forever'
 # If this feature is enabled all caught items will be dropped if the chest has expired.
 drop-items-after-expiration: false
 

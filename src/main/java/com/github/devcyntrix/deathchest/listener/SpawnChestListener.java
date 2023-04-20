@@ -3,10 +3,7 @@ package com.github.devcyntrix.deathchest.listener;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
 import com.github.devcyntrix.deathchest.DeathChestSpawnEvent;
 import com.github.devcyntrix.deathchest.api.DeathChest;
-import com.github.devcyntrix.deathchest.config.ChangeDeathMessageOptions;
-import com.github.devcyntrix.deathchest.config.DeathChestConfig;
-import com.github.devcyntrix.deathchest.config.GlobalNotificationOptions;
-import com.github.devcyntrix.deathchest.config.PlayerNotificationOptions;
+import com.github.devcyntrix.deathchest.config.*;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.apache.commons.text.StringSubstitutor;
 import org.bukkit.Bukkit;
@@ -107,7 +104,8 @@ public class SpawnChestListener implements Listener {
         if (expiration == null)
             expiration = Duration.ofSeconds(-1);
 
-        boolean expires = deathChestConfig.noExpirationPermission() == null || !player.hasPermission(deathChestConfig.noExpirationPermission());
+        NoExpirationPermission permission = deathChestConfig.noExpirationPermission();
+        boolean expires = permission == null || !permission.enabled() || !player.hasPermission(permission.permission());
         long createdAt = System.currentTimeMillis();
         long expireAt = !expiration.isNegative() && !expiration.isZero() && expires ? createdAt + expiration.toMillis() : -1;
 

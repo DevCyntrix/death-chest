@@ -12,7 +12,7 @@ public record DeathChestConfig(
         @SerializedName("update-checker") boolean updateChecker,
         @SerializedName("duration-format") @NotNull String durationFormat,
         @SerializedName("expiration") @Nullable Duration expiration,
-        @SerializedName("no-expiration-permission") @Nullable String noExpirationPermission,
+        @SerializedName("no-expiration-permission") @Nullable NoExpirationPermission noExpirationPermission,
         @SerializedName("drop-items-after-expiration") boolean dropItemsAfterExpiration,
         @SerializedName("inventory") @NotNull InventoryOptions inventoryOptions,
         @SerializedName("hologram") @NotNull HologramOptions hologramOptions,
@@ -41,7 +41,14 @@ public record DeathChestConfig(
             }
         }
 
-        String noExpirationPermission = config.getString("drop-items-after-expiration");
+        NoExpirationPermission permission = null;
+        if (config.isString("no-expiration-permission")) {
+            permission = new NoExpirationPermission(false, config.getString("no-expiration-permission"));
+        } else {
+            if (config.contains("no-expiration-permission.enabled") && config.contains("no-expiration-permission.enabled")) {
+                permission = new NoExpirationPermission(config.getBoolean("no-expiration-permission.enabled"), config.getString("no-expiration-permission.permission"));
+            }
+        }
 
         boolean dropItemsAfterExpiration = config.getBoolean("drop-items-after-expiration", false);
 
@@ -74,7 +81,7 @@ public record DeathChestConfig(
 
         String preferredAnimationService = config.getString("preferred-animation-service");
 
-        return new DeathChestConfig(configVersion, updateCheck, durationFormat, expiration, noExpirationPermission, dropItemsAfterExpiration, inventoryOptions, hologramOptions, particleOptions, breakEffectOptions, playerNotificationOptions, globalNotificationOptions, changeDeathMessageOptions, worldFilterConfig, blastProtection, chestProtectionOptions, preferredAnimationService);
+        return new DeathChestConfig(configVersion, updateCheck, durationFormat, expiration, permission, dropItemsAfterExpiration, inventoryOptions, hologramOptions, particleOptions, breakEffectOptions, playerNotificationOptions, globalNotificationOptions, changeDeathMessageOptions, worldFilterConfig, blastProtection, chestProtectionOptions, preferredAnimationService);
     }
 
 }
