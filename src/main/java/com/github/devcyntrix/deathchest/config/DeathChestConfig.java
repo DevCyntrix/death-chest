@@ -12,6 +12,7 @@ public record DeathChestConfig(
         @SerializedName("update-checker") boolean updateChecker,
         @SerializedName("duration-format") @NotNull String durationFormat,
         @SerializedName("expiration") @Nullable Duration expiration,
+        @SerializedName("no-expiration-permission") @Nullable String noExpirationPermission,
         @SerializedName("drop-items-after-expiration") boolean dropItemsAfterExpiration,
         @SerializedName("inventory") @NotNull InventoryOptions inventoryOptions,
         @SerializedName("hologram") @NotNull HologramOptions hologramOptions,
@@ -39,6 +40,8 @@ public record DeathChestConfig(
                 expiration = Duration.ofSeconds(expirationInSeconds);
             }
         }
+
+        String noExpirationPermission = config.getString("drop-items-after-expiration");
 
         boolean dropItemsAfterExpiration = config.getBoolean("drop-items-after-expiration", false);
 
@@ -71,7 +74,7 @@ public record DeathChestConfig(
 
         String preferredAnimationService = config.getString("preferred-animation-service");
 
-        return new DeathChestConfig(configVersion, updateCheck, durationFormat, expiration, dropItemsAfterExpiration, inventoryOptions, hologramOptions, particleOptions, breakEffectOptions, playerNotificationOptions, globalNotificationOptions, changeDeathMessageOptions, worldFilterConfig, blastProtection, chestProtectionOptions, preferredAnimationService);
+        return new DeathChestConfig(configVersion, updateCheck, durationFormat, expiration, noExpirationPermission, dropItemsAfterExpiration, inventoryOptions, hologramOptions, particleOptions, breakEffectOptions, playerNotificationOptions, globalNotificationOptions, changeDeathMessageOptions, worldFilterConfig, blastProtection, chestProtectionOptions, preferredAnimationService);
     }
 
 }

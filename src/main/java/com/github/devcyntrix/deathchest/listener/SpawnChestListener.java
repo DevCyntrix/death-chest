@@ -104,8 +104,9 @@ public class SpawnChestListener implements Listener {
         if (expiration == null)
             expiration = Duration.ofSeconds(-1);
 
+        boolean expires = deathChestConfig.noExpirationPermission() == null || !player.hasPermission(deathChestConfig.noExpirationPermission());
         long createdAt = System.currentTimeMillis();
-        long expireAt = !expiration.isNegative() && !expiration.isZero() ? createdAt + expiration.toMillis() : -1;
+        long expireAt = !expiration.isNegative() && !expiration.isZero() && expires ? createdAt + expiration.toMillis() : -1;
 
         Location loc = deathLocation.getBlock().getLocation();
         ThreadLocalRandom random = ThreadLocalRandom.current();
