@@ -17,7 +17,7 @@ public interface DeathChestStorage extends Closeable {
 
     void put(DeathChestSnapshot chest);
 
-    void putAll(Collection<DeathChestSnapshot> chests);
+    void update(Collection<DeathChestSnapshot> chests);
 
     Set<DeathChestSnapshot> getChests();
 

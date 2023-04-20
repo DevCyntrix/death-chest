@@ -18,10 +18,12 @@ import com.github.devcyntrix.deathchest.command.DeathChestCommand;
 import com.github.devcyntrix.deathchest.config.ChestProtectionOptions;
 import com.github.devcyntrix.deathchest.config.DeathChestConfig;
 import com.github.devcyntrix.deathchest.hologram.NativeHologramService;
+import com.github.devcyntrix.deathchest.listener.LastDeathChestListener;
 import com.github.devcyntrix.deathchest.listener.SpawnChestListener;
 import com.github.devcyntrix.deathchest.listener.UpdateNotificationListener;
 import com.github.devcyntrix.deathchest.report.GsonReportManager;
 import com.github.devcyntrix.deathchest.support.storage.YamlStorage;
+import com.github.devcyntrix.deathchest.util.LastDeathChestLocationExpansion;
 import com.github.devcyntrix.deathchest.util.Metrics;
 import com.github.devcyntrix.deathchest.util.UpdateChecker;
 import com.github.devcyntrix.deathchest.util.WorldGuardDeathChestFlag;
@@ -32,6 +34,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
@@ -46,9 +49,12 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import java.util.Map;
 import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This plugin creates chests if a player dies and will destroy them after a specific time.
@@ -81,11 +87,15 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
 
     private AuditManager auditManager;
 
+    private final Map<Player, DeathChest> lastDeathChests = new WeakHashMap<>();
+
     /**
      * This method cleanups the whole plugin
      */
     @Override
     public void onDisable() {
+
+        System.out.println(deathChests);
         // Save all chests
         try {
             saveChests();
@@ -169,6 +179,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
 
         pluginManager.registerEvents(new UpdateNotificationListener(this), this);
         pluginManager.registerEvents(new SpawnChestListener(this), this);
+        pluginManager.registerEvents(new LastDeathChestListener(this), this);
         //getServer().getPluginManager().registerEvents(new MenuFunctionListener(), this);
 
         ServicesManager servicesManager = getServer().getServicesManager();
@@ -198,6 +209,10 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
 
         this.reportManager = new GsonReportManager(new File(getDataFolder(), "reports"));
         this.auditManager = new GsonAuditManager(new File(getDataFolder(), "audits"));
+
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            new LastDeathChestLocationExpansion(this).register();
+        }
 
         // Checks for updates
         if (this.deathChestConfig.updateChecker()) {
@@ -241,6 +256,11 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         }
     }
 
+    @Override
+    public @Nullable DeathChest getLastChest(@NotNull Player player) {
+        return this.lastDeathChests.get(player);
+    }
+
     /**
      * Creates snapshots of all current valid chests and hand over the snapshots to the storage system which saves them.
      *
@@ -248,7 +268,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
      */
     @Override
     public void saveChests() throws IOException {
-        this.storage.putAll(this.deathChests.stream().map(DeathChest::createSnapshot).collect(Collectors.toSet()));
+        this.storage.update(this.deathChests.stream().map(DeathChest::createSnapshot).collect(Collectors.toSet()));
         this.storage.save();
     }
 
@@ -313,8 +333,8 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
     }
 
     @Override
-    public @NotNull Set<@NotNull DeathChest> getChests() {
-        return this.deathChests;
+    public @NotNull Stream<@NotNull DeathChest> getChests() {
+        return this.deathChests.stream();
     }
 
     @Override
@@ -334,5 +354,9 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
 
     public String getPrefix() {
         return "§cᴅᴇᴀᴛʜ ᴄʜᴇꜱᴛ §8︳ §r";
+    }
+
+    public Map<Player, DeathChest> getLastDeathChests() {
+        return lastDeathChests;
     }
 }

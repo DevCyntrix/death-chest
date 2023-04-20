@@ -20,7 +20,7 @@ import java.util.function.Supplier;
 public class YamlStorage implements DeathChestStorage {
 
     private File file;
-    private final Set<DeathChestSnapshot> deathChests = new HashSet<>();
+    private Set<DeathChestSnapshot> deathChests = new HashSet<>();
 
     @Override
     public ConfigurationSection getDefaultOptions() {
@@ -56,8 +56,8 @@ public class YamlStorage implements DeathChestStorage {
     }
 
     @Override
-    public void putAll(Collection<DeathChestSnapshot> chests) {
-        this.deathChests.addAll(chests);
+    public void update(Collection<DeathChestSnapshot> chests) {
+        this.deathChests = new HashSet<>(chests);
     }
 
     @Override

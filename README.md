@@ -1,9 +1,25 @@
 # Death Chest
+
 [![MIT License](https://img.shields.io/github/license/DevCyntrix/death-chest)](LICENSE)
 [![Discord](https://img.shields.io/discord/899027136046841958?label=Discord)](https://discord.gg/SdDeWUB8F6)
 
 A spigot plugin for spawning a chest when the player dies. It supports Holographic Displays, Decent Holograms,
 ProtocolLib, WorldGuard, GriefPrevention and PlotSquared for additional features
+
+## PAPI Placeholders
+
+```
+%deathchest_last_location%
+```
+
+You can configure the format of the location and the fallback message in the papi config by adding this properties:
+
+```yaml
+expansions:
+  DeathChest:
+    location_format: '<x> <y> <z> <world>'
+    fallback_message: '&cChest not found'
+```
 
 ## Configuration
 

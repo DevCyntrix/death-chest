@@ -441,6 +441,8 @@ public class DeathChestImpl implements DeathChest {
             e.printStackTrace();
         }
         this.plugin.deathChests.remove(this);
+
+        Bukkit.getPluginManager().callEvent(new DeathChestDestroyEvent(this));
     }
 
     @Override

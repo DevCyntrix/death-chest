@@ -1,12 +1,15 @@
 package com.github.devcyntrix.deathchest.listener;
 
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
+import com.github.devcyntrix.deathchest.DeathChestSpawnEvent;
+import com.github.devcyntrix.deathchest.api.DeathChest;
 import com.github.devcyntrix.deathchest.config.ChangeDeathMessageOptions;
 import com.github.devcyntrix.deathchest.config.DeathChestConfig;
 import com.github.devcyntrix.deathchest.config.GlobalNotificationOptions;
 import com.github.devcyntrix.deathchest.config.PlayerNotificationOptions;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.apache.commons.text.StringSubstitutor;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -125,7 +128,10 @@ public class SpawnChestListener implements Listener {
 
         try {
             boolean protectedChest = player.hasPermission(deathChestConfig.chestProtectionOptions().permission());
-            plugin.createDeathChest(loc, createdAt, expireAt, player, protectedChest, event.getDrops().toArray(new ItemStack[0]));
+            DeathChest deathChest = plugin.createDeathChest(loc, createdAt, expireAt, player, protectedChest, event.getDrops().toArray(new ItemStack[0]));
+
+            DeathChestSpawnEvent deathChestSpawnEvent = new DeathChestSpawnEvent(player, deathChest);
+            Bukkit.getPluginManager().callEvent(deathChestSpawnEvent);
             // Clears the drops
             event.getDrops().clear();
         } catch (Exception e) {
