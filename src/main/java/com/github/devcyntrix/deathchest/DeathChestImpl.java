@@ -122,8 +122,12 @@ public class DeathChestImpl implements DeathChest {
         try {
             // Creates inventory
             InventoryOptions inventoryOptions = builder.inventoryOptions();
-            String title = PlaceholderAPI.setPlaceholders(getPlayer(), substitutor.replace(inventoryOptions.title()));
 
+            String title = substitutor.replace(inventoryOptions.title());
+            if (DeathChestPlugin.isPlaceholderAPIEnabled()) {
+                title = PlaceholderAPI.setPlaceholders(getPlayer(), title);
+            }
+            
             this.inventory = Bukkit.createInventory(new DeathChestHolder(this), inventoryOptions.size().getSize(stacks.length), title);
             this.inventory.setContents(stacks);
 
