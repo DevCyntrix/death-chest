@@ -236,11 +236,8 @@ public class DeathChestCommand implements TabExecutor {
     @Nullable
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
-        if (args.length == 0) {
-            return ImmutableList.of("reload", "deleteInWorld", "report");
-        }
         if (args.length == 1) {
-            return StringUtil.copyPartialMatches(args[0], ImmutableList.of("reload", "deleteInWorld", "report"), new ArrayList<>());
+            return StringUtil.copyPartialMatches(args[0], ImmutableList.of("reload", "deleteInWorld", "report", "blacklist"), new ArrayList<>());
         }
 
         if (args.length == 2 && args[0].equalsIgnoreCase("deleteInWorld")) {

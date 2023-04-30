@@ -23,13 +23,15 @@ public class InventoryChangeSlotItemListener implements Listener {
 
         int rawSlot = event.getRawSlot();
         Inventory inventory = view.getInventory(rawSlot);
-        ItemStack previous = view.getItem(event.getSlot());
+        ItemStack previous = view.getItem(event.getRawSlot());
         ItemStack cursor = event.getCursor();
 
         int prevAmount = previous != null ? previous.getAmount() : 0;
         ItemStack newItem, oldItem = null;
 
         InventoryChangeSlotItemEvent itemEvent;
+
+        System.out.println(event.getAction() + ": " + rawSlot + " " + event.getCurrentItem());
 
         switch (event.getAction()) {
             case PLACE_ONE:
@@ -68,6 +70,34 @@ public class InventoryChangeSlotItemListener implements Listener {
                 Bukkit.getPluginManager().callEvent(itemEvent);
                 event.setCancelled(itemEvent.isCancelled());
                 break;
+            case HOTBAR_SWAP:
+            case HOTBAR_MOVE_AND_READD:
+                itemEvent = new InventoryChangeSlotItemEvent(whoClicked, view.getBottomInventory(), event.getHotbarButton(), view.getBottomInventory().getItem(event.getHotbarButton()), null);
+                Bukkit.getPluginManager().callEvent(itemEvent);
+
+                if (!itemEvent.isCancelled()) {
+                    itemEvent = new InventoryChangeSlotItemEvent(whoClicked, inventory, view.convertSlot(event.getRawSlot()), view.getItem(event.getRawSlot()), view.getBottomInventory().getItem(event.getHotbarButton()));
+                    itemEvent.setCancelled(event.isCancelled());
+                    Bukkit.getPluginManager().callEvent(itemEvent);
+                    event.setCancelled(itemEvent.isCancelled());
+
+                    System.out.println("2: " + itemEvent);
+                }
+                break;
+            case SWAP_WITH_CURSOR:
+                itemEvent = new InventoryChangeSlotItemEvent(whoClicked, inventory, event.getSlot(), previous, cursor);
+                Bukkit.getPluginManager().callEvent(itemEvent);
+
+                if (!itemEvent.isCancelled()) {
+                    inventory.setItem(event.getSlot(), itemEvent.getTo());
+                    event.setCursor(itemEvent.getFrom());
+                }
+                break;
+            case DROP_ONE_SLOT:
+            case DROP_ALL_SLOT:
+            case DROP_ALL_CURSOR:
+            case DROP_ONE_CURSOR:
+                break;
             case MOVE_TO_OTHER_INVENTORY:
                 itemEvent = new InventoryChangeSlotItemEvent(whoClicked, inventory, event.getSlot(), previous, null);
                 itemEvent.setCancelled(event.isCancelled());
@@ -92,13 +122,9 @@ public class InventoryChangeSlotItemListener implements Listener {
                         if (!currentItem.isSimilar(item) && item != null && !item.getType().isAir())
                             continue;
 
-                        //System.out.println(currentItem);
-
                         int maxStackSize = Math.min(currentItem.getMaxStackSize(), otherInventory.getMaxStackSize());
-                        //System.out.println(maxStackSize);
                         int currentAmount = 0;
 
-                        //System.out.println(item);
                         if (item != null && !item.getType().isAir()) {
                             currentAmount = item.getAmount();
                             if (currentAmount >= maxStackSize)
@@ -106,17 +132,11 @@ public class InventoryChangeSlotItemListener implements Listener {
                             oldItem = item.clone();
                         } else {
                             item = currentItem.clone();
-                            currentAmount = 0;
                         }
 
 
-                        //System.out.println("Current Amount (" + i + "): " + currentAmount + ", To spread: " + spreadAmount);
                         int added = Math.min(maxStackSize - currentAmount, spreadAmount);
-                        //System.out.println(item);
-                        //System.out.printf("Added %d, previous amount: %d %n", added, currentAmount);
                         item.setAmount(currentAmount + added);
-
-                        //System.out.println("New Amount (" + i + "): " + currentAmount);
 
                         itemEvent = new InventoryChangeSlotItemEvent(whoClicked, otherInventory, i, oldItem, item);
                         Bukkit.getPluginManager().callEvent(itemEvent);
@@ -128,16 +148,12 @@ public class InventoryChangeSlotItemListener implements Listener {
                         }
                     }
 
-                    //System.out.println("Left: " + spreadAmount);
-
                     currentItem.setAmount(spreadAmount); // Sets the left amount
                     view.setItem(event.getRawSlot(), currentItem);
 
                 }
                 break;
         }
-
-        System.out.println(event.getAction());
 
     }
 
