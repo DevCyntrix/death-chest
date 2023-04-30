@@ -1,5 +1,6 @@
 package com.github.devcyntrix.deathchest;
 
+import com.github.devcyntrix.api.event.InventoryChangeSlotItemListener;
 import com.github.devcyntrix.deathchest.api.DeathChest;
 import com.github.devcyntrix.deathchest.api.DeathChestService;
 import com.github.devcyntrix.deathchest.api.DeathChestSnapshot;
@@ -14,6 +15,8 @@ import com.github.devcyntrix.deathchest.api.protection.ProtectionService;
 import com.github.devcyntrix.deathchest.api.report.ReportManager;
 import com.github.devcyntrix.deathchest.api.storage.DeathChestStorage;
 import com.github.devcyntrix.deathchest.audit.GsonAuditManager;
+import com.github.devcyntrix.deathchest.blacklist.ItemBlacklist;
+import com.github.devcyntrix.deathchest.blacklist.ItemBlacklistListener;
 import com.github.devcyntrix.deathchest.command.DeathChestCommand;
 import com.github.devcyntrix.deathchest.config.ChestProtectionOptions;
 import com.github.devcyntrix.deathchest.config.DeathChestConfig;
@@ -30,6 +33,7 @@ import com.github.devcyntrix.deathchest.util.WorldGuardDeathChestFlag;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.MemoryConfiguration;
@@ -86,6 +90,8 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
     private ReportManager reportManager;
 
     private AuditManager auditManager;
+
+    private ItemBlacklist blacklist = new ItemBlacklist(Set.of(new ItemStack(Material.DIAMOND)));
 
     private final Map<Player, DeathChest> lastDeathChests = new WeakHashMap<>();
 
@@ -180,6 +186,8 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         pluginManager.registerEvents(new UpdateNotificationListener(this), this);
         pluginManager.registerEvents(new SpawnChestListener(this), this);
         pluginManager.registerEvents(new LastDeathChestListener(this), this);
+        pluginManager.registerEvents(new ItemBlacklistListener(blacklist), this);
+        pluginManager.registerEvents(new InventoryChangeSlotItemListener(), this);
         //getServer().getPluginManager().registerEvents(new MenuFunctionListener(), this);
 
         ServicesManager servicesManager = getServer().getServicesManager();
@@ -358,5 +366,9 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
 
     public Map<Player, DeathChest> getLastDeathChests() {
         return lastDeathChests;
+    }
+
+    public ItemBlacklist getBlacklist() {
+        return blacklist;
     }
 }

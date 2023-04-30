@@ -45,7 +45,6 @@ dependencies {
     // Placeholder API
     compileOnly("me.clip:placeholderapi:2.11.2") { isTransitive = false }
 
-    //implementation("com.github.MP-MC:Canvas:941db8c981")
     compileOnly("org.apache.commons:commons-text:1.10.0")
     compileOnly("org.jetbrains:annotations:23.0.0")
 
@@ -82,7 +81,7 @@ tasks {
 bukkit {
     name = "DeathChest"
     main = "com.github.devcyntrix.deathchest.DeathChestPlugin"
-    apiVersion = "1.17"
+    apiVersion = "1.13"
     website = "https://www.spigotmc.org/resources/death-chest.101066/"
     authors = listOf("CyntrixAlgorithm")
     softDepend = listOf(

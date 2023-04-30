@@ -8,6 +8,7 @@ import com.github.devcyntrix.deathchest.api.audit.info.DestroyReason;
 import com.github.devcyntrix.deathchest.api.audit.info.ReloadInfo;
 import com.github.devcyntrix.deathchest.api.report.Report;
 import com.github.devcyntrix.deathchest.api.report.ReportManager;
+import com.github.devcyntrix.deathchest.blacklist.ItemBlacklist;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.internal.bind.util.ISO8601Utils;
 import net.md_5.bungee.api.ChatColor;
@@ -21,7 +22,9 @@ import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
+import org.bukkit.entity.Player;
 import org.bukkit.generator.WorldInfo;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -91,6 +94,27 @@ public class DeathChestCommand implements TabExecutor {
             });
 
             sender.sendMessage(plugin.getPrefix() + "§cAll chests in the world \"" + world.getName() + "\" were deleted.");
+            return true;
+        }
+
+        if (args[0].equalsIgnoreCase("chests") && sender.hasPermission("deathchest.command.chest")) {
+            if (!(sender instanceof Player player)) {
+                return false;
+            }
+           /* ChestsGui gui = new ChestsGui(player, plugin);
+            gui.open(); */
+            return true;
+        }
+
+        if (args[0].equalsIgnoreCase("blacklist") && sender.hasPermission("deathchest.command.blacklist")) {
+            if (!(sender instanceof Player player)) {
+                return false;
+            }
+            ItemBlacklist blacklist = plugin.getBlacklist();
+            System.out.println(blacklist.getList());
+            Inventory inventory = blacklist.getInventory();
+            player.openInventory(inventory);
+
             return true;
         }
 
