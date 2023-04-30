@@ -1,6 +1,9 @@
 package com.github.devcyntrix.deathchest.blacklist;
 
 import com.github.devcyntrix.api.event.InventoryChangeSlotItemEvent;
+import org.bukkit.Instrument;
+import org.bukkit.Note;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -22,9 +25,14 @@ public class ItemBlacklistListener implements Listener {
     @EventHandler
     public void onUpdateItem(InventoryChangeSlotItemEvent event) {
         if (event.getInventory().getHolder() != blacklist) return;
+
+        System.out.println(event.getSlot());
+        System.out.println("FROM: " + event.getFrom());
+        System.out.println("TO: " + event.getTo());
+
+
         event.setCancelled(true);
         if (event.getSlot() == 9 * 6 - 5) {
-            System.out.println("To: " + event.getTo());
             updateApplyItem(event.getInventory(), event.getTo());
             event.setCancelled(false);
         }
@@ -42,21 +50,13 @@ public class ItemBlacklistListener implements Listener {
         if (event.getSlot() < 9 * 6 - 9) {
             // Blacklisted items
         } else {
-            if (event.getSlot() == 9 * 6 - 5) {
-                event.setCancelled(false);
-                return;
-            }
-            /*if (event.getSlot() == 9 * 6 - 5) {
-                event.setCancelled(false);
-                updateApplyItem(event.getInventory(), event.getCursor());
-                return;
-            }
-             */
             if (event.getSlot() == 9 * 6 - 3) {
                 ItemStack itemToAdd = event.getInventory().getItem(9 * 6 - 5);
 
                 if (!isValidItem(itemToAdd)) {
-                    // PLAY SOUND
+                    if (event.getWhoClicked() instanceof Player player) {
+                        player.playNote(player.getLocation(), Instrument.BASS_DRUM, Note.flat(1, Note.Tone.D));
+                    }
                     return;
                 }
 
@@ -72,13 +72,11 @@ public class ItemBlacklistListener implements Listener {
 
                 if (ItemBlacklist.FORCE_ADD_ITEM.isSimilar(event.getCurrentItem())) {
                     List<ItemStack> list = blacklist.getList().stream().filter(stack -> !compareItem(itemToAdd, stack)).toList();
-                    System.out.println(list);
                     blacklist.getList().clear();
                     blacklist.getList().addAll(list);
-                    System.out.println(blacklist.getList());
+
                     event.getInventory().clear(9 * 6 - 5);
                     blacklist.getList().add(itemToAdd);
-                    System.out.println(blacklist.getList());
                     blacklist.updateInventory();
                     updateApplyItem(event.getInventory(), null);
                     return;

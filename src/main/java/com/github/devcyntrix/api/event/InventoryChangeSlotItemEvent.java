@@ -73,4 +73,16 @@ public class InventoryChangeSlotItemEvent extends Event implements Cancellable {
     public void setCancelled(boolean cancel) {
         this.cancelled = cancel;
     }
+
+    @Override
+    public String toString() {
+        return "InventoryChangeSlotItemEvent{" +
+                "entity=" + entity +
+                ", inventory=" + inventory +
+                ", slot=" + slot +
+                ", from=" + from +
+                ", to=" + to +
+                ", cancelled=" + cancelled +
+                '}';
+    }
 }
