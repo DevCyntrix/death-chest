@@ -9,10 +9,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.List;
-import java.util.Objects;
 
 public class ItemBlacklistListener implements Listener {
 
@@ -25,10 +23,6 @@ public class ItemBlacklistListener implements Listener {
     @EventHandler
     public void onUpdateItem(InventoryChangeSlotItemEvent event) {
         if (event.getInventory().getHolder() != blacklist) return;
-
-        System.out.println(event.getSlot());
-        System.out.println("FROM: " + event.getFrom());
-        System.out.println("TO: " + event.getTo());
 
 
         event.setCancelled(true);
@@ -53,7 +47,7 @@ public class ItemBlacklistListener implements Listener {
             if (event.getSlot() == 9 * 6 - 3) {
                 ItemStack itemToAdd = event.getInventory().getItem(9 * 6 - 5);
 
-                if (!isValidItem(itemToAdd)) {
+                if (!blacklist.isValidItem(itemToAdd)) {
                     if (event.getWhoClicked() instanceof Player player) {
                         player.playNote(player.getLocation(), Instrument.BASS_DRUM, Note.flat(1, Note.Tone.D));
                     }
@@ -71,7 +65,7 @@ public class ItemBlacklistListener implements Listener {
                 }
 
                 if (ItemBlacklist.FORCE_ADD_ITEM.isSimilar(event.getCurrentItem())) {
-                    List<ItemStack> list = blacklist.getList().stream().filter(stack -> !compareItem(itemToAdd, stack)).toList();
+                    List<ItemStack> list = blacklist.getList().stream().filter(stack -> !blacklist.compareItem(itemToAdd, stack)).toList();
                     blacklist.getList().clear();
                     blacklist.getList().addAll(list);
 
@@ -117,60 +111,16 @@ public class ItemBlacklistListener implements Listener {
 //
 //    }
 
-    /**
-     * Compares the lower item with the higher item
-     */
-    private boolean compareItem(ItemStack higher, ItemStack lower) {
-        boolean result = Objects.equals(higher.getType(), lower.getType());
-        if (!result)
-            return false;
-
-        result = higher.getItemMeta() == null || lower.getItemMeta() != null;
-
-        if (higher.getItemMeta() != null && result) {
-            ItemMeta meta = higher.getItemMeta();
-
-            result = !higher.getItemMeta().hasDisplayName() || lower.getItemMeta().hasDisplayName();
-
-            if (meta.hasDisplayName() && result) {
-                result = Objects.equals(meta.getDisplayName(), lower.getItemMeta().getDisplayName());
-            }
-
-            result = result && !higher.getItemMeta().hasLore() || lower.getItemMeta().hasLore();
-
-            if (meta.hasLore() && result) {
-                result = Objects.equals(meta.getLore(), lower.getItemMeta().getLore());
-            }
-
-            result = result && !higher.getItemMeta().hasCustomModelData() || lower.getItemMeta().hasCustomModelData();
-            if (meta.hasCustomModelData() && result) {
-                result = Objects.equals(meta.getCustomModelData(), lower.getItemMeta().getCustomModelData());
-            }
-
-            result = result && !higher.getItemMeta().hasAttributeModifiers() || lower.getItemMeta().hasAttributeModifiers();
-            if (meta.hasAttributeModifiers() && result) {
-                result = Objects.equals(meta.getAttributeModifiers(), lower.getItemMeta().getAttributeModifiers());
-            }
-
-            result = result && !higher.getItemMeta().isUnbreakable() || lower.getItemMeta().isUnbreakable();
-        }
-        return result;
-    }
-
-    private boolean isValidItem(ItemStack stack) {
-        return stack != null && !stack.getType().isAir() && blacklist.getList().stream()
-                .noneMatch(stack1 -> compareItem(stack1, stack));
-    }
 
     private boolean hasDuplicate(ItemStack stack) {
         return stack != null && !stack.getType().isAir() && blacklist.getList().stream()
-                .anyMatch(stack1 -> compareItem(stack, stack1));
+                .anyMatch(stack1 -> blacklist.compareItem(stack, stack1));
     }
 
     private void updateApplyItem(Inventory inventory, ItemStack clicked) {
         ItemStack stack = ItemBlacklist.DENY_ITEM;
 
-        if (isValidItem(clicked)) {
+        if (blacklist.isValidItem(clicked)) {
             stack = ItemBlacklist.ADD_ITEM;
 
             if (hasDuplicate(clicked)) {

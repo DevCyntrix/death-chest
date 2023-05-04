@@ -1,25 +1,41 @@
 package com.github.devcyntrix.api.event;
 
+import com.github.devcyntrix.deathchest.DeathChestPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class InventoryChangeSlotItemListener implements Listener {
 
+    private final List<InventoryHolder> holders;
+
+    public InventoryChangeSlotItemListener(InventoryHolder... holders) {
+        this.holders = Arrays.asList(holders);
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onClick(InventoryClickEvent event) {
+
         HumanEntity whoClicked = event.getWhoClicked();
         InventoryView view = event.getView();
+
+        if (!holders.contains(view.getTopInventory().getHolder()))
+            return;
 
         int rawSlot = event.getRawSlot();
         Inventory inventory = view.getInventory(rawSlot);
@@ -30,8 +46,6 @@ public class InventoryChangeSlotItemListener implements Listener {
         ItemStack newItem, oldItem = null;
 
         InventoryChangeSlotItemEvent itemEvent;
-
-        System.out.println(event.getAction() + ": " + rawSlot + " " + event.getCurrentItem());
 
         switch (event.getAction()) {
             case PLACE_ONE:
@@ -72,16 +86,21 @@ public class InventoryChangeSlotItemListener implements Listener {
                 break;
             case HOTBAR_SWAP:
             case HOTBAR_MOVE_AND_READD:
-                itemEvent = new InventoryChangeSlotItemEvent(whoClicked, view.getBottomInventory(), event.getHotbarButton(), view.getBottomInventory().getItem(event.getHotbarButton()), null);
+
+                oldItem = event.getHotbarButton() != -1 ? view.getBottomInventory().getItem(event.getHotbarButton()) : event.getWhoClicked().getInventory().getItemInOffHand();
+
+                itemEvent = new InventoryChangeSlotItemEvent(whoClicked, view.getBottomInventory(), event.getHotbarButton(), oldItem, null);
                 Bukkit.getPluginManager().callEvent(itemEvent);
 
                 if (!itemEvent.isCancelled()) {
-                    itemEvent = new InventoryChangeSlotItemEvent(whoClicked, inventory, view.convertSlot(event.getRawSlot()), view.getItem(event.getRawSlot()), view.getBottomInventory().getItem(event.getHotbarButton()));
+                    itemEvent = new InventoryChangeSlotItemEvent(whoClicked, inventory, view.convertSlot(event.getRawSlot()), view.getItem(event.getRawSlot()), oldItem);
                     itemEvent.setCancelled(event.isCancelled());
                     Bukkit.getPluginManager().callEvent(itemEvent);
                     event.setCancelled(itemEvent.isCancelled());
 
-                    System.out.println("2: " + itemEvent);
+                    if (event.getWhoClicked() instanceof Player player) {
+                        Bukkit.getScheduler().runTask(JavaPlugin.getPlugin(DeathChestPlugin.class), player::updateInventory);
+                    }
                 }
                 break;
             case SWAP_WITH_CURSOR:
@@ -98,6 +117,9 @@ public class InventoryChangeSlotItemListener implements Listener {
             case DROP_ALL_CURSOR:
             case DROP_ONE_CURSOR:
                 break;
+            case COLLECT_TO_CURSOR:
+                event.setCancelled(true);
+                break;
             case MOVE_TO_OTHER_INVENTORY:
                 itemEvent = new InventoryChangeSlotItemEvent(whoClicked, inventory, event.getSlot(), previous, null);
                 itemEvent.setCancelled(event.isCancelled());
@@ -106,8 +128,7 @@ public class InventoryChangeSlotItemListener implements Listener {
 
                 if (!itemEvent.isCancelled()) {
                     ItemStack currentItem = event.getCurrentItem();
-                    if (currentItem == null)
-                        return;
+                    if (currentItem == null) return;
 
                     event.setCancelled(true);
 
@@ -115,20 +136,17 @@ public class InventoryChangeSlotItemListener implements Listener {
                     int spreadAmount = currentItem.getAmount();
 
                     for (int i = 0; i < otherInventory.getSize(); i++) {
-                        if (spreadAmount <= 0)
-                            break;
+                        if (spreadAmount <= 0) break;
 
                         ItemStack item = otherInventory.getItem(i);
-                        if (!currentItem.isSimilar(item) && item != null && !item.getType().isAir())
-                            continue;
+                        if (!currentItem.isSimilar(item) && item != null && !item.getType().isAir()) continue;
 
                         int maxStackSize = Math.min(currentItem.getMaxStackSize(), otherInventory.getMaxStackSize());
                         int currentAmount = 0;
 
                         if (item != null && !item.getType().isAir()) {
                             currentAmount = item.getAmount();
-                            if (currentAmount >= maxStackSize)
-                                continue;
+                            if (currentAmount >= maxStackSize) continue;
                             oldItem = item.clone();
                         } else {
                             item = currentItem.clone();

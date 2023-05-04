@@ -33,7 +33,6 @@ import com.github.devcyntrix.deathchest.util.WorldGuardDeathChestFlag;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.MemoryConfiguration;
@@ -91,17 +90,24 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
 
     private AuditManager auditManager;
 
-    private ItemBlacklist blacklist = new ItemBlacklist(Set.of(new ItemStack(Material.DIAMOND)));
+    private ItemBlacklist blacklist;
 
     private final Map<Player, DeathChest> lastDeathChests = new WeakHashMap<>();
 
     /**
-     * This method cleanups the whole plugin
+     * This method cleans the whole plugin up
      */
     @Override
     public void onDisable() {
 
-        System.out.println(deathChests);
+        if (this.blacklist != null) {
+            try {
+                this.blacklist.save();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         // Save all chests
         try {
             saveChests();
@@ -136,6 +142,8 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
     }
 
     private void unloadAuditManager() {
+        if (auditManager == null)
+            return;
         try {
             auditManager.close();
         } catch (IOException e) {
@@ -187,7 +195,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         pluginManager.registerEvents(new SpawnChestListener(this), this);
         pluginManager.registerEvents(new LastDeathChestListener(this), this);
         pluginManager.registerEvents(new ItemBlacklistListener(blacklist), this);
-        pluginManager.registerEvents(new InventoryChangeSlotItemListener(), this);
+        pluginManager.registerEvents(new InventoryChangeSlotItemListener(blacklist), this);
         //getServer().getPluginManager().registerEvents(new MenuFunctionListener(), this);
 
         ServicesManager servicesManager = getServer().getServicesManager();
@@ -209,6 +217,8 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
             getLogger().severe("Failed to initialize the storage system. Please check your configuration file.");
             throw new RuntimeException(e);
         }
+
+        this.blacklist = new ItemBlacklist(new File(getDataFolder(), "blacklist.yml"));
 
         // Recreates the deathchests
         Set<DeathChestSnapshot> chests = this.storage.getChests();

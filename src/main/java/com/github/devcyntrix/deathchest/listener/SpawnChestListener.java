@@ -19,6 +19,7 @@ import org.bukkit.inventory.ItemStack;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
@@ -73,9 +74,19 @@ public class SpawnChestListener implements Listener {
 
         if (event.getKeepInventory())
             return;
+
         event.getDrops().removeIf(itemStack -> itemStack.getType() == Material.AIR); // Prevent spawning an empty chest
-        if (event.getDrops().isEmpty())
+
+        ItemStack[] items = event.getDrops().stream()
+                .filter(Objects::nonNull)
+                .filter(stack -> plugin.getBlacklist().isValidItem(stack))
+                .toArray(ItemStack[]::new);
+
+
+        if (items.length == 0) {
+            event.getDrops().clear();
             return;
+        }
 
         Player player = event.getEntity();
         Location deathLocation = new Location(
@@ -126,7 +137,7 @@ public class SpawnChestListener implements Listener {
 
         try {
             boolean protectedChest = player.hasPermission(deathChestConfig.chestProtectionOptions().permission());
-            DeathChest deathChest = plugin.createDeathChest(loc, createdAt, expireAt, player, protectedChest, event.getDrops().toArray(new ItemStack[0]));
+            DeathChest deathChest = plugin.createDeathChest(loc, createdAt, expireAt, player, protectedChest, items);
 
             DeathChestSpawnEvent deathChestSpawnEvent = new DeathChestSpawnEvent(player, deathChest);
             Bukkit.getPluginManager().callEvent(deathChestSpawnEvent);

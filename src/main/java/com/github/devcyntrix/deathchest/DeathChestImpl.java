@@ -129,7 +129,7 @@ public class DeathChestImpl implements DeathChest {
             }
             
             this.inventory = Bukkit.createInventory(new DeathChestHolder(this), inventoryOptions.size().getSize(stacks.length), title);
-            this.inventory.setContents(stacks);
+            this.inventory.addItem(stacks);
 
             // Creates hologram
             HologramService hologramService = builder.hologramService();
