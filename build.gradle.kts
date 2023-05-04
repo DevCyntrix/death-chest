@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.github.devcyntrix"
-version = "1.5.23"
+version = "1.5.24"
 
 repositories {
     mavenCentral()
@@ -82,7 +82,7 @@ tasks {
 bukkit {
     name = "DeathChest"
     main = "com.github.devcyntrix.deathchest.DeathChestPlugin"
-    apiVersion = "1.17"
+    apiVersion = "1.13"
     website = "https://www.spigotmc.org/resources/death-chest.101066/"
     authors = listOf("CyntrixAlgorithm")
     softDepend = listOf(
