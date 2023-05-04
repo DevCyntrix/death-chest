@@ -44,7 +44,6 @@ import lombok.SneakyThrows;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.MemoryConfiguration;
@@ -95,7 +94,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
 
     private AuditManager auditManager;
 
-    private ItemBlacklist blacklist = new ItemBlacklist(Set.of(new ItemStack(Material.DIAMOND)));
+    private ItemBlacklist blacklist;
 
     @Getter
     private final Map<Player, DeathChestModel> lastDeathChests = new WeakHashMap<>();
@@ -116,11 +115,20 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
     private BukkitAudiences audiences;
 
     /**
-     * This method cleanups the whole plugin
+     * This method cleans the whole plugin up
      */
     @Override
     public void onDisable() {
 
+        if (this.blacklist != null) {
+            try {
+                this.blacklist.save();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // Save all chests
         PluginManager pluginManager = Bukkit.getPluginManager();
         try {
             ChestProtectionOptions protectionOptions = getDeathChestConfig().chestProtectionOptions();
@@ -270,6 +278,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         pluginManager.registerEvents(new WorldListener(this), this);
         pluginManager.registerEvents(new ItemBlacklistListener(blacklist), this);
         pluginManager.registerEvents(new InventoryChangeSlotItemListener(), this);
+        pluginManager.registerEvents(new InventoryChangeSlotItemListener(blacklist), this);
 
         if (deathChestConfig.convertExpToBottles()) {
             pluginManager.registerEvents(new ConvertExpToBottleListener(), this);
@@ -324,6 +333,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
             throw new RuntimeException(e);
         }
 
+        this.blacklist = new ItemBlacklist(new File(getDataFolder(), "blacklist.yml"));
 
         if (isPlaceholderAPIEnabled()) {
             debug(0, "Registering PlaceHolder API Expansion...");

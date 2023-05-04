@@ -111,7 +111,6 @@ public class DeathChestCommand implements TabExecutor {
                 return false;
             }
             ItemBlacklist blacklist = plugin.getBlacklist();
-            System.out.println(blacklist.getList());
             Inventory inventory = blacklist.getInventory();
             player.openInventory(inventory);
 
@@ -172,7 +171,6 @@ public class DeathChestCommand implements TabExecutor {
                     sender.sendMessage(plugin.getPrefix() + "§cCannot parse given date format");
                     return true;
                 }
-                System.out.println(date);
                 boolean b = plugin.getReportManager().deleteReport(date);
                 if (b) {
                     sender.sendMessage(plugin.getPrefix() + "§7You deleted the report successfully");
