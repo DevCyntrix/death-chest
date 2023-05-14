@@ -68,14 +68,15 @@ import java.util.stream.Stream;
 public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChestService {
 
     public static final int RESOURCE_ID = 101066;
-
     public static final int BSTATS_ID = 14866;
 
-    protected final Set<DeathChest> deathChests = new CopyOnWriteArraySet<>();
+    protected Set<DeathChest> deathChests;
+    private Map<Player, DeathChest> lastDeathChests;
 
     private DeathChestConfig deathChestConfig;
 
     private HologramService hologramService;
+    @Nullable
     private AnimationService animationService;
     private ProtectionService protectionService;
 
@@ -93,8 +94,6 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
 
     private ItemBlacklist blacklist;
 
-    private final Map<Player, DeathChest> lastDeathChests = new WeakHashMap<>();
-
     /**
      * This method cleans the whole plugin up
      */
@@ -105,7 +104,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
             try {
                 this.blacklist.save();
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
         }
 
@@ -157,22 +156,28 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
     public void onLoad() {
         PluginManager pluginManager = Bukkit.getPluginManager();
         Plugin plugin = pluginManager.getPlugin("WorldGuard");
-        if (plugin != null) {
+        if (plugin != null && plugin.isEnabled()) {
             WorldGuardDeathChestFlag.register();
         }
     }
 
     @Override
     public void onEnable() {
-        placeholderAPIEnabled = Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI");
+        this.deathChests = new CopyOnWriteArraySet<>();
+        this.lastDeathChests = new WeakHashMap<>();
 
         checkConfigVersion();
         reload();
 
+        placeholderAPIEnabled = Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI");
+        if (isPlaceholderAPIEnabled()) {
+            new LastDeathChestLocationExpansion(this).register();
+        }
+
         this.hologramService = new NativeHologramService();
         this.animationService = SupportServices.getAnimationService(this, this.deathChestConfig.preferredAnimationService());
         this.protectionService = SupportServices.getProtectionService(this);
-        // Standard protection service: No service
+        // Standard protection service: Always true
         if (protectionService == null)
             this.protectionService = (player, location, material) -> true;
 
@@ -184,7 +189,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         ServicesManager servicesManager = getServer().getServicesManager();
         servicesManager.register(DeathChestService.class, this, this, ServicePriority.Normal);
 
-        // Registers the deathchest command
+        // Registers the death chest command
         PluginCommand deathChestCommand = getCommand("deathchest");
         if (deathChestCommand != null) {
             DeathChestCommand command = new DeathChestCommand(this);
@@ -201,17 +206,13 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
             throw new RuntimeException(e);
         }
 
-        // Recreates the deathchests
+        // Recreates the death chests
         Set<DeathChestSnapshot> chests = this.storage.getChests();
         chests.forEach(deathChestSnapshot -> this.deathChests.add(deathChestSnapshot.createChest(this)));
         getLogger().info(this.deathChests.size() + " death chests loaded.");
 
         this.reportManager = new GsonReportManager(new File(getDataFolder(), "reports"));
         this.auditManager = new GsonAuditManager(new File(getDataFolder(), "audits"));
-
-        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
-            new LastDeathChestLocationExpansion(this).register();
-        }
 
         // Checks for updates
         if (this.deathChestConfig.updateChecker()) {
@@ -256,8 +257,8 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
                 if (getDescription().getVersion().equals(version))
                     return;
                 this.newerVersion = version;
-                getLogger().warning("New version " + version + " is out. You are still running " + getDescription().getVersion());
-                getLogger().warning("Please update the plugin at https://www.spigotmc.org/resources/death-chest.101066/");
+                getLogger().info("New version " + version + " is out. You are still running " + getDescription().getVersion());
+                getLogger().info("Please update the plugin at https://www.spigotmc.org/resources/death-chest.101066/");
             });
         }, 0, 20 * 60 * 30); // Every 30 minutes
     }
@@ -362,12 +363,12 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
     }
 
     @Override
-    public HologramService getHologramService() {
+    public @NotNull HologramService getHologramService() {
         return hologramService;
     }
 
     @Override
-    public AnimationService getAnimationService() {
+    public @Nullable AnimationService getAnimationService() {
         return animationService;
     }
 
