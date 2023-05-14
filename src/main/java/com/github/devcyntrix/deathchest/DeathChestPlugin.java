@@ -190,6 +190,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
             getLogger().warning("Failed to register the permission of the chest-protection");
             e.printStackTrace();
         }
+        this.blacklist = new ItemBlacklist(new File(getDataFolder(), "blacklist.yml"));
 
         pluginManager.registerEvents(new UpdateNotificationListener(this), this);
         pluginManager.registerEvents(new SpawnChestListener(this), this);
@@ -218,7 +219,6 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
             throw new RuntimeException(e);
         }
 
-        this.blacklist = new ItemBlacklist(new File(getDataFolder(), "blacklist.yml"));
 
         // Recreates the deathchests
         Set<DeathChestSnapshot> chests = this.storage.getChests();

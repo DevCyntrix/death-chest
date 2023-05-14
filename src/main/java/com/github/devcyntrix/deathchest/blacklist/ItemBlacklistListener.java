@@ -11,6 +11,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
+import java.util.Objects;
 
 public class ItemBlacklistListener implements Listener {
 
@@ -22,7 +23,7 @@ public class ItemBlacklistListener implements Listener {
 
     @EventHandler
     public void onUpdateItem(InventoryChangeSlotItemEvent event) {
-        if (event.getInventory().getHolder() != blacklist) return;
+        if (!Objects.equals(event.getInventory().getHolder(), blacklist)) return;
 
 
         event.setCancelled(true);
@@ -36,7 +37,7 @@ public class ItemBlacklistListener implements Listener {
     @EventHandler
     public void onClick(InventoryClickEvent event) {
         if (event.getClickedInventory() == null) return;
-        if (event.getClickedInventory().getHolder() != blacklist) return;
+        if (!Objects.equals(blacklist, event.getClickedInventory().getHolder())) return;
 
         event.setCancelled(true);
 

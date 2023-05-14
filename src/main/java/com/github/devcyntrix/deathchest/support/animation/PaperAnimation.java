@@ -26,13 +26,12 @@ public class PaperAnimation implements AnimationService {
     public void spawnBlockBreakAnimation(int entityId, @NotNull Vector location, @Range(from = -1, to = 9) int state, @NotNull Stream<? extends Player> players) {
         if (sendBlockDamageMethod == null)
             return;
-        if (state == -1) {
-            state = 0;
-        }
-        @Range(from = -1, to = 9) int finalState = state;
+
+        float relativeState = Math.max(0, Math.min(1, state / 9f));
+
         players.forEach(player -> {
             try {
-                sendBlockDamageMethod.invoke(player, location.toLocation(player.getWorld()), finalState / 9f, entityId);
+                sendBlockDamageMethod.invoke(player, location.toLocation(player.getWorld()), relativeState, entityId);
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             } catch (InvocationTargetException e) {
