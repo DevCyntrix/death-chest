@@ -1,9 +1,9 @@
 package com.github.devcyntrix.deathchest.listener;
 
-import com.github.devcyntrix.deathchest.DeathChestDestroyEvent;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
-import com.github.devcyntrix.deathchest.DeathChestSpawnEvent;
 import com.github.devcyntrix.deathchest.api.DeathChest;
+import com.github.devcyntrix.deathchest.api.event.DeathChestDestroyEvent;
+import com.github.devcyntrix.deathchest.api.event.DeathChestSpawnEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

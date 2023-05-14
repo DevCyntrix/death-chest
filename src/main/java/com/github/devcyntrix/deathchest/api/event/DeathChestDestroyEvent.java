@@ -1,25 +1,18 @@
-package com.github.devcyntrix.deathchest;
+package com.github.devcyntrix.deathchest.api.event;
 
 import com.github.devcyntrix.deathchest.api.DeathChest;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
-public class DeathChestSpawnEvent extends Event {
+public class DeathChestDestroyEvent extends Event {
 
     private static final HandlerList HANDLER_LIST = new HandlerList();
 
-    private final Player player;
     private final DeathChest deathChest;
 
-    public DeathChestSpawnEvent(Player player, DeathChest deathChest) {
-        this.player = player;
+    public DeathChestDestroyEvent(DeathChest deathChest) {
         this.deathChest = deathChest;
-    }
-
-    public Player getPlayer() {
-        return player;
     }
 
     public DeathChest getDeathChest() {

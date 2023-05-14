@@ -1,8 +1,8 @@
 package com.github.devcyntrix.deathchest.listener;
 
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
-import com.github.devcyntrix.deathchest.DeathChestSpawnEvent;
 import com.github.devcyntrix.deathchest.api.DeathChest;
+import com.github.devcyntrix.deathchest.api.event.DeathChestSpawnEvent;
 import com.github.devcyntrix.deathchest.config.*;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.apache.commons.text.StringSubstitutor;

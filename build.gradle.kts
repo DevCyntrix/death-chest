@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.github.devcyntrix"
-version = "1.5.23"
+version = "1.5.24"
 
 repositories {
     mavenCentral()

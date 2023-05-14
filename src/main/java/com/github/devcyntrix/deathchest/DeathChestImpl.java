@@ -7,6 +7,7 @@ import com.github.devcyntrix.deathchest.api.audit.AuditAction;
 import com.github.devcyntrix.deathchest.api.audit.AuditItem;
 import com.github.devcyntrix.deathchest.api.audit.info.DestroyChestInfo;
 import com.github.devcyntrix.deathchest.api.audit.info.DestroyReason;
+import com.github.devcyntrix.deathchest.api.event.DeathChestDestroyEvent;
 import com.github.devcyntrix.deathchest.api.hologram.Hologram;
 import com.github.devcyntrix.deathchest.api.hologram.HologramService;
 import com.github.devcyntrix.deathchest.api.hologram.HologramTextLine;
