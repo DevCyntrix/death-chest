@@ -37,6 +37,7 @@ dependencies {
     // Command library
     compileOnly("cloud.commandframework:cloud-core:1.7.1")
     compileOnly("cloud.commandframework:cloud-bukkit:1.7.1")
+    implementation("org.bstats:bstats-bukkit:3.0.2")
 
     // Protection Support
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.7")
@@ -85,6 +86,9 @@ tasks {
     }
     test {
         useJUnitPlatform()
+    }
+    shadowJar {
+        relocate("org.bstats", "com.github.devcyntrix.deathchest.metrics")
     }
 }
 

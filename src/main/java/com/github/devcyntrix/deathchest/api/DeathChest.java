@@ -55,7 +55,7 @@ public interface DeathChest extends Listener, Closeable {
      *
      * @return the unix time
      */
-    long getExpireAt();
+    long getExpiresAt();
 
     /**
      * Gets weather the chest will expire.
