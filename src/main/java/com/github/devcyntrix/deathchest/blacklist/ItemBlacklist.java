@@ -49,7 +49,7 @@ public class ItemBlacklist implements InventoryHolder {
         this.file = file;
         if (file.isFile()) {
             YamlConfiguration yamlConfiguration = YamlConfiguration.loadConfiguration(file);
-            this.list.addAll((Collection<? extends ItemStack>) yamlConfiguration.getList("blacklist"));
+            this.list.addAll((Collection<? extends ItemStack>) yamlConfiguration.getList("blacklist", new ArrayList<>()));
         }
 
         this.inventory = Bukkit.createInventory(this, 9 * 6, "Blacklist");
@@ -141,7 +141,7 @@ public class ItemBlacklist implements InventoryHolder {
 
     public void save() throws IOException {
         YamlConfiguration configuration = new YamlConfiguration();
-        configuration.set("blacklist", this.list);
+        configuration.set("blacklist", this.list.stream().toList());
         configuration.save(file);
     }
 }

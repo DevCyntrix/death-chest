@@ -257,6 +257,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
             getLogger().warning("Failed to register the permission of the chest-protection");
             e.printStackTrace();
         }
+        this.blacklist = new ItemBlacklist(new File(getDataFolder(), "blacklist.yml"));
 
         debug(0, "Registering event listeners...");
         pluginManager.registerEvents(new SpawnChestListener(this), this);
