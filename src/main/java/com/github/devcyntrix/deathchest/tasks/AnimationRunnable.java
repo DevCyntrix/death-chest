@@ -29,7 +29,7 @@ public class AnimationRunnable extends BukkitRunnable {
 
     @Override
     public void run() {
-        double process = (double) (System.currentTimeMillis() - chest.getCreatedAt()) / (chest.getExpireAt() - chest.getCreatedAt());
+        double process = (double) (System.currentTimeMillis() - chest.getCreatedAt()) / (chest.getExpiresAt() - chest.getCreatedAt());
 
         try {
             Stream<Player> playerStream = Bukkit.getScheduler().callSyncMethod(chest.getPlugin(), () -> chest.getWorld().getNearbyEntities(chest.getLocation(), options.viewDistance(), options.viewDistance(), options.viewDistance(), entity -> entity.getType() == EntityType.PLAYER).stream().map(entity -> (Player) entity)).get(1, TimeUnit.SECONDS);

@@ -1,4 +1,4 @@
-package com.github.devcyntrix.deathchest.report;
+package com.github.devcyntrix.deathchest.util.adapter;
 
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;

@@ -23,6 +23,7 @@ repositories {
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT")
+    implementation("org.bstats:bstats-bukkit:3.0.2")
 
     // Protection Support
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.7")
@@ -75,6 +76,9 @@ tasks {
     }
     test {
         useJUnitPlatform()
+    }
+    shadowJar {
+        relocate("org.bstats", "com.github.devcyntrix.deathchest.metrics")
     }
 }
 

@@ -2,6 +2,7 @@ package com.github.devcyntrix.deathchest.report;
 
 import com.github.devcyntrix.deathchest.api.report.Report;
 import com.github.devcyntrix.deathchest.api.report.ReportManager;
+import com.github.devcyntrix.deathchest.util.adapter.DurationAdapter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.internal.bind.util.ISO8601Utils;
@@ -121,7 +122,9 @@ public class GsonReportManager implements ReportManager {
             return;
 
         for (File file : files) {
-            file.delete();
+            if (!file.delete()) {
+                LOG.warning("Failed to delete file: " + file);
+            }
         }
     }
 

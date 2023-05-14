@@ -26,7 +26,7 @@ public final class DeathChestSnapshotImpl implements DeathChestSnapshot {
     DeathChestSnapshotImpl(DeathChest chest) {
         this.location = chest.getLocation().clone();
         this.createdAt = chest.getCreatedAt();
-        this.expireAt = chest.getExpireAt();
+        this.expireAt = chest.getExpiresAt();
         this.owner = chest.getPlayer();
         this.isProtected = chest.isProtected();
         this.items = chest.getInventory().getContents();

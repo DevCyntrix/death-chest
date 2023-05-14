@@ -1,6 +1,7 @@
 package com.github.devcyntrix.deathchest.support.animation;
 
 import com.github.devcyntrix.deathchest.api.animation.AnimationService;
+import com.github.devcyntrix.deathchest.util.MathUtil;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -27,14 +28,12 @@ public class PaperAnimation implements AnimationService {
         if (sendBlockDamageMethod == null)
             return;
 
-        float relativeState = Math.max(0, Math.min(1, state / 9f));
+        float relativeState = MathUtil.clamp(state / 9f, 0f, 1f);
 
         players.forEach(player -> {
             try {
                 sendBlockDamageMethod.invoke(player, location.toLocation(player.getWorld()), relativeState, entityId);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            } catch (InvocationTargetException e) {
+            } catch (IllegalAccessException | InvocationTargetException e) {
                 throw new RuntimeException(e);
             }
         });

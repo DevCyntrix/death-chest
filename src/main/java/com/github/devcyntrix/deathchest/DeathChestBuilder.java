@@ -18,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
 public final class DeathChestBuilder {
 
     private long createdAt = System.currentTimeMillis();
-    private long expireAt = -1;
+    private long expiresAt = -1;
 
     private String durationFormat = "mm:ss";
 
@@ -46,11 +46,11 @@ public final class DeathChestBuilder {
     }
 
     public long expireAt() {
-        return expireAt;
+        return expiresAt;
     }
 
-    public DeathChestBuilder setExpireAt(long expireAt) {
-        this.expireAt = expireAt;
+    public DeathChestBuilder setExpiresAt(long expiresAt) {
+        this.expiresAt = expiresAt;
         return this;
     }
 

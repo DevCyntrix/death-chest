@@ -27,10 +27,10 @@ import com.github.devcyntrix.deathchest.listener.UpdateNotificationListener;
 import com.github.devcyntrix.deathchest.report.GsonReportManager;
 import com.github.devcyntrix.deathchest.support.storage.YamlStorage;
 import com.github.devcyntrix.deathchest.util.LastDeathChestLocationExpansion;
-import com.github.devcyntrix.deathchest.util.Metrics;
 import com.github.devcyntrix.deathchest.util.UpdateChecker;
 import com.github.devcyntrix.deathchest.util.WorldGuardDeathChestFlag;
 import lombok.Getter;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -68,6 +68,7 @@ import java.util.stream.Stream;
 public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChestService {
 
     public static final int RESOURCE_ID = 101066;
+
     public static final int BSTATS_ID = 14866;
 
     protected final Set<DeathChest> deathChests = new CopyOnWriteArraySet<>();
@@ -175,29 +176,10 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         if (protectionService == null)
             this.protectionService = (player, location, material) -> true;
 
-        PluginManager pluginManager = getServer().getPluginManager();
-
-        // Registers the protection permissions if they are not registered
-        try {
-            ChestProtectionOptions protectionOptions = getDeathChestConfig().chestProtectionOptions();
-            if (protectionOptions.enabled()) {
-                if (pluginManager.getPermission(protectionOptions.permission()) == null)
-                    pluginManager.addPermission(new org.bukkit.permissions.Permission(protectionOptions.permission()));
-                if (pluginManager.getPermission(protectionOptions.bypassPermission()) == null)
-                    pluginManager.addPermission(new org.bukkit.permissions.Permission(protectionOptions.bypassPermission()));
-            }
-        } catch (Exception e) {
-            getLogger().warning("Failed to register the permission of the chest-protection");
-            e.printStackTrace();
-        }
         this.blacklist = new ItemBlacklist(new File(getDataFolder(), "blacklist.yml"));
-
-        pluginManager.registerEvents(new UpdateNotificationListener(this), this);
-        pluginManager.registerEvents(new SpawnChestListener(this), this);
-        pluginManager.registerEvents(new LastDeathChestListener(this), this);
-        pluginManager.registerEvents(new ItemBlacklistListener(blacklist), this);
-        pluginManager.registerEvents(new InventoryChangeSlotItemListener(blacklist), this);
-        //getServer().getPluginManager().registerEvents(new MenuFunctionListener(), this);
+        PluginManager pluginManager = getServer().getPluginManager();
+        registerPermissions(pluginManager);
+        registerListeners(pluginManager);
 
         ServicesManager servicesManager = getServer().getServicesManager();
         servicesManager.register(DeathChestService.class, this, this, ServicePriority.Normal);
@@ -219,7 +201,6 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
             throw new RuntimeException(e);
         }
 
-
         // Recreates the deathchests
         Set<DeathChestSnapshot> chests = this.storage.getChests();
         chests.forEach(deathChestSnapshot -> this.deathChests.add(deathChestSnapshot.createChest(this)));
@@ -238,6 +219,31 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         }
 
         new Metrics(this, BSTATS_ID);
+    }
+
+    private void registerListeners(PluginManager pluginManager) {
+        pluginManager.registerEvents(new UpdateNotificationListener(this), this);
+        pluginManager.registerEvents(new SpawnChestListener(this), this);
+        pluginManager.registerEvents(new LastDeathChestListener(this), this);
+
+        pluginManager.registerEvents(new ItemBlacklistListener(blacklist), this);
+        pluginManager.registerEvents(new InventoryChangeSlotItemListener(blacklist), this);
+    }
+
+    private void registerPermissions(PluginManager pluginManager) {
+        // Registers the protection permissions if they are not registered
+        try {
+            ChestProtectionOptions protectionOptions = getDeathChestConfig().chestProtectionOptions();
+            if (protectionOptions.enabled()) {
+                if (pluginManager.getPermission(protectionOptions.permission()) == null)
+                    pluginManager.addPermission(new org.bukkit.permissions.Permission(protectionOptions.permission()));
+                if (pluginManager.getPermission(protectionOptions.bypassPermission()) == null)
+                    pluginManager.addPermission(new org.bukkit.permissions.Permission(protectionOptions.bypassPermission()));
+            }
+        } catch (Exception e) {
+            getLogger().warning("Failed to register the permission of the chest-protection");
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -334,7 +340,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
     public @NotNull DeathChest createDeathChest(@NotNull Location location, long createdAt, long expireAt, @Nullable OfflinePlayer player, boolean isProtected, ItemStack @NotNull ... items) {
         DeathChest build = DeathChestBuilder.builder()
                 .setCreatedAt(createdAt)
-                .setExpireAt(expireAt)
+                .setExpiresAt(expireAt)
                 .setPlayer(player)
                 .setItems(items)
                 .setProtected(isProtected)

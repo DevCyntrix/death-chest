@@ -73,7 +73,7 @@ public class DeathChestImpl implements DeathChest {
     @Expose
     private final long createdAt;
     @Expose
-    private final long expireAt;
+    private final long expiresAt;
     @Expose
     @Nullable
     private final OfflinePlayer player;
@@ -89,7 +89,7 @@ public class DeathChestImpl implements DeathChest {
     private final boolean isProtected;
 
     public DeathChestImpl(DeathChestSnapshot snapshot) {
-        this(snapshot.getLocation(), DeathChestBuilder.builder().setCreatedAt(snapshot.getCreatedAt()).setExpireAt(snapshot.getExpireAt()).setItems(snapshot.getItems()).setPlayer(snapshot.getOwner()));
+        this(snapshot.getLocation(), DeathChestBuilder.builder().setCreatedAt(snapshot.getCreatedAt()).setExpiresAt(snapshot.getExpireAt()).setItems(snapshot.getItems()).setPlayer(snapshot.getOwner()));
     }
 
     public DeathChestImpl(@NotNull Location location, @NotNull DeathChestBuilder builder) {
@@ -107,12 +107,12 @@ public class DeathChestImpl implements DeathChest {
         });
 
         this.createdAt = builder.createdAt();
-        this.expireAt = builder.expireAt();
+        this.expiresAt = builder.expireAt();
         this.player = builder.player();
         this.isProtected = builder.isProtected();
         this.durationSupplier = () -> {
             if (!isExpiring()) return DurationFormatUtils.formatDuration(0, builder.durationFormat());
-            long duration = expireAt - System.currentTimeMillis();
+            long duration = expiresAt - System.currentTimeMillis();
             if (duration <= 0) duration = 0;
             return DurationFormatUtils.formatDuration(duration, builder.durationFormat());
         };
@@ -162,7 +162,7 @@ public class DeathChestImpl implements DeathChest {
             }
 
             if (isExpiring() && !isClosed()) {
-                this.tasks.add(new ExpirationRunnable(plugin.getAuditManager(), this).runTaskLater(plugin, (getExpireAt() - System.currentTimeMillis()) / 50));
+                this.tasks.add(new ExpirationRunnable(plugin.getAuditManager(), this).runTaskLater(plugin, (getExpiresAt() - System.currentTimeMillis()) / 50));
             }
             Bukkit.getPluginManager().registerEvents(this, plugin);
         } catch (Exception e) {
@@ -483,13 +483,13 @@ public class DeathChestImpl implements DeathChest {
     }
 
     @Override
-    public long getExpireAt() {
-        return expireAt;
+    public long getExpiresAt() {
+        return expiresAt;
     }
 
     @Override
     public boolean isExpiring() {
-        return this.expireAt > 0;
+        return this.expiresAt > 0;
     }
 
     @Override
