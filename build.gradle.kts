@@ -19,6 +19,7 @@ repositories {
     maven("https://repo.dmulloy2.net/repository/public/")
     maven("https://raw.githubusercontent.com/FabioZumbi12/RedProtect/mvn-repo/")
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
+    maven("https://repository.minecodes.pl/releases")
     maven("https://jitpack.io")
 }
 
@@ -32,11 +33,6 @@ dependencies {
     // Command library
     compileOnly("cloud.commandframework:cloud-core:1.7.1")
     compileOnly("cloud.commandframework:cloud-bukkit:1.7.1")
-
-    // Command library
-    compileOnly("cloud.commandframework:cloud-core:1.7.1")
-    compileOnly("cloud.commandframework:cloud-bukkit:1.7.1")
-
     // Protection Support
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.7")
     compileOnly("com.plotsquared:PlotSquared-Core:6.8.1") { isTransitive = false }
@@ -44,6 +40,8 @@ dependencies {
     compileOnly("com.github.TechFortress:GriefPrevention:16.18") { isTransitive = false }
     compileOnly("br.net.fabiozumbi12.RedProtect:RedProtect-Core:7.7.3") { isTransitive = false }
     compileOnly("br.net.fabiozumbi12.RedProtect:RedProtect-Spigot:7.7.3") { isTransitive = false }
+    compileOnly("pl.minecodes.plots:plugin-api:4.0.0")
+
 
     // Animation Support
     compileOnly("com.comphenix.protocol:ProtocolLib:4.7.0") { isTransitive = false }

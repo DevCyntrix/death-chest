@@ -15,6 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 
 public final class SupportServices {
@@ -27,7 +28,8 @@ public final class SupportServices {
             "WorldGuard", plugin -> new WorldGuardProtection(),
             "PlotSquared", plugin -> new PlotSquaredProtection(),
             "GriefPrevention", plugin -> new GriefPreventionProtection(),
-            "RedProtect", plugin -> new RedProtection()
+            "RedProtect", plugin -> new RedProtection(),
+            "minePlots", plugin -> new MinePlotsProtectionService()
     );
 
     public static @Nullable BreakAnimationService getBlockBreakAnimationService(@NotNull DeathChestPlugin plugin, @Nullable String preferred) {
@@ -59,9 +61,13 @@ public final class SupportServices {
             if (Bukkit.getPluginManager().isPluginEnabled(preferred)) {
                 Function<Plugin, T> func = map.get(preferred);
                 if (func != null) {
-                    service = func.apply(plugin);
-                    if (service != null)
-                        return service;
+                    try {
+                        service = func.apply(plugin);
+                        if (service != null)
+                            return service;
+                    } catch (Exception ignored) {
+                        plugin.getLogger().warning("Failed to initialize support for " + preferred);
+                    }
                 }
             }
             plugin.getLogger().warning("Cannot use the preferred service \"%s\"".formatted(preferred));
@@ -72,12 +78,16 @@ public final class SupportServices {
                 continue;
 
             Function<Plugin, T> value = entry.getValue();
-            T apply = value.apply(plugin);
-            if (apply == null) {
-                plugin.getLogger().warning("Failed to initialize the service \"%s\"".formatted(entry.getKey()));
-                continue;
+            try {
+                T apply = value.apply(plugin);
+                if (apply == null) {
+                    plugin.getLogger().warning("Failed to initialize the service \"%s\"".formatted(entry.getKey()));
+                    continue;
+                }
+                return apply;
+            } catch (Exception ignored) {
+                plugin.getLogger().warning("Failed to initialize support for " + preferred);
             }
-            return apply;
         }
         return null;
     }
