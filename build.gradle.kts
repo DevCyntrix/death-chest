@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.github.devcyntrix"
-version = "1.5.24"
+version = "1.5.24-mineplots"
 
 repositories {
     mavenCentral()
@@ -18,6 +18,7 @@ repositories {
     maven("https://raw.githubusercontent.com/FabioZumbi12/RedProtect/mvn-repo/")
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
     maven("https://repo.glaremasters.me/repository/bloodshot")
+    maven("https://repository.minecodes.pl/releases")
     maven("https://jitpack.io")
 }
 
@@ -31,6 +32,8 @@ dependencies {
     compileOnly("com.github.TechFortress:GriefPrevention:16.18") { isTransitive = false }
     compileOnly("br.net.fabiozumbi12.RedProtect:RedProtect-Core:7.7.3") { isTransitive = false }
     compileOnly("br.net.fabiozumbi12.RedProtect:RedProtect-Spigot:7.7.3") { isTransitive = false }
+    compileOnly("pl.minecodes.plots:plugin-api:4.0.0")
+
 
     compileOnly("com.griefdefender:api:2.1.0-SNAPSHOT")
 

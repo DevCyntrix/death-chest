@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 
 public final class SupportServices {
@@ -26,7 +27,8 @@ public final class SupportServices {
             "PlotSquared", plugin -> new PlotSquaredProtection(),
             "GriefPrevention", plugin -> new GriefPreventionProtection(),
             "RedProtect", plugin -> new RedProtection(),
-            "GriefDefender", plugin -> new GriefDefenderProtectionService()
+            "GriefDefender", plugin -> new GriefDefenderProtectionService(),
+            "minePlots", plugin -> new MinePlotsProtectionService()
     );
 
     public static @Nullable AnimationService getAnimationService(@NotNull Plugin plugin, @Nullable String preferred) {
@@ -39,8 +41,15 @@ public final class SupportServices {
     public static @Nullable ProtectionService getProtectionService(@NotNull Plugin plugin) {
         ProtectionService[] services = protectionServiceMap.entrySet().stream()
                 .filter(entry -> Bukkit.getPluginManager().isPluginEnabled(entry.getKey()))
-                .map(Map.Entry::getValue)
-                .map(f -> f.apply(plugin))
+                .map(f -> {
+                    try {
+                        return f.getValue().apply(plugin);
+                    } catch (Exception ignored) {
+                        plugin.getLogger().warning("Failed to initialize support for " + f.getKey());
+                    }
+                    return null;
+                })
+                .filter(Objects::nonNull)
                 .toArray(ProtectionService[]::new);
         return new CombinedProtectionService(services);
     }
@@ -52,9 +61,13 @@ public final class SupportServices {
             if (Bukkit.getPluginManager().isPluginEnabled(preferred)) {
                 Function<Plugin, T> func = map.get(preferred);
                 if (func != null) {
-                    service = func.apply(plugin);
-                    if (service != null)
-                        return service;
+                    try {
+                        service = func.apply(plugin);
+                        if (service != null)
+                            return service;
+                    } catch (Exception ignored) {
+                        plugin.getLogger().warning("Failed to initialize support for " + preferred);
+                    }
                 }
             }
             plugin.getLogger().warning("Cannot use the preferred service \"%s\"".formatted(preferred));
@@ -65,12 +78,16 @@ public final class SupportServices {
                 continue;
 
             Function<Plugin, T> value = entry.getValue();
-            T apply = value.apply(plugin);
-            if (apply == null) {
-                plugin.getLogger().warning("Failed to initialize the service \"%s\"".formatted(entry.getKey()));
-                continue;
+            try {
+                T apply = value.apply(plugin);
+                if (apply == null) {
+                    plugin.getLogger().warning("Failed to initialize the service \"%s\"".formatted(entry.getKey()));
+                    continue;
+                }
+                return apply;
+            } catch (Exception ignored) {
+                plugin.getLogger().warning("Failed to initialize support for " + preferred);
             }
-            return apply;
         }
         return null;
     }
