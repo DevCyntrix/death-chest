@@ -15,7 +15,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Function;
 
 public final class SupportServices {
@@ -29,7 +28,6 @@ public final class SupportServices {
             "PlotSquared", plugin -> new PlotSquaredProtection(),
             "GriefPrevention", plugin -> new GriefPreventionProtection(),
             "RedProtect", plugin -> new RedProtection(),
-            "GriefDefender", plugin -> new GriefDefenderProtectionService(),
             "minePlots", plugin -> new MinePlotsProtectionService()
     );
 
@@ -46,7 +44,12 @@ public final class SupportServices {
         for (Map.Entry<String, Function<Plugin, ProtectionService>> entry : protectionServiceMap.entrySet()) {
             if (!Bukkit.getPluginManager().isPluginEnabled(entry.getKey()))
                 continue;
-            ProtectionService apply = entry.getValue().apply(plugin);
+            ProtectionService apply = null;
+            try {
+                apply = entry.getValue().apply(plugin);
+            } catch (Exception ignored) {
+                plugin.getLogger().warning("Failed to initialize support for " + entry.getKey());
+            }
             if (apply == null)
                 continue;
             plugin.debug(1, "Using " + entry.getKey() + " protection service");
