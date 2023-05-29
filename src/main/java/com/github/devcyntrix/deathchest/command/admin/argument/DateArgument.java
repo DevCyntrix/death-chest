@@ -85,7 +85,7 @@ public class DateArgument<C> extends CommandArgument<C, Date> {
                 @NonNull Queue<@NonNull String> inputQueue
         ) {
             String input = inputQueue.peek();
-            if(input == null)    {
+            if (input == null) {
                 return ArgumentParseResult.failure(new NoInputProvidedException(DateParser.class, commandContext));
             }
 

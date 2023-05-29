@@ -2,11 +2,10 @@ package com.github.devcyntrix.deathchest.command.admin;
 
 import cloud.commandframework.ArgumentDescription;
 import cloud.commandframework.Command;
-import cloud.commandframework.CommandManager;
 import cloud.commandframework.bukkit.parsers.WorldArgument;
 import cloud.commandframework.context.CommandContext;
+import com.github.devcyntrix.deathchest.DeathChestModel;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
-import com.github.devcyntrix.deathchest.api.DeathChest;
 import com.github.devcyntrix.deathchest.api.audit.AuditAction;
 import com.github.devcyntrix.deathchest.api.audit.AuditItem;
 import com.github.devcyntrix.deathchest.api.audit.info.DestroyChestInfo;
@@ -40,7 +39,7 @@ public class DeleteinworldCommandProvider implements CommandProvider {
                 .handler(commandContext -> {
                     World world = commandContext.get("world");
 
-                    long deletedCount = plugin.getDeathChests().stream()
+                    long deletedCount = plugin.getChests()
                             .map(deathChest -> deleteChest(commandContext, deathChest))
                             .filter(aBoolean -> aBoolean)
                             .count();
@@ -49,25 +48,20 @@ public class DeleteinworldCommandProvider implements CommandProvider {
                 });
     }
 
-    private boolean deleteChest(CommandContext<CommandSender> commandContext, DeathChest deathChest) {
-        try {
-            deathChest.close();
+    private boolean deleteChest(CommandContext<CommandSender> commandContext, DeathChestModel deathChest) {
+        plugin.getDeathChestController().destroyChest(deathChest);
 
-            plugin.getAuditManager().audit(new AuditItem(new Date(), AuditAction.DESTROY_CHEST, new DestroyChestInfo(
-                    deathChest,
-                    DestroyReason.COMMAND,
-                    Map.of("executor", commandContext.getSender(),
-                            "command", "/" + commandContext.getRawInputJoined())
-            )));
+        plugin.getAuditManager().audit(new AuditItem(new Date(), AuditAction.DESTROY_CHEST, new DestroyChestInfo(
+                deathChest,
+                DestroyReason.COMMAND,
+                Map.of("executor", commandContext.getSender(),
+                        "command", "/" + commandContext.getRawInputJoined())
+        )));
 
-            return true;
-        } catch (IOException e) {
-            commandContext.getSender().sendMessage("§cA death chest at " + formatLocation(deathChest.getLocation()));
-        }
-        return false;
+        return true;
     }
 
-    private String formatLocation(Location location)    {
+    private String formatLocation(Location location) {
         return String.format("%d, %d, %d in world %s", location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
     }
 }
