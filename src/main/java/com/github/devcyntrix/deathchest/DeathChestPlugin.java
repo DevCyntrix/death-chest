@@ -14,7 +14,7 @@ import com.github.devcyntrix.deathchest.api.protection.ProtectionService;
 import com.github.devcyntrix.deathchest.api.report.ReportManager;
 import com.github.devcyntrix.deathchest.api.storage.DeathChestStorage;
 import com.github.devcyntrix.deathchest.audit.GsonAuditManager;
-import com.github.devcyntrix.deathchest.command.DeathChestCommand;
+import com.github.devcyntrix.deathchest.command.CommandRegistry;
 import com.github.devcyntrix.deathchest.config.ChestProtectionOptions;
 import com.github.devcyntrix.deathchest.config.DeathChestConfig;
 import com.github.devcyntrix.deathchest.hologram.NativeHologramService;
@@ -28,10 +28,10 @@ import com.github.devcyntrix.deathchest.util.Metrics;
 import com.github.devcyntrix.deathchest.util.UpdateChecker;
 import com.github.devcyntrix.deathchest.util.WorldGuardDeathChestFlag;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
@@ -146,6 +146,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         }
     }
 
+    @SneakyThrows
     @Override
     public void onEnable() {
         placeholderAPIEnabled = Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI");
@@ -185,12 +186,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         servicesManager.register(DeathChestService.class, this, this, ServicePriority.Normal);
 
         // Registers the deathchest command
-        PluginCommand deathChestCommand = getCommand("deathchest");
-        if (deathChestCommand != null) {
-            DeathChestCommand command = new DeathChestCommand(this);
-            deathChestCommand.setExecutor(command);
-            deathChestCommand.setTabCompleter(command);
-        }
+        CommandRegistry.create(this).registerCommands(this);
 
         // Initialize the storage system
         try {

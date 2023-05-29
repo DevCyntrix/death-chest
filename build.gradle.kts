@@ -25,6 +25,10 @@ repositories {
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT")
 
+    // Command library
+    compileOnly("cloud.commandframework:cloud-core:1.7.1")
+    compileOnly("cloud.commandframework:cloud-bukkit:1.7.1")
+
     // Protection Support
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.7")
     compileOnly("com.plotsquared:PlotSquared-Core:6.8.1") { isTransitive = false }
@@ -89,15 +93,10 @@ bukkit {
         "RedProtect"
     )
     libraries = listOf(
-        "org.apache.commons:commons-text:1.9"
+        "org.apache.commons:commons-text:1.9",
+        "cloud.commandframework:cloud-core:1.7.1",
+        "cloud.commandframework:cloud-bukkit:1.7.1"
     )
-    commands {
-        register("deathchest") {
-            description = "The admin command for reloading the plugin's configuration"
-            permission = "deathchest.command.deathchest"
-            usage = "§c/<command> <reload|deleteInWorld [<world>]>"
-        }
-    }
 
     permissions {
         register("deathchest.command.report") {
