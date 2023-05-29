@@ -6,6 +6,8 @@ softdepend: ['WorldGuard', 'ProtocolLib', 'GriefPrevention', 'GriefDefender', 'P
 libraries:
   - 'org.apache.commons:commons-text:1.9'
   - 'com.google.inject:guice:7.0.0'
+  - 'cloud.commandframework:cloud-core:1.7.1'
+  - 'cloud.commandframework:cloud-bukkit:1.7.1'
 commands:
   deathchest:
     description: The admin command for reloading the plugin's configuration

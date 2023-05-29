@@ -24,6 +24,9 @@ dependencies {
     compileOnly("com.google.inject:guice:7.0.0")
     compileOnly("org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT")
 
+    // Command library
+    compileOnly("cloud.commandframework:cloud-core:1.7.1")
+    compileOnly("cloud.commandframework:cloud-bukkit:1.7.1")
 
     // Protection Support
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.7")
