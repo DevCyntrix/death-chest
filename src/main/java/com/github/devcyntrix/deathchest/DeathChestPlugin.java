@@ -95,7 +95,6 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
     @Override
     public void onDisable() {
 
-        System.out.println(deathChests);
         // Save all chests
         try {
             saveChests();
