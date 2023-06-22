@@ -1,7 +1,7 @@
 plugins {
     `java-library`
     id("xyz.jpenilla.run-paper") version "2.0.1"
-    id("net.minecrell.plugin-yml.bukkit") version "0.5.1"
+    id("net.minecrell.plugin-yml.bukkit") version "0.6.0"
     id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
@@ -39,11 +39,6 @@ dependencies {
 
     // Animation Support
     compileOnly("com.comphenix.protocol:ProtocolLib:4.7.0") { isTransitive = false }
-
-    // Hologram Support
-    compileOnly("com.github.sainttx.Holograms:holograms-api:0f5b027") { isTransitive = false }
-    compileOnly("com.github.decentsoftware-eu:decentholograms:2.5.2") { isTransitive = false }
-    compileOnly("com.gmail.filoghost.holographicdisplays:holographicdisplays-api:2.4.9") { isTransitive = false }
 
     // Placeholder API
     compileOnly("me.clip:placeholderapi:2.11.2") { isTransitive = false }
