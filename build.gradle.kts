@@ -1,7 +1,6 @@
 plugins {
     `java-library`
     id("xyz.jpenilla.run-paper") version "2.0.1"
-    id("net.minecrell.plugin-yml.bukkit") version "0.5.1"
     id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
@@ -37,11 +36,6 @@ dependencies {
     // Animation Support
     compileOnly("com.comphenix.protocol:ProtocolLib:4.7.0") { isTransitive = false }
 
-    // Hologram Support
-    compileOnly("com.github.sainttx.Holograms:holograms-api:0f5b027") { isTransitive = false }
-    compileOnly("com.github.decentsoftware-eu:decentholograms:2.5.2") { isTransitive = false }
-    compileOnly("com.gmail.filoghost.holographicdisplays:holographicdisplays-api:2.4.9") { isTransitive = false }
-
     // Placeholder API
     compileOnly("me.clip:placeholderapi:2.11.2") { isTransitive = false }
 
@@ -67,57 +61,16 @@ tasks {
     }
     processResources {
         filteringCharset = Charsets.UTF_8.name()
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+        from("src/main/resources") {
+            include("**")
+        }
+
     }
     runServer {
         minecraftVersion("1.19.4")
     }
     test {
         useJUnitPlatform()
-    }
-}
-
-bukkit {
-    name = "DeathChest"
-    main = "com.github.devcyntrix.deathchest.DeathChestPlugin"
-    apiVersion = "1.13"
-    website = "https://www.spigotmc.org/resources/death-chest.101066/"
-    authors = listOf("CyntrixAlgorithm")
-    softDepend = listOf(
-        "WorldGuard",
-        "ProtocolLib",
-        "GriefPrevention",
-        "GriefDefender",
-        "PlaceholderAPI",
-        "RedProtect"
-    )
-    libraries = listOf(
-        "org.apache.commons:commons-text:1.9"
-    )
-    commands {
-        register("deathchest") {
-            description = "The admin command for reloading the plugin's configuration"
-            permission = "deathchest.command.deathchest"
-            usage = "§c/<command> <reload|deleteInWorld [<world>]>"
-        }
-    }
-
-    permissions {
-        register("deathchest.command.report") {
-            description = "The permission to create, read and delete reports of the plugin"
-        }
-        register("deathchest.command.deleteInWorld") {
-            description = "The permission to delete all chests in all or a specific worlds"
-        }
-        register("deathchest.command.reload") {
-            description = "The permission to reload the configuration file of the DeathChest plugin"
-        }
-        register("deathchest.admin") {
-            children = listOf(
-                "deathchest.command.deathchest",
-                "deathchest.command.report",
-                "deathchest.command.deleteInWorld",
-                "deathchest.command.reload"
-            )
-        }
     }
 }
