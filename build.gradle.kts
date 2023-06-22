@@ -1,7 +1,6 @@
 plugins {
     `java-library`
     id("xyz.jpenilla.run-paper") version "2.0.1"
-    id("net.minecrell.plugin-yml.bukkit") version "0.6.0"
     id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
@@ -17,7 +16,6 @@ repositories {
     maven("https://repo.dmulloy2.net/repository/public/")
     maven("https://raw.githubusercontent.com/FabioZumbi12/RedProtect/mvn-repo/")
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
-    maven("https://repo.glaremasters.me/repository/bloodshot")
     maven("https://repository.minecodes.pl/releases")
     maven("https://jitpack.io")
 }
@@ -69,52 +67,16 @@ tasks {
     }
     processResources {
         filteringCharset = Charsets.UTF_8.name()
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+        from("src/main/resources") {
+            include("**")
+        }
+
     }
     runServer {
         minecraftVersion("1.19.4")
     }
     test {
         useJUnitPlatform()
-    }
-}
-
-bukkit {
-    name = "DeathChest"
-    main = "com.github.devcyntrix.deathchest.DeathChestPlugin"
-    apiVersion = "1.13"
-    website = "https://www.spigotmc.org/resources/death-chest.101066/"
-    authors = listOf("CyntrixAlgorithm")
-    softDepend = listOf(
-        "WorldGuard",
-        "ProtocolLib",
-        "GriefPrevention",
-        "GriefDefender",
-        "PlaceholderAPI",
-        "RedProtect"
-    )
-    libraries = listOf(
-        "org.apache.commons:commons-text:1.9",
-        "cloud.commandframework:cloud-core:1.7.1",
-        "cloud.commandframework:cloud-bukkit:1.7.1"
-    )
-
-    permissions {
-        register("deathchest.command.report") {
-            description = "The permission to create, read and delete reports of the plugin"
-        }
-        register("deathchest.command.deleteInWorld") {
-            description = "The permission to delete all chests in all or a specific worlds"
-        }
-        register("deathchest.command.reload") {
-            description = "The permission to reload the configuration file of the DeathChest plugin"
-        }
-        register("deathchest.admin") {
-            children = listOf(
-                "deathchest.command.deathchest",
-                "deathchest.command.report",
-                "deathchest.command.deleteInWorld",
-                "deathchest.command.reload"
-            )
-        }
     }
 }
