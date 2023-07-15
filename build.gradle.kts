@@ -21,6 +21,7 @@ repositories {
 }
 
 dependencies {
+    compileOnly("com.google.inject:guice:7.0.0")
     compileOnly("org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT")
 
     // Command library

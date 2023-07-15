@@ -19,7 +19,6 @@ public class GsonAuditManager extends Thread implements AuditManager {
     public GsonAuditManager(File folder) {
         this.folder = folder;
         this.folder.mkdirs();
-        start();
     }
 
     @Override

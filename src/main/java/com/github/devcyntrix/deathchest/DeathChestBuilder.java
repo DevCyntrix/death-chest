@@ -3,7 +3,7 @@ package com.github.devcyntrix.deathchest;
 import com.github.devcyntrix.deathchest.api.DeathChest;
 import com.github.devcyntrix.deathchest.api.animation.AnimationService;
 import com.github.devcyntrix.deathchest.api.hologram.HologramService;
-import com.github.devcyntrix.deathchest.config.BreakEffectOptions;
+import com.github.devcyntrix.deathchest.config.BreakAnimationOptions;
 import com.github.devcyntrix.deathchest.config.HologramOptions;
 import com.github.devcyntrix.deathchest.config.InventoryOptions;
 import com.github.devcyntrix.deathchest.config.ParticleOptions;
@@ -32,7 +32,7 @@ public final class DeathChestBuilder {
     private AnimationService animationService;
 
     private HologramOptions hologramOptions;
-    private BreakEffectOptions breakEffectOptions;
+    private BreakAnimationOptions breakAnimationOptions;
     private InventoryOptions inventoryOptions;
     private ParticleOptions particleOptions;
 
@@ -121,12 +121,12 @@ public final class DeathChestBuilder {
         return inventoryOptions;
     }
 
-    public BreakEffectOptions breakEffectOptions() {
-        return breakEffectOptions;
+    public BreakAnimationOptions breakEffectOptions() {
+        return breakAnimationOptions;
     }
 
-    public DeathChestBuilder setBreakEffectOptions(BreakEffectOptions breakEffectOptions) {
-        this.breakEffectOptions = breakEffectOptions;
+    public DeathChestBuilder setBreakEffectOptions(BreakAnimationOptions breakAnimationOptions) {
+        this.breakAnimationOptions = breakAnimationOptions;
         return this;
     }
 

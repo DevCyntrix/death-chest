@@ -17,7 +17,7 @@ public record DeathChestConfig(
         @SerializedName("inventory") @NotNull InventoryOptions inventoryOptions,
         @SerializedName("hologram") @NotNull HologramOptions hologramOptions,
         @SerializedName("particle") @NotNull ParticleOptions particleOptions,
-        @SerializedName("break-effect") @NotNull BreakEffectOptions breakEffectOptions,
+        @SerializedName("break-effect") @NotNull BreakAnimationOptions breakAnimationOptions,
         @SerializedName("player-notification") @NotNull PlayerNotificationOptions playerNotificationOptions,
         @SerializedName("global-notification") @NotNull GlobalNotificationOptions globalNotificationOptions,
         @SerializedName("change-death-message") @NotNull ChangeDeathMessageOptions changeDeathMessageOptions,
@@ -65,7 +65,7 @@ public record DeathChestConfig(
         ParticleOptions particleOptions = ParticleOptions.load(config.getConfigurationSection("particle"));
 
         // Effect
-        BreakEffectOptions breakEffectOptions = BreakEffectOptions.load(config.getConfigurationSection("break-effect"));
+        BreakAnimationOptions breakAnimationOptions = BreakAnimationOptions.load(config.getConfigurationSection("break-effect"));
 
         // Notification
         PlayerNotificationOptions playerNotificationOptions = PlayerNotificationOptions.load(config.getConfigurationSection("player-notification"));
@@ -81,7 +81,7 @@ public record DeathChestConfig(
 
         String preferredAnimationService = config.getString("preferred-animation-service");
 
-        return new DeathChestConfig(configVersion, updateCheck, durationFormat, expiration, permission, dropItemsAfterExpiration, inventoryOptions, hologramOptions, particleOptions, breakEffectOptions, playerNotificationOptions, globalNotificationOptions, changeDeathMessageOptions, worldFilterConfig, blastProtection, chestProtectionOptions, preferredAnimationService);
+        return new DeathChestConfig(configVersion, updateCheck, durationFormat, expiration, permission, dropItemsAfterExpiration, inventoryOptions, hologramOptions, particleOptions, breakAnimationOptions, playerNotificationOptions, globalNotificationOptions, changeDeathMessageOptions, worldFilterConfig, blastProtection, chestProtectionOptions, preferredAnimationService);
     }
 
 }

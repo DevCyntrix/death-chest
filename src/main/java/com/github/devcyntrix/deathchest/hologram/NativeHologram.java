@@ -13,12 +13,12 @@ import java.util.List;
 
 public class NativeHologram implements Hologram {
 
-    private final NativeHologramService service;
+    private final HologramService service;
     private Location location;
 
     private final List<NativeHologramTextLine> list = new ArrayList<>();
 
-    public NativeHologram(NativeHologramService service, Location location) {
+    public NativeHologram(HologramService service, Location location) {
         this.service = service;
         this.location = location.subtract(0, 0.5, 0);
     }

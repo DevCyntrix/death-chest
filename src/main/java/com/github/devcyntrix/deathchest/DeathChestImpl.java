@@ -12,7 +12,7 @@ import com.github.devcyntrix.deathchest.api.hologram.Hologram;
 import com.github.devcyntrix.deathchest.api.hologram.HologramService;
 import com.github.devcyntrix.deathchest.api.hologram.HologramTextLine;
 import com.github.devcyntrix.deathchest.config.*;
-import com.github.devcyntrix.deathchest.tasks.AnimationRunnable;
+import com.github.devcyntrix.deathchest.tasks.BreakAnimationRunnable;
 import com.github.devcyntrix.deathchest.tasks.ExpirationRunnable;
 import com.github.devcyntrix.deathchest.tasks.HologramRunnable;
 import com.github.devcyntrix.deathchest.tasks.ParticleRunnable;
@@ -124,13 +124,13 @@ public class DeathChestImpl implements DeathChest {
             // Creates inventory
             InventoryOptions inventoryOptions = builder.inventoryOptions();
 
-            String title = substitutor.replace(inventoryOptions.title());
-            if (DeathChestPlugin.isPlaceholderAPIEnabled()) {
-                title = PlaceholderAPI.setPlaceholders(getPlayer(), title);
-            }
-            
-            this.inventory = Bukkit.createInventory(new DeathChestHolder(this), inventoryOptions.size().getSize(stacks.length), title);
-            this.inventory.setContents(stacks);
+            this.inventory = inventoryOptions.createInventory(title -> {
+                title = substitutor.replace(title);
+                if (DeathChestPlugin.isPlaceholderAPIEnabled()) {
+                    title = PlaceholderAPI.setPlaceholders(getPlayer(), title);
+                }
+                return title;
+            }, stacks);
 
             // Creates hologram
             HologramService hologramService = builder.hologramService();
@@ -143,17 +143,17 @@ public class DeathChestImpl implements DeathChest {
 
                 // Start task
                 if (!blueprints.isEmpty()) {
-                    this.tasks.add(new HologramRunnable(this, blueprints, substitutor).runTaskTimerAsynchronously(plugin, 20, 20));
+                    this.tasks.add(new HologramRunnable(plugin, this, blueprints, substitutor).runTaskTimerAsynchronously(plugin, 20, 20));
                 }
             }
 
 
             AnimationService animationService = builder.animationService();
-            BreakEffectOptions breakEffectOptions = builder.breakEffectOptions();
+            BreakAnimationOptions breakAnimationOptions = builder.breakEffectOptions();
             // Spawns the block break animation
-            if (animationService != null && isExpiring() && breakEffectOptions.enabled()) {
+            if (animationService != null && isExpiring() && breakAnimationOptions.enabled()) {
                 this.breakingEntityId = EntityIdHelper.increaseAndGet();
-                tasks.add(new AnimationRunnable(this, animationService, breakEffectOptions, breakingEntityId).runTaskTimerAsynchronously(plugin, 20, 20));
+                tasks.add(new BreakAnimationRunnable(this, animationService, breakAnimationOptions).runTaskTimerAsynchronously(plugin, 20, 20));
             }
 
             ParticleOptions particleOptions = builder.particleOptions();
