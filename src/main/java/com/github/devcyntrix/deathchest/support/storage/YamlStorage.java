@@ -135,13 +135,13 @@ public class YamlStorage implements DeathChestStorage {
             File worldFile = getFile(world, false);
             if (!worldFile.isFile())
                 continue;
-
+            long time = System.currentTimeMillis();
             YamlConfiguration configuration = YamlConfiguration.loadConfiguration(worldFile);
             List<Map<String, Object>> chests = (List<Map<String, Object>>) configuration.getList("chests", Collections.emptyList());
             Set<DeathChestModel> list = chests.stream()
                     .map(map -> DeathChestModel.deserialize(map, plugin.getDeathChestConfig().inventoryOptions()))
                     .filter(Objects::nonNull)
-                    //.filter(deathChestModel -> !deathChestModel.isExpiring() || deathChestModel.getExpireAt() < System.currentTimeMillis())
+                    .filter(deathChestModel -> !deathChestModel.isExpiring() || deathChestModel.getExpireAt() < time)
                     .collect(Collectors.toSet());
             this.deathChestsCache.putAll(world, list);
         }
@@ -178,7 +178,8 @@ public class YamlStorage implements DeathChestStorage {
     @Override
     public void save() throws IOException {
 
-        for (World world : deathChestsCache.keySet()) {
+        // It is important to iterate through all bukkit worlds to avoid duplication bugs because the last death chest in the worlds cannot be overwritten
+        for (World world : Bukkit.getWorlds()) {
             File worldFile = getFile(world, true);
 
             List<Map<String, Object>> collect = deathChestsCache.get(world).stream()
@@ -192,6 +193,5 @@ public class YamlStorage implements DeathChestStorage {
 
     @Override
     public void close() {
-
     }
 }

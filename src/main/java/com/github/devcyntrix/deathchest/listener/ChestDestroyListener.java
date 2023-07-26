@@ -100,10 +100,10 @@ public class ChestDestroyListener implements Listener {
             if (content == null) continue;
             model.getWorld().dropItemNaturally(model.getLocation(), content);
         }
+        this.plugin.getAuditManager().audit(new AuditItem(new Date(), AuditAction.DESTROY_CHEST, new DestroyChestInfo(model, DestroyReason.BREAK, Map.of("player", player))));
         model.getInventory().clear();
 
         plugin.getDeathChestController().destroyChest(model);
-        this.plugin.getAuditManager().audit(new AuditItem(new Date(), AuditAction.DESTROY_CHEST, new DestroyChestInfo(model, DestroyReason.BREAK, Map.of("player", player))));
 
     }
 

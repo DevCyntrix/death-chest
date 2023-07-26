@@ -1,8 +1,8 @@
 package com.github.devcyntrix.deathchest.tasks;
 
 import com.github.devcyntrix.deathchest.DeathChestModel;
-import com.github.devcyntrix.deathchest.api.hologram.HologramTextLine;
 import com.github.devcyntrix.deathchest.controller.PlaceHolderController;
+import com.github.devcyntrix.hologram.api.HologramTextLine;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;

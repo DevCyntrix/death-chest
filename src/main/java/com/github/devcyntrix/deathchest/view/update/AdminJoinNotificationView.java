@@ -1,7 +1,6 @@
 package com.github.devcyntrix.deathchest.view.update;
 
 import com.github.devcyntrix.deathchest.controller.UpdateController;
-import com.google.inject.Inject;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

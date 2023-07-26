@@ -1,14 +1,13 @@
-package com.github.devcyntrix.deathchest.hologram;
+package com.github.devcyntrix.hologram;
 
-import com.github.devcyntrix.deathchest.DeathChestPlugin;
-import com.github.devcyntrix.deathchest.api.hologram.Hologram;
-import com.github.devcyntrix.deathchest.api.hologram.HologramTextLine;
+import com.github.devcyntrix.hologram.api.Hologram;
+import com.github.devcyntrix.hologram.api.HologramTextLine;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,7 +18,7 @@ public class NativeHologramTextLine implements HologramTextLine {
     private final Location location;
     private final UUID armorStand;
 
-    public NativeHologramTextLine(@NotNull Location location, @NotNull String text) {
+    public NativeHologramTextLine(@NotNull Plugin plugin, @NotNull Location location, @NotNull String text) {
         Preconditions.checkNotNull(location.getWorld());
         this.location = location;
         this.armorStand = location.getWorld().spawn(location, ArmorStand.class, stand -> {
@@ -27,7 +26,7 @@ public class NativeHologramTextLine implements HologramTextLine {
             stand.setInvisible(true);
             stand.setCustomName(text);
             stand.setCustomNameVisible(true);
-            stand.setMetadata(Hologram.METADATA_KEY, new FixedMetadataValue(JavaPlugin.getPlugin(DeathChestPlugin.class), true));
+            stand.setMetadata(Hologram.METADATA_KEY, new FixedMetadataValue(plugin, true));
         }).getUniqueId();
     }
 

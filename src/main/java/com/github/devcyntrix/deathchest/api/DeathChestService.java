@@ -2,8 +2,8 @@ package com.github.devcyntrix.deathchest.api;
 
 import com.github.devcyntrix.deathchest.DeathChestModel;
 import com.github.devcyntrix.deathchest.api.animation.AnimationService;
-import com.github.devcyntrix.deathchest.api.hologram.HologramService;
 import com.github.devcyntrix.deathchest.api.protection.ProtectionService;
+import com.github.devcyntrix.hologram.api.HologramService;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;

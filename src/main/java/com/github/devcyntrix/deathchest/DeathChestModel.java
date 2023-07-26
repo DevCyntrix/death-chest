@@ -1,9 +1,10 @@
 package com.github.devcyntrix.deathchest;
 
-import com.github.devcyntrix.deathchest.api.hologram.Hologram;
 import com.github.devcyntrix.deathchest.config.InventoryOptions;
+import com.github.devcyntrix.hologram.api.Hologram;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
+import com.google.gson.annotations.Expose;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,11 +27,18 @@ import java.util.*;
 @AllArgsConstructor
 public final class DeathChestModel {
 
+    @Expose
     private Location location;
+    @Expose
     private long createdAt;
+    @Expose
     private long expireAt;
+    @Expose
+    @Nullable
     private OfflinePlayer owner;
+    @Expose
     private boolean isProtected;
+    @Expose(deserialize = false)
     private Inventory inventory;
 
     private transient BlockState previous;
@@ -87,12 +95,12 @@ public final class DeathChestModel {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DeathChestModel that = (DeathChestModel) o;
-        return createdAt == that.createdAt && Objects.equal(location, that.location) && Objects.equal(owner.getUniqueId(), that.owner.getUniqueId());
+        return createdAt == that.createdAt && Objects.equal(location, that.location) && Objects.equal(owner, that.owner);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(location, createdAt, owner.getUniqueId());
+        return Objects.hashCode(location, createdAt, owner);
     }
 
     @NotNull

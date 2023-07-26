@@ -3,10 +3,9 @@ package com.github.devcyntrix.deathchest;
 import com.github.devcyntrix.deathchest.api.DeathChestService;
 import com.github.devcyntrix.deathchest.api.animation.AnimationService;
 import com.github.devcyntrix.deathchest.api.audit.AuditManager;
-import com.github.devcyntrix.deathchest.api.hologram.Hologram;
-import com.github.devcyntrix.deathchest.api.hologram.HologramService;
 import com.github.devcyntrix.deathchest.api.protection.ProtectionService;
 import com.github.devcyntrix.deathchest.api.report.ReportManager;
+import com.github.devcyntrix.deathchest.api.storage.DeathChestStorage;
 import com.github.devcyntrix.deathchest.audit.GsonAuditManager;
 import com.github.devcyntrix.deathchest.command.DeathChestCommand;
 import com.github.devcyntrix.deathchest.config.BreakAnimationOptions;
@@ -16,10 +15,7 @@ import com.github.devcyntrix.deathchest.controller.DeathChestController;
 import com.github.devcyntrix.deathchest.controller.HologramController;
 import com.github.devcyntrix.deathchest.controller.PlaceHolderController;
 import com.github.devcyntrix.deathchest.controller.UpdateController;
-import com.github.devcyntrix.deathchest.listener.ChestDestroyListener;
-import com.github.devcyntrix.deathchest.listener.ChestModificationListener;
-import com.github.devcyntrix.deathchest.listener.LastDeathChestListener;
-import com.github.devcyntrix.deathchest.listener.SpawnChestListener;
+import com.github.devcyntrix.deathchest.listener.*;
 import com.github.devcyntrix.deathchest.report.GsonReportManager;
 import com.github.devcyntrix.deathchest.support.storage.YamlStorage;
 import com.github.devcyntrix.deathchest.util.LastDeathChestLocationExpansion;
@@ -32,6 +28,8 @@ import com.github.devcyntrix.deathchest.view.chest.HologramAdapter;
 import com.github.devcyntrix.deathchest.view.update.AdminJoinNotificationView;
 import com.github.devcyntrix.deathchest.view.update.AdminNotificationView;
 import com.github.devcyntrix.deathchest.view.update.ConsoleNotificationView;
+import com.github.devcyntrix.hologram.api.Hologram;
+import com.github.devcyntrix.hologram.api.HologramService;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -92,6 +90,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
 
     private HologramController hologramController;
 
+    private DeathChestStorage deathChestStorage;
     private DeathChestController deathChestController;
 
     /**
@@ -113,6 +112,20 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
                 this.deathChestController.close();
             } catch (IOException e) {
                 e.printStackTrace();
+            }
+        }
+
+        if (this.deathChestStorage != null) {
+            try {
+                this.deathChestStorage.save();
+            } catch (IOException e) {
+                getLogger().severe("Failed to save the chests");
+                e.printStackTrace();
+            }
+            try {
+                this.deathChestStorage.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         }
 
@@ -144,7 +157,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         checkConfigVersion();
         reload();
 
-        this.hologramController = new HologramController();
+        this.hologramController = new HologramController(this);
         this.animationService = SupportServices.getAnimationService(this, this.deathChestConfig.preferredAnimationService());
         this.protectionService = SupportServices.getProtectionService(this);
         // Standard protection service: No service
@@ -171,6 +184,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         pluginManager.registerEvents(new ChestModificationListener(this), this);
         pluginManager.registerEvents(new ChestDestroyListener(this), this);
         pluginManager.registerEvents(new LastDeathChestListener(this), this);
+        pluginManager.registerEvents(new WorldListener(this), this);
 
         ServicesManager servicesManager = getServer().getServicesManager();
         servicesManager.register(DeathChestService.class, this, this, ServicePriority.Normal);
@@ -187,9 +201,10 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         this.auditManager = new GsonAuditManager(new File(getDataFolder(), "audits"));
 
         try {
-            var storage = new YamlStorage();
-            storage.init(this, new MemoryConfiguration());
-            this.deathChestController = new DeathChestController(this, getLogger(), this.auditManager, storage);
+            this.deathChestStorage = new YamlStorage();
+            this.deathChestStorage.init(this, new MemoryConfiguration());
+
+            this.deathChestController = new DeathChestController(this, getLogger(), this.auditManager, this.deathChestStorage);
             BlockAdapter adapter = new BlockAdapter(this, deathChestController);
             this.deathChestController.registerAdapter(adapter);
             getServer().getPluginManager().registerEvents(adapter, this);
@@ -208,7 +223,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
                 this.deathChestController.registerAdapter(new BreakAnimationAdapter(this, animationService, breakAnimationOptions));
             }
 
-            this.deathChestController.loadChests();
+            this.deathChestController.loadChests(); // Loads the chests to the cache
 
         } catch (IOException e) {
             getLogger().severe("Failed to initialize the storage system. Please check your configuration file.");
@@ -262,11 +277,9 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
 
     /**
      * Creates snapshots of all current valid chests and hand over the snapshots to the storage system which saves them.
-     *
-     * @throws IOException depends on the storage system
      */
     @Override
-    public void saveChests() throws IOException {
+    public void saveChests() {
         this.deathChestController.saveChests();
     }
 
