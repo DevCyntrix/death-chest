@@ -1,13 +1,13 @@
 package com.github.devcyntrix.deathchest.view.chest;
 
 import com.github.devcyntrix.deathchest.DeathChestModel;
-import com.github.devcyntrix.deathchest.util.ChestListener;
+import com.github.devcyntrix.deathchest.util.ChestAdapter;
 import org.bukkit.entity.HumanEntity;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CloseInventoryListener implements ChestListener {
+public class CloseInventoryAdapter implements ChestAdapter {
     @Override
     public void onCreate(DeathChestModel model) {
 
@@ -29,7 +29,7 @@ public class CloseInventoryListener implements ChestListener {
 
     @Override
     public void onLoad(DeathChestModel model) {
-
+        onCreate(model);
     }
 
     @Override

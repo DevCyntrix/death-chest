@@ -2,8 +2,8 @@ package com.github.devcyntrix.deathchest;
 
 import com.github.devcyntrix.deathchest.api.hologram.Hologram;
 import com.github.devcyntrix.deathchest.config.InventoryOptions;
-import com.github.devcyntrix.deathchest.util.EntityIdHelper;
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,6 +14,7 @@ import org.bukkit.World;
 import org.bukkit.block.BlockState;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Closeable;
@@ -38,13 +39,12 @@ public final class DeathChestModel {
 
     private transient Set<Closeable> tasks = new HashSet<>();
 
-    public DeathChestModel(Location location, long createdAt, long expireAt, OfflinePlayer owner, boolean isProtected, Inventory inventory) {
+    public DeathChestModel(Location location, long createdAt, long expireAt, OfflinePlayer owner, boolean isProtected) {
         this.location = location;
         this.createdAt = createdAt;
         this.expireAt = expireAt;
         this.owner = owner;
         this.isProtected = isProtected;
-        this.inventory = inventory;
     }
 
     @Nullable
@@ -59,13 +59,27 @@ public final class DeathChestModel {
     }
 
     public void cancelTasks() {
-        for (Closeable closeable : this.tasks) {
+        for (Closeable closeable : tasks) {
             try {
                 closeable.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+        tasks.clear();
+    }
+
+    public void dropItems() {
+        dropItems(getLocation());
+    }
+
+    public void dropItems(@NotNull Location location) {
+        Preconditions.checkNotNull(location.getWorld(), "invalid location");
+        for (ItemStack itemStack : getInventory()) {
+            if (itemStack == null) continue;
+            getWorld().dropItemNaturally(location, itemStack); // World won't be null
+        }
+        inventory.clear();
     }
 
     @Override
@@ -73,12 +87,25 @@ public final class DeathChestModel {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DeathChestModel that = (DeathChestModel) o;
-        return createdAt == that.createdAt && Objects.equal(location, that.location) && Objects.equal(owner, that.owner);
+        return createdAt == that.createdAt && Objects.equal(location, that.location) && Objects.equal(owner.getUniqueId(), that.owner.getUniqueId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(location, createdAt, owner);
+        return Objects.hashCode(location, createdAt, owner.getUniqueId());
+    }
+
+    @NotNull
+    public Map<String, Object> serialize() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("location", getLocation());
+        map.put("createdAt", getCreatedAt());
+        map.put("expireAt", getExpireAt());
+        if (getOwner() != null)
+            map.put("player", getOwner().getUniqueId().toString());
+        map.put("protected", isProtected());
+        map.put("items", getInventory().getContents());
+        return map;
     }
 
     public static DeathChestModel deserialize(Map<String, Object> map, InventoryOptions options) {
@@ -106,9 +133,9 @@ public final class DeathChestModel {
         if (stacks == null)
             return null;
         var itemStacks = stacks.toArray(ItemStack[]::new);
-        var inventory = options.createInventory(s -> s, itemStacks);
-
-        return new DeathChestModel(location, createdAt, expireAt, owner, isProtected, inventory);
+        var model = new DeathChestModel(location, createdAt, expireAt, owner, isProtected);
+        model.setInventory(options.createInventory(model, s -> s, itemStacks));
+        return model;
     }
 
 }

@@ -26,7 +26,6 @@ import org.bukkit.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.text.DateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -71,11 +70,7 @@ public class DeathChestCommand implements TabExecutor {
                             Map.of("executor", sender,
                                     "command", "/" + label + " " + String.join(" ", args))
                     )));
-                    try {
-                        deathChest.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    plugin.getDeathChestController().destroyChest(deathChest);
                 });
                 sender.sendMessage(plugin.getPrefix() + "§cAll chests in each world were deleted.");
                 return true;
@@ -83,11 +78,7 @@ public class DeathChestCommand implements TabExecutor {
 
             World finalWorld = world;
             plugin.getChests().filter(deathChest -> finalWorld.equals(deathChest.getWorld())).forEach(deathChest -> {
-                try {
-                    deathChest.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                plugin.getDeathChestController().destroyChest(deathChest);
             });
 
             sender.sendMessage(plugin.getPrefix() + "§cAll chests in the world \"" + world.getName() + "\" were deleted.");

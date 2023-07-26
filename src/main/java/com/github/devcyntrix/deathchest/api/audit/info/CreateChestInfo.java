@@ -1,19 +1,19 @@
 package com.github.devcyntrix.deathchest.api.audit.info;
 
-import com.github.devcyntrix.deathchest.api.DeathChest;
+import com.github.devcyntrix.deathchest.DeathChestModel;
 import com.github.devcyntrix.deathchest.api.audit.AuditInfo;
 import com.google.gson.annotations.Expose;
 
 public class CreateChestInfo extends AuditInfo {
 
     @Expose
-    private DeathChest chest;
+    private DeathChestModel chest;
 
-    public CreateChestInfo(DeathChest chest) {
+    public CreateChestInfo(DeathChestModel chest) {
         this.chest = chest;
     }
 
-    public DeathChest getChest() {
+    public DeathChestModel getChest() {
         return chest;
     }
 }

@@ -1,5 +1,5 @@
 name: DeathChest
-version: '${project.version}'
+version: ${projectVersion}
 main: 'com.github.devcyntrix.deathchest.DeathChestPlugin'
 author: CyntrixAlgorithm
 softdepend: ['WorldGuard', 'ProtocolLib', 'GriefPrevention', 'GriefDefender', 'PlaceholderAPI', 'RedProtect']
@@ -8,7 +8,7 @@ libraries:
   - 'com.google.inject:guice:7.0.0'
 commands:
   deathchest:
-    description: 'The admin command for reloading the plugin's configuration'
+    description: The admin command for reloading the plugin's configuration
     permission: 'deathchest.command.deathchest'
 
 permissions:

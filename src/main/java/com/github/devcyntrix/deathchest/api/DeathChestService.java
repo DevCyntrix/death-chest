@@ -1,10 +1,11 @@
 package com.github.devcyntrix.deathchest.api;
 
+import com.github.devcyntrix.deathchest.DeathChestModel;
 import com.github.devcyntrix.deathchest.api.animation.AnimationService;
 import com.github.devcyntrix.deathchest.api.hologram.HologramService;
 import com.github.devcyntrix.deathchest.api.protection.ProtectionService;
 import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -15,25 +16,25 @@ import java.util.stream.Stream;
 
 public interface DeathChestService {
 
-    @Nullable DeathChest getLastChest(@NotNull Player player);
+    @Nullable DeathChestModel getLastChest(@NotNull Player player);
 
     boolean canPlaceChestAt(@NotNull Location location);
 
-    @NotNull DeathChest createDeathChest(@NotNull Location location, ItemStack @NotNull ... items);
+    @NotNull DeathChestModel createDeathChest(@NotNull Location location, ItemStack @NotNull ... items);
 
-    @NotNull DeathChest createDeathChest(@NotNull Location location, @Nullable OfflinePlayer player, ItemStack @NotNull ... items);
+    @NotNull DeathChestModel createDeathChest(@NotNull Location location, @Nullable Player player, ItemStack @NotNull ... items);
 
-    @NotNull DeathChest createDeathChest(@NotNull Location location, long expireAt, @Nullable OfflinePlayer player, ItemStack @NotNull ... items);
+    @NotNull DeathChestModel createDeathChest(@NotNull Location location, long expireAt, @Nullable Player player, ItemStack @NotNull ... items);
 
-    @NotNull DeathChest createDeathChest(@NotNull DeathChestSnapshot snapshot);
-
-    default @NotNull DeathChest createDeathChest(@NotNull Location location, long createdAt, long expireAt, @Nullable OfflinePlayer player, ItemStack @NotNull ... items) {
+    default @NotNull DeathChestModel createDeathChest(@NotNull Location location, long createdAt, long expireAt, @Nullable Player player, ItemStack @NotNull ... items) {
         return createDeathChest(location, createdAt, expireAt, player, false, items);
     }
 
-    @NotNull DeathChest createDeathChest(@NotNull Location location, long createdAt, long expireAt, @Nullable OfflinePlayer player, boolean isProtected, ItemStack @NotNull ... items);
+    @NotNull DeathChestModel createDeathChest(@NotNull Location location, long createdAt, long expireAt, @Nullable Player player, boolean isProtected, ItemStack @NotNull ... items);
 
-    @NotNull Stream<@NotNull DeathChest> getChests();
+    @NotNull Stream<@NotNull DeathChestModel> getChests();
+
+    @NotNull Stream<@NotNull DeathChestModel> getChests(@NotNull World world);
 
     void saveChests() throws IOException;
 

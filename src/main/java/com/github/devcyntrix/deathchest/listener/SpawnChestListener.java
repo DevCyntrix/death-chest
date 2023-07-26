@@ -1,7 +1,7 @@
 package com.github.devcyntrix.deathchest.listener;
 
+import com.github.devcyntrix.deathchest.DeathChestModel;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
-import com.github.devcyntrix.deathchest.api.DeathChest;
 import com.github.devcyntrix.deathchest.api.event.DeathChestSpawnEvent;
 import com.github.devcyntrix.deathchest.config.*;
 import me.clip.placeholderapi.PlaceholderAPI;
@@ -139,7 +139,7 @@ public class SpawnChestListener implements Listener {
 
         try {
             boolean protectedChest = player.hasPermission(deathChestConfig.chestProtectionOptions().permission());
-            DeathChest deathChest = plugin.createDeathChest(loc, createdAt, expireAt, player, protectedChest, event.getDrops().toArray(new ItemStack[0]));
+            DeathChestModel deathChest = plugin.createDeathChest(loc, createdAt, expireAt, player, protectedChest, event.getDrops().toArray(new ItemStack[0]));
 
             DeathChestSpawnEvent deathChestSpawnEvent = new DeathChestSpawnEvent(player, deathChest);
             Bukkit.getPluginManager().callEvent(deathChestSpawnEvent);

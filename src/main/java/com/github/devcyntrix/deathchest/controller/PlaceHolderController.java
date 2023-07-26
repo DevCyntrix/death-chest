@@ -12,19 +12,18 @@ import java.util.function.Function;
 
 public class PlaceHolderController {
 
-    private final Function<DeathChestModel, String> durationSupplier;
+    private final Function<Long, String> duration;
 
     public PlaceHolderController(DeathChestConfig config) {
-        this.durationSupplier = model -> {
-            if (!model.isExpiring()) return DurationFormatUtils.formatDuration(0, config.durationFormat());
-            long duration = model.getExpireAt() - System.currentTimeMillis();
+        this.duration = expiresAt -> {
+            long duration = expiresAt - System.currentTimeMillis();
             if (duration <= 0) duration = 0;
             return DurationFormatUtils.formatDuration(duration, config.durationFormat());
         };
     }
 
     public String replace(DeathChestModel model, String s) {
-        StringSubstitutor substitutor = new StringSubstitutor(new PlayerStringLookup(model.getOwner(), () -> durationSupplier.apply(model)));
+        StringSubstitutor substitutor = new StringSubstitutor(new PlayerStringLookup(model, duration));
         s = substitutor.replace(s);
         if (DeathChestPlugin.isPlaceholderAPIEnabled()) s = PlaceholderAPI.setPlaceholders(model.getOwner(), s);
         return s;

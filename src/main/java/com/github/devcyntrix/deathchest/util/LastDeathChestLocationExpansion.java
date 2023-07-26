@@ -1,7 +1,7 @@
 package com.github.devcyntrix.deathchest.util;
 
+import com.github.devcyntrix.deathchest.DeathChestModel;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
-import com.github.devcyntrix.deathchest.api.DeathChest;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -48,7 +48,7 @@ public class LastDeathChestLocationExpansion extends PlaceholderExpansion {
         if (player == null)
             return null;
 
-        DeathChest deathChest = plugin.getLastChest(player);
+        DeathChestModel deathChest = plugin.getLastChest(player);
         if (deathChest == null) {
             return ChatColor.translateAlternateColorCodes('&', this.fallbackMessage);
         }
