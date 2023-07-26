@@ -14,11 +14,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
@@ -34,6 +34,13 @@ public class SpawnChestListener implements Listener {
         this.plugin = plugin;
     }
 
+    private Set<Player> set = Collections.newSetFromMap(new WeakHashMap<>());
+
+    @EventHandler
+    public void onRespawn(PlayerRespawnEvent event) {
+        set.remove(event.getPlayer());
+    }
+
     /**
      * Creates the death chest if the player dies.
      * It only spawns a chest if the player has the permission to build in the region.
@@ -44,14 +51,21 @@ public class SpawnChestListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onDeath(PlayerDeathEvent event) {
 
+        Player player = event.getEntity();
+        Location location = player.getLocation();
+        if(set.contains(player)) {
+            event.getDrops().clear();
+            return;
+        }
+        set.add(player);
+
+
         ChangeDeathMessageOptions changeDeathMessageOptions = plugin.getDeathChestConfig().changeDeathMessageOptions();
         if (changeDeathMessageOptions.enabled()) {
             if (changeDeathMessageOptions.message() == null) {
                 event.setDeathMessage(null);
                 return;
             }
-            Player player = event.getEntity();
-            Location location = player.getLocation();
             if (location.getWorld() == null) {
                 return; // Invalid location
             }
@@ -77,7 +91,6 @@ public class SpawnChestListener implements Listener {
         if (event.getDrops().isEmpty())
             return;
 
-        Player player = event.getEntity();
         Location deathLocation = new Location(
                 player.getWorld(),
                 player.getLocation().getX(),
