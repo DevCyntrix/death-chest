@@ -52,6 +52,7 @@ public class DeathChestController implements Closeable {
         this.plugin = plugin;
         this.logger = logger;
         this.auditManager = auditManager;
+        this.auditManager.start();
         this.storage = storage;
 
         this.durationFormat = (expireAt) -> {
@@ -66,26 +67,20 @@ public class DeathChestController implements Closeable {
     }
 
     public void loadChests() {
-        // Loading chests...
-        // Recreates the deathchests
-
         Bukkit.getWorlds()
+                .forEach(this::loadChests);
+    }
+
+    public void loadChests(World world) {
+        this.storage.getChests(world)
                 .stream()
-                .flatMap(world -> this.storage.getChests(world).stream())
-                .distinct()
-                .forEach(chest -> {
+                .forEach(model -> {
                     for (ChestAdapter listener : listeners) {
-                        listener.onLoad(chest);
+                        listener.onLoad(model);
                     }
-                    this.loadedChests.put(chest.getWorld(), chest.getLocation(), chest);
+                    this.loadedChests.put(model.getWorld(), model.getLocation(), model);
+                    logger.info(this.loadedChests.size() + " death chests loaded in world \"" + world.getName() + "\"");
                 });
-
-        logger.info(this.loadedChests.size() + " death chests loaded.");
-
-        if (this.auditManager != null) {
-            this.auditManager.start();
-        }
-
     }
 
     public DeathChestModel createChest(@NotNull Location location, long expireAt, @Nullable Player player, ItemStack @NotNull ... items) {
@@ -139,16 +134,18 @@ public class DeathChestController implements Closeable {
         }
         model.cancelTasks();
 
-        this.loadedChests.remove(model.getWorld(), model.getLocation()); // Remove from cache
+        model = this.loadedChests.remove(model.getWorld(), model.getLocation()); // Remove from cache
+        if (model == null)
+            throw new IllegalArgumentException("Invalid model");
+
         this.storage.remove(model); // Remove from database
+
         Bukkit.getPluginManager().callEvent(new DeathChestDestroyEvent(model));
     }
 
 
     @Override
     public void close() throws IOException {
-        saveChests();
-
         // Unload audit manager
         if (this.auditManager != null) {
             try {
@@ -157,11 +154,14 @@ public class DeathChestController implements Closeable {
                 e.printStackTrace();
             }
         }
-
-        unloadChests();
+        unloadChests(true);
     }
 
-    private void unloadChests() {
+    private void unloadChests(boolean save) {
+        if (save) {
+            saveChests();
+        }
+
         this.loadedChests.values().forEach(model -> {
             this.listeners.forEach(listener -> listener.onUnload(model));
             model.cancelTasks();
@@ -169,10 +169,28 @@ public class DeathChestController implements Closeable {
         this.loadedChests.clear();
     }
 
-    public void saveChests() throws IOException {
-        this.storage.update(this.loadedChests.values());
-        this.storage.save();
+    public void unloadChests(World world, boolean save) {
+        if (save) {
+            saveChests(world);
+        }
+
+        Collection<DeathChestModel> values = this.loadedChests.row(world).values();
+        for (DeathChestModel model : values) {
+            this.listeners.forEach(listener -> listener.onUnload(model));
+            model.cancelTasks();
+        }
+        values.clear();
     }
+
+    public void saveChests() {
+        this.storage.update(this.loadedChests.values());
+    }
+
+    public void saveChests(@NotNull World world) {
+        Collection<DeathChestModel> values = this.loadedChests.row(world).values();
+        this.storage.update(values);
+    }
+
 
     public DeathChestConfig getConfig() {
         return this.plugin.getDeathChestConfig();

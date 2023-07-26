@@ -1,11 +1,13 @@
-package com.github.devcyntrix.deathchest.hologram;
+package com.github.devcyntrix.hologram;
 
-import com.github.devcyntrix.deathchest.api.hologram.Hologram;
-import com.github.devcyntrix.deathchest.api.hologram.HologramService;
-import com.github.devcyntrix.deathchest.api.hologram.HologramTextLine;
+import com.github.devcyntrix.hologram.api.Hologram;
+import com.github.devcyntrix.hologram.api.HologramService;
+import com.github.devcyntrix.hologram.api.HologramTextLine;
+import com.google.common.base.Preconditions;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -13,12 +15,21 @@ import java.util.List;
 
 public class NativeHologram implements Hologram {
 
+    @NotNull
+    private final JavaPlugin plugin;
+    @NotNull
     private final HologramService service;
+    @NotNull
     private Location location;
 
     private final List<NativeHologramTextLine> list = new ArrayList<>();
 
-    public NativeHologram(HologramService service, Location location) {
+    public NativeHologram(@NotNull JavaPlugin plugin, @NotNull HologramService service, Location location) {
+        Preconditions.checkNotNull(plugin);
+        Preconditions.checkNotNull(service);
+        Preconditions.checkNotNull(location);
+
+        this.plugin = plugin;
         this.service = service;
         this.location = location.subtract(0, 0.5, 0);
     }
@@ -45,7 +56,7 @@ public class NativeHologram implements Hologram {
 
     @Override
     public HologramTextLine appendLine(@NotNull String line) {
-        NativeHologramTextLine l = new NativeHologramTextLine(location.clone().subtract(0, list.size() * 0.25, 0), line);
+        NativeHologramTextLine l = new NativeHologramTextLine(this.plugin, location.clone().subtract(0, list.size() * 0.25, 0), line);
         list.add(l);
         return l;
     }

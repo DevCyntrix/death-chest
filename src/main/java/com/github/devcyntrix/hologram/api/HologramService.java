@@ -1,4 +1,4 @@
-package com.github.devcyntrix.deathchest.api.hologram;
+package com.github.devcyntrix.hologram.api;
 
 import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
