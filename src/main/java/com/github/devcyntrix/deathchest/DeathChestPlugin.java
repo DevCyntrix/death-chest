@@ -103,6 +103,8 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
     @Nullable
     private UpdateController updateController;
 
+    private PlaceHolderController placeHolderController;
+
     private HologramController hologramController;
 
     private DeathChestController deathChestController;
