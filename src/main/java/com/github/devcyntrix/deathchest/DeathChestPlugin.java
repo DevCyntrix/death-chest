@@ -1,13 +1,8 @@
 package com.github.devcyntrix.deathchest;
 
-import com.github.devcyntrix.deathchest.api.DeathChest;
 import com.github.devcyntrix.deathchest.api.DeathChestService;
-import com.github.devcyntrix.deathchest.api.DeathChestSnapshot;
 import com.github.devcyntrix.deathchest.api.animation.AnimationService;
-import com.github.devcyntrix.deathchest.api.audit.AuditAction;
-import com.github.devcyntrix.deathchest.api.audit.AuditItem;
 import com.github.devcyntrix.deathchest.api.audit.AuditManager;
-import com.github.devcyntrix.deathchest.api.audit.info.CreateChestInfo;
 import com.github.devcyntrix.deathchest.api.hologram.Hologram;
 import com.github.devcyntrix.deathchest.api.hologram.HologramService;
 import com.github.devcyntrix.deathchest.api.protection.ProtectionService;
@@ -20,7 +15,10 @@ import com.github.devcyntrix.deathchest.config.ChestProtectionOptions;
 import com.github.devcyntrix.deathchest.config.DeathChestConfig;
 import com.github.devcyntrix.deathchest.controller.DeathChestController;
 import com.github.devcyntrix.deathchest.controller.HologramController;
+import com.github.devcyntrix.deathchest.controller.PlaceHolderController;
 import com.github.devcyntrix.deathchest.controller.UpdateController;
+import com.github.devcyntrix.deathchest.listener.ChestDestroyListener;
+import com.github.devcyntrix.deathchest.listener.ChestModificationListener;
 import com.github.devcyntrix.deathchest.listener.LastDeathChestListener;
 import com.github.devcyntrix.deathchest.listener.SpawnChestListener;
 import com.github.devcyntrix.deathchest.report.GsonReportManager;
@@ -28,10 +26,10 @@ import com.github.devcyntrix.deathchest.support.storage.YamlStorage;
 import com.github.devcyntrix.deathchest.util.LastDeathChestLocationExpansion;
 import com.github.devcyntrix.deathchest.util.Metrics;
 import com.github.devcyntrix.deathchest.util.WorldGuardDeathChestFlag;
-import com.github.devcyntrix.deathchest.view.chest.BreakAnimationListener;
-import com.github.devcyntrix.deathchest.view.chest.ChestSpawnListener;
-import com.github.devcyntrix.deathchest.view.chest.CloseInventoryListener;
-import com.github.devcyntrix.deathchest.view.chest.HologramListener;
+import com.github.devcyntrix.deathchest.view.chest.BlockAdapter;
+import com.github.devcyntrix.deathchest.view.chest.BreakAnimationAdapter;
+import com.github.devcyntrix.deathchest.view.chest.CloseInventoryAdapter;
+import com.github.devcyntrix.deathchest.view.chest.HologramAdapter;
 import com.github.devcyntrix.deathchest.view.update.AdminJoinNotificationView;
 import com.github.devcyntrix.deathchest.view.update.AdminNotificationView;
 import com.github.devcyntrix.deathchest.view.update.ConsoleNotificationView;
@@ -40,6 +38,8 @@ import lombok.SneakyThrows;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
@@ -56,7 +56,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Date;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.stream.Stream;
@@ -86,10 +85,13 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
 
     private AuditManager auditManager;
 
-    private final Map<Player, DeathChest> lastDeathChests = new WeakHashMap<>();
+    @Getter
+    private final Map<Player, DeathChestModel> lastDeathChests = new WeakHashMap<>();
 
     @Nullable
     private UpdateController updateController;
+
+    private PlaceHolderController placeHolderController;
 
     private HologramController hologramController;
 
@@ -170,6 +172,8 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         }
 
         pluginManager.registerEvents(new SpawnChestListener(this), this);
+        pluginManager.registerEvents(new ChestModificationListener(this), this);
+        pluginManager.registerEvents(new ChestDestroyListener(this), this);
         pluginManager.registerEvents(new LastDeathChestListener(this), this);
 
         ServicesManager servicesManager = getServer().getServicesManager();
@@ -184,18 +188,23 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         try {
             var storage = new YamlStorage();
             storage.init(this, new MemoryConfiguration());
-            this.deathChestController = new DeathChestController(this.auditManager, storage);
-            this.deathChestController.subscribe(new ChestSpawnListener(this));
-            this.deathChestController.subscribe(new CloseInventoryListener());
+            this.deathChestController = new DeathChestController(this, getLogger(), this.auditManager, storage);
+            BlockAdapter adapter = new BlockAdapter(this, deathChestController);
+            this.deathChestController.registerAdapter(adapter);
+            getServer().getPluginManager().registerEvents(adapter, this);
+
+            this.deathChestController.registerAdapter(new CloseInventoryAdapter());
+
+            this.placeHolderController = new PlaceHolderController(getDeathChestConfig());
 
             var hologramOptions = getDeathChestConfig().hologramOptions();
             if (hologramOptions.enabled()) {
-                this.deathChestController.subscribe(new HologramListener(this, hologramController, hologramOptions, placeHolderController));
+                this.deathChestController.registerAdapter(new HologramAdapter(this, hologramController, hologramOptions, placeHolderController));
             }
 
             BreakAnimationOptions breakAnimationOptions = getDeathChestConfig().breakAnimationOptions();
-            if(breakAnimationOptions.enabled()) {
-                this.deathChestController.subscribe(new BreakAnimationListener(this, animationService, breakAnimationOptions));
+            if (breakAnimationOptions.enabled()) {
+                this.deathChestController.registerAdapter(new BreakAnimationAdapter(this, animationService, breakAnimationOptions));
             }
 
             this.deathChestController.loadChests();
@@ -246,7 +255,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
     }
 
     @Override
-    public @Nullable DeathChest getLastChest(@NotNull Player player) {
+    public @Nullable DeathChestModel getLastChest(@NotNull Player player) {
         return this.lastDeathChests.get(player);
     }
 
@@ -277,52 +286,37 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
      */
     @Override
     public boolean canPlaceChestAt(@NotNull Location location) {
-        return this.deathChests.stream().noneMatch(chest -> chest.getLocation().equals(location)) && !location.getBlock().getType().isSolid();
+        return deathChestController.getChest(location) == null && !location.getBlock().getType().isSolid();
     }
 
     @Override
-    public @NotNull DeathChest createDeathChest(@NotNull Location location, ItemStack @NotNull ... items) {
+    public @NotNull DeathChestModel createDeathChest(@NotNull Location location, ItemStack @NotNull ... items) {
         return createDeathChest(location, null, items);
     }
 
     @Override
-    public @NotNull DeathChest createDeathChest(@NotNull Location location, @Nullable OfflinePlayer player, ItemStack @NotNull ... items) {
+    public @NotNull DeathChestModel createDeathChest(@NotNull Location location, @Nullable Player player, ItemStack @NotNull ... items) {
         return createDeathChest(location, -1, player, items);
     }
 
     @Override
-    public @NotNull DeathChest createDeathChest(@NotNull Location location, long expireAt, @Nullable OfflinePlayer player, ItemStack @NotNull ... items) {
+    public @NotNull DeathChestModel createDeathChest(@NotNull Location location, long expireAt, @Nullable Player player, ItemStack @NotNull ... items) {
         return createDeathChest(location, System.currentTimeMillis(), expireAt, player, items);
     }
 
     @Override
-    public @NotNull DeathChest createDeathChest(@NotNull DeathChestSnapshot snapshot) {
-        return createDeathChest(snapshot.getLocation(), snapshot.getCreatedAt(), snapshot.getExpireAt(), snapshot.getOwner(), snapshot.isProtected(), snapshot.getItems());
+    public @NotNull DeathChestModel createDeathChest(@NotNull Location location, long createdAt, long expireAt, @Nullable Player player, boolean isProtected, ItemStack @NotNull ... items) {
+        return this.deathChestController.createChest(location, expireAt, player, items);
     }
 
     @Override
-    public @NotNull DeathChest createDeathChest(@NotNull Location location, long createdAt, long expireAt, @Nullable OfflinePlayer player, boolean isProtected, ItemStack @NotNull ... items) {
-        DeathChest build = DeathChestBuilder.builder()
-                .setCreatedAt(createdAt)
-                .setExpireAt(expireAt)
-                .setPlayer(player)
-                .setItems(items)
-                .setProtected(isProtected)
-                .setAnimationService(animationService)
-                .setHologramService(hologramController)
-                .setBreakEffectOptions(deathChestConfig.breakAnimationOptions())
-                .setHologramOptions(deathChestConfig.hologramOptions())
-                .setParticleOptions(deathChestConfig.particleOptions())
-                .build(location, deathChestConfig.inventoryOptions());
-        if (auditManager != null)
-            auditManager.audit(new AuditItem(new Date(), AuditAction.CREATE_CHEST, new CreateChestInfo(build)));
-        this.deathChests.add(build);
-        return build;
+    public @NotNull Stream<@NotNull DeathChestModel> getChests() {
+        return this.deathChestController.getChests().stream();
     }
 
     @Override
-    public @NotNull Stream<@NotNull DeathChest> getChests() {
-        return this.deathChests.stream();
+    public @NotNull Stream<@NotNull DeathChestModel> getChests(@NotNull World world) {
+        return this.deathChestController.getChests(world).stream();
     }
 
     @Override
@@ -342,9 +336,5 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
 
     public String getPrefix() {
         return "§cᴅᴇᴀᴛʜ ᴄʜᴇꜱᴛ §8︳ §r";
-    }
-
-    public Map<Player, DeathChest> getLastDeathChests() {
-        return lastDeathChests;
     }
 }

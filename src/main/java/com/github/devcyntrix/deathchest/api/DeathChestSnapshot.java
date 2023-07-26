@@ -1,8 +1,9 @@
 package com.github.devcyntrix.deathchest.api;
 
+import com.github.devcyntrix.deathchest.DeathChestModel;
 import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,7 +17,7 @@ public interface DeathChestSnapshot extends ConfigurationSerializable {
 
     @NotNull ItemStack @NotNull [] getItems();
 
-    @Nullable OfflinePlayer getOwner();
+    @Nullable Player getOwner();
 
     long getCreatedAt();
 
@@ -24,7 +25,7 @@ public interface DeathChestSnapshot extends ConfigurationSerializable {
 
     boolean isProtected();
 
-    default DeathChest createChest(DeathChestService service) {
+    default DeathChestModel createChest(DeathChestService service) {
         return service.createDeathChest(getLocation(), getCreatedAt(), getExpireAt(), getOwner(), isProtected(), getItems());
     }
 

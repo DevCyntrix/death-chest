@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.github.devcyntrix"
-version = "1.5.24-mineplots"
+version = "2.0.0"
 
 repositories {
     mavenCentral()
@@ -69,8 +69,8 @@ tasks {
     processResources {
         filteringCharset = Charsets.UTF_8.name()
         duplicatesStrategy = DuplicatesStrategy.INCLUDE
-        from("src/main/resources") {
-            include("**")
+        filesMatching("plugin.yml") {
+            expand(Pair("projectVersion", project.version))
         }
 
     }
