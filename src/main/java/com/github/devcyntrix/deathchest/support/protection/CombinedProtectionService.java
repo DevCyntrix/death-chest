@@ -21,6 +21,6 @@ public class CombinedProtectionService implements ProtectionService {
         return Arrays.stream(services)
                 .map(s -> s.canBuild(player, location, material))
                 .reduce(Boolean::equals)
-                .orElse(true);
+                .orElse(true); // Default is true
     }
 }

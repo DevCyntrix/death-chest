@@ -6,6 +6,8 @@
 # Do not touch this!
 config-version: 2
 
+# Prints debug messages if property is set to true
+debug: false
 # I recommend leaving this on true to receive notification if I published an update.
 update-checker: true
 duration-format: 'mm:ss'

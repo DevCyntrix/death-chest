@@ -2,7 +2,6 @@ package com.github.devcyntrix.deathchest.view.chest;
 
 import com.github.devcyntrix.deathchest.DeathChestModel;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
-import com.github.devcyntrix.deathchest.controller.DeathChestController;
 import com.github.devcyntrix.deathchest.util.ChestAdapter;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -11,37 +10,39 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 public class BlockAdapter implements ChestAdapter, Listener {
 
     private final DeathChestPlugin plugin;
-    private DeathChestController controller;
 
-    public BlockAdapter(DeathChestPlugin plugin, DeathChestController controller) {
+    public BlockAdapter(DeathChestPlugin plugin) {
         this.plugin = plugin;
-        this.controller = controller;
     }
 
     @Override
     public void onCreate(DeathChestModel model) {
         // Creates the chest in the next tick because if you try to sleep in the nether the explosion spawns after the player dies. That means the chest would be destroyed by the explosion.
-        new BukkitRunnable() {
+        BukkitTask bukkitTask = new BukkitRunnable() {
             @Override
             public void run() {
+                plugin.debug(0, "Creating death chest block...");
                 Location location = model.getLocation();
                 BlockState state = location.getBlock().getState();
                 model.setPrevious(state);
                 location.getBlock().setType(Material.CHEST);
             }
         }.runTask(plugin);
+        model.getTasks().add(bukkitTask::cancel);
     }
 
     @Override
     public void onDestroy(DeathChestModel model) {
         try {
             if (model.getLocation() != null) {
+                plugin.debug(0, "Spawning block crack particle...");
                 Block block = model.getLocation().getBlock();
-                model.getWorld().spawnParticle(Particle.BLOCK_CRACK, model.getLocation().clone().add(0.5, 0.5, 0.5), 10, block.getBlockData().getMaterial().getNewData((byte) 0));
+                model.getWorld().spawnParticle(Particle.BLOCK_CRACK, model.getLocation().clone().add(0.5, 0.5, 0.5), 10, block.getBlockData());
             }
         } catch (Exception e) {
             plugin.getLogger().warning("Failed to play block crack particle");
@@ -50,6 +51,7 @@ public class BlockAdapter implements ChestAdapter, Listener {
 
         if (model.getPrevious() == null)
             return;
+        plugin.debug(0, "Resetting the death chest block...");
         model.getPrevious().update(true, false);
     }
 

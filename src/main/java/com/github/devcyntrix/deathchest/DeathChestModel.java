@@ -44,6 +44,7 @@ public final class DeathChestModel {
     private transient BlockState previous;
     private transient Hologram hologram;
     private transient Integer breakingEntityId;
+    private transient boolean isDeleting;
 
     private transient Set<Closeable> tasks = new HashSet<>();
 
@@ -64,6 +65,10 @@ public final class DeathChestModel {
 
     public boolean isExpiring() {
         return this.expireAt > 0;
+    }
+
+    public boolean isExpired() {
+        return this.expireAt < System.currentTimeMillis();
     }
 
     public void cancelTasks() {
@@ -119,9 +124,6 @@ public final class DeathChestModel {
     public static DeathChestModel deserialize(Map<String, Object> map, InventoryOptions options) {
         long createdAt = Long.parseLong(map.get("createdAt").toString());
         long expireAt = Long.parseLong(map.get("expireAt").toString());
-
-        if (expireAt != -1 && expireAt <= System.currentTimeMillis()) // Expire here
-            return null;
 
         Location location = (Location) map.get("location");
         if (location == null)

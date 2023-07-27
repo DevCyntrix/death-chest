@@ -24,6 +24,7 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Date;
 import java.util.Iterator;
@@ -65,7 +66,14 @@ public class ChestDestroyListener implements Listener {
                 reason = DestroyReason.THIEF;
 
             this.plugin.getAuditManager().audit(new AuditItem(new Date(), AuditAction.DESTROY_CHEST, new DestroyChestInfo(model, reason, Map.of("player", human))));
-            this.plugin.getDeathChestController().destroyChest(model);
+
+            // Remove the chest at the next server tick to prevent a stack overflow because of the inventory closing of destroyed death chests.
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    plugin.getDeathChestController().destroyChest(model);
+                }
+            }.runTask(plugin);
         }
     }
 

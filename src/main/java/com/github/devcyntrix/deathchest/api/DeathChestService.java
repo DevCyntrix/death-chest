@@ -1,20 +1,31 @@
 package com.github.devcyntrix.deathchest.api;
 
 import com.github.devcyntrix.deathchest.DeathChestModel;
-import com.github.devcyntrix.deathchest.api.animation.AnimationService;
+import com.github.devcyntrix.deathchest.api.animation.BreakAnimationService;
 import com.github.devcyntrix.deathchest.api.protection.ProtectionService;
 import com.github.devcyntrix.hologram.api.HologramService;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.stream.Stream;
 
-public interface DeathChestService {
+public interface DeathChestService extends Plugin {
+
+    boolean isDebugMode();
+
+    default void debug(int indents, Object... message) {
+        if (!isDebugMode())
+            return;
+        for (Object o : message) {
+            getLogger().info("[DEBUG] " + "  ".repeat(indents) + o);
+        }
+    }
 
     @Nullable DeathChestModel getLastChest(@NotNull Player player);
 
@@ -44,11 +55,11 @@ public interface DeathChestService {
 
     @Nullable HologramService getHologramService();
 
-    default boolean hasAnimation() {
-        return getAnimationService() != null;
+    default boolean hasBreakAnimation() {
+        return getBreakAnimationService() != null;
     }
 
-    @Nullable AnimationService getAnimationService();
+    @Nullable BreakAnimationService getBreakAnimationService();
 
     @NotNull ProtectionService getProtectionService();
 }

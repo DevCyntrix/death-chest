@@ -1,7 +1,7 @@
 plugins {
     `java-library`
-    id("xyz.jpenilla.run-paper") version "2.0.1"
-    id("com.github.johnrengelman.shadow") version "7.1.2"
+    id("xyz.jpenilla.run-paper") version "2.1.0"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 group = "com.github.devcyntrix"

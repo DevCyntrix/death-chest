@@ -135,13 +135,11 @@ public class YamlStorage implements DeathChestStorage {
             File worldFile = getFile(world, false);
             if (!worldFile.isFile())
                 continue;
-            long time = System.currentTimeMillis();
             YamlConfiguration configuration = YamlConfiguration.loadConfiguration(worldFile);
             List<Map<String, Object>> chests = (List<Map<String, Object>>) configuration.getList("chests", Collections.emptyList());
             Set<DeathChestModel> list = chests.stream()
                     .map(map -> DeathChestModel.deserialize(map, plugin.getDeathChestConfig().inventoryOptions()))
                     .filter(Objects::nonNull)
-                    .filter(deathChestModel -> !deathChestModel.isExpiring() || deathChestModel.getExpireAt() < time)
                     .collect(Collectors.toSet());
             this.deathChestsCache.putAll(world, list);
         }

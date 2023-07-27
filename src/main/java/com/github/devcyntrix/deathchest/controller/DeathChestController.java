@@ -73,14 +73,15 @@ public class DeathChestController implements Closeable {
 
     public void loadChests(World world) {
         this.storage.getChests(world)
-                .stream()
                 .forEach(model -> {
                     for (ChestAdapter listener : listeners) {
                         listener.onLoad(model);
                     }
                     this.loadedChests.put(model.getWorld(), model.getLocation(), model);
-                    logger.info(this.loadedChests.size() + " death chests loaded in world \"" + world.getName() + "\"");
                 });
+        logger.info(this.loadedChests.row(world).size() + " death chests loaded in world \"" + world.getName() + "\"");
+        long time = System.currentTimeMillis();
+        logger.info("  From this %d expired".formatted(this.loadedChests.row(world).values().stream().filter(model1 -> model1.getExpireAt() < time).count()));
     }
 
     public DeathChestModel createChest(@NotNull Location location, long expireAt, @Nullable Player player, ItemStack @NotNull ... items) {
@@ -128,11 +129,15 @@ public class DeathChestController implements Closeable {
     }
 
     public void destroyChest(DeathChestModel model) {
+        // Prevent multiple invocation
+        if (model.isDeleting())
+            return;
+        model.setDeleting(true);
 
+        model.cancelTasks();
         for (ChestAdapter listener : this.listeners) {
             listener.onDestroy(model);
         }
-        model.cancelTasks();
 
         model = this.loadedChests.remove(model.getWorld(), model.getLocation()); // Remove from cache
         if (model == null)
