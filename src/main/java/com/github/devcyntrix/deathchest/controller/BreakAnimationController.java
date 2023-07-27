@@ -1,6 +1,6 @@
 package com.github.devcyntrix.deathchest.controller;
 
-import com.github.devcyntrix.deathchest.api.animation.AnimationService;
+import com.github.devcyntrix.deathchest.api.animation.BreakAnimationService;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Range;
 
 import java.util.stream.Stream;
 
-public class BreakAnimationController implements AnimationService {
+public class BreakAnimationController implements BreakAnimationService {
 
 
     @Override

@@ -1,6 +1,7 @@
 package com.github.devcyntrix.deathchest.view.chest;
 
 import com.github.devcyntrix.deathchest.DeathChestModel;
+import com.github.devcyntrix.deathchest.DeathChestPlugin;
 import com.github.devcyntrix.deathchest.config.ParticleOptions;
 import com.github.devcyntrix.deathchest.tasks.ParticleRunnable;
 import com.github.devcyntrix.deathchest.util.ChestAdapter;
@@ -8,15 +9,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 
 public class ParticleAdapter implements ChestAdapter {
 
-    private final Plugin plugin;
+    private final DeathChestPlugin plugin;
     private final ParticleOptions options;
 
-    public ParticleAdapter(Plugin plugin, ParticleOptions options) {
+    public ParticleAdapter(DeathChestPlugin plugin, ParticleOptions options) {
         this.plugin = plugin;
         this.options = options;
     }
@@ -26,6 +26,7 @@ public class ParticleAdapter implements ChestAdapter {
         Particle.DustOptions orangeDustOptions = new Particle.DustOptions(Color.ORANGE, 0.75f);
         Particle.DustOptions aquaDustOptions = new Particle.DustOptions(Color.AQUA, 0.75f);
 
+        plugin.debug(0, "Starting particle runner...");
         BukkitTask bukkitTask = new ParticleRunnable(model.getLocation(), options.count(), options.radius(), particleLocation -> {
             // Orange dust
             Location orangeDust = particleLocation.clone().add(0.5, 0.5, 0.5); // Center the particle location

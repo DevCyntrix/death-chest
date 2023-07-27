@@ -1,13 +1,14 @@
 package com.github.devcyntrix.deathchest;
 
 import com.github.devcyntrix.deathchest.api.DeathChestService;
-import com.github.devcyntrix.deathchest.api.animation.AnimationService;
+import com.github.devcyntrix.deathchest.api.animation.BreakAnimationService;
 import com.github.devcyntrix.deathchest.api.audit.AuditManager;
 import com.github.devcyntrix.deathchest.api.protection.ProtectionService;
 import com.github.devcyntrix.deathchest.api.report.ReportManager;
 import com.github.devcyntrix.deathchest.api.storage.DeathChestStorage;
 import com.github.devcyntrix.deathchest.audit.GsonAuditManager;
 import com.github.devcyntrix.deathchest.command.CommandRegistry;
+import com.github.devcyntrix.deathchest.config.*;
 import com.github.devcyntrix.deathchest.config.BreakAnimationOptions;
 import com.github.devcyntrix.deathchest.command.CommandRegistry;
 import com.github.devcyntrix.deathchest.config.ChestProtectionOptions;
@@ -22,15 +23,15 @@ import com.github.devcyntrix.deathchest.support.storage.YamlStorage;
 import com.github.devcyntrix.deathchest.util.LastDeathChestLocationExpansion;
 import com.github.devcyntrix.deathchest.util.Metrics;
 import com.github.devcyntrix.deathchest.util.WorldGuardDeathChestFlag;
-import com.github.devcyntrix.deathchest.view.chest.BlockAdapter;
-import com.github.devcyntrix.deathchest.view.chest.BreakAnimationAdapter;
-import com.github.devcyntrix.deathchest.view.chest.CloseInventoryAdapter;
-import com.github.devcyntrix.deathchest.view.chest.HologramAdapter;
+import com.github.devcyntrix.deathchest.util.adapter.DurationAdapter;
+import com.github.devcyntrix.deathchest.view.chest.*;
 import com.github.devcyntrix.deathchest.view.update.AdminJoinNotificationView;
 import com.github.devcyntrix.deathchest.view.update.AdminNotificationView;
 import com.github.devcyntrix.deathchest.view.update.ConsoleNotificationView;
 import com.github.devcyntrix.hologram.api.Hologram;
 import com.github.devcyntrix.hologram.api.HologramService;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.bukkit.Bukkit;
@@ -53,9 +54,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.stream.Stream;
+
+import static com.github.devcyntrix.deathchest.api.report.ReportManager.DATE_FORMAT_CONFIG;
 
 /**
  * This plugin creates chests if a player dies and will destroy them after a specific time.
@@ -71,12 +75,11 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
 
     private DeathChestConfig deathChestConfig;
 
-    private AnimationService animationService;
+    private BreakAnimationService breakAnimationService;
     private ProtectionService protectionService;
 
     @Getter
     private static boolean placeholderAPIEnabled;
-
 
     private ReportManager reportManager;
 
@@ -148,6 +151,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         PluginManager pluginManager = Bukkit.getPluginManager();
         Plugin plugin = pluginManager.getPlugin("WorldGuard");
         if (plugin != null) {
+            debug(0, "Registering death chest flag to WorldGuard...");
             WorldGuardDeathChestFlag.register();
         }
     }
@@ -157,15 +161,18 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
     public void onEnable() {
         placeholderAPIEnabled = Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI");
 
+        debug(0, "Checking config version...");
         checkConfigVersion();
+        debug(0, "Loading configuration file...");
         reload();
 
+        debug(0, "Creating hologram controller...");
         this.hologramController = new HologramController(this);
-        this.animationService = SupportServices.getAnimationService(this, this.deathChestConfig.preferredAnimationService());
+
+        debug(0, "Selecting animation service...");
+        this.breakAnimationService = SupportServices.getBlockBreakAnimationService(this, this.deathChestConfig.preferredBlockBreakAnimationService());
+        debug(0, "Selecting protection services...");
         this.protectionService = SupportServices.getProtectionService(this);
-        // Standard protection service: No service
-        if (protectionService == null)
-            this.protectionService = (player, location, material) -> true;
 
         PluginManager pluginManager = getServer().getPluginManager();
 
@@ -173,16 +180,23 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         try {
             ChestProtectionOptions protectionOptions = getDeathChestConfig().chestProtectionOptions();
             if (protectionOptions.enabled()) {
-                if (pluginManager.getPermission(protectionOptions.permission()) == null)
+                debug(0, "Configuring chest protection...");
+                debug(1, "Registering permissions...");
+                if (pluginManager.getPermission(protectionOptions.permission()) == null) {
                     pluginManager.addPermission(new org.bukkit.permissions.Permission(protectionOptions.permission()));
-                if (pluginManager.getPermission(protectionOptions.bypassPermission()) == null)
+                    debug(2, "Permission \"%s\" registered.".formatted(protectionOptions.permission()));
+                }
+                if (pluginManager.getPermission(protectionOptions.bypassPermission()) == null) {
                     pluginManager.addPermission(new org.bukkit.permissions.Permission(protectionOptions.bypassPermission()));
+                    debug(2, "Permission \"%s\" registered.".formatted(protectionOptions.bypassPermission()));
+                }
             }
         } catch (Exception e) {
             getLogger().warning("Failed to register the permission of the chest-protection");
             e.printStackTrace();
         }
 
+        debug(0, "Registering event listeners...");
         pluginManager.registerEvents(new SpawnChestListener(this), this);
         pluginManager.registerEvents(new ChestModificationListener(this), this);
         pluginManager.registerEvents(new ChestDestroyListener(this), this);
@@ -190,37 +204,51 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         pluginManager.registerEvents(new WorldListener(this), this);
 
         ServicesManager servicesManager = getServer().getServicesManager();
+        debug(0, "Registering death chest service...");
         servicesManager.register(DeathChestService.class, this, this, ServicePriority.Normal);
 
+        debug(0, "Registering commands...");
         // Registers the deathchest command
         CommandRegistry.create(this).registerCommands(this);
 
         this.reportManager = new GsonReportManager(new File(getDataFolder(), "reports"));
+        debug(0, "Using gson report manager");
         this.auditManager = new GsonAuditManager(new File(getDataFolder(), "audits"));
+        debug(0, "Using gson audit manager");
 
         try {
+            debug(0, "Using death chest yaml storage");
             this.deathChestStorage = new YamlStorage();
+            debug(0, "Initializing death chest storage...");
             this.deathChestStorage.init(this, new MemoryConfiguration());
 
+
             this.deathChestController = new DeathChestController(this, getLogger(), this.auditManager, this.deathChestStorage);
-            BlockAdapter adapter = new BlockAdapter(this, deathChestController);
+            BlockAdapter adapter = new BlockAdapter(this);
             this.deathChestController.registerAdapter(adapter);
             getServer().getPluginManager().registerEvents(adapter, this);
 
             this.deathChestController.registerAdapter(new CloseInventoryAdapter());
+            this.deathChestController.registerAdapter(new ExpirationAdapter(this));
 
             this.placeHolderController = new PlaceHolderController(getDeathChestConfig());
 
-            var hologramOptions = getDeathChestConfig().hologramOptions();
+            HologramOptions hologramOptions = getDeathChestConfig().hologramOptions();
             if (hologramOptions.enabled()) {
                 this.deathChestController.registerAdapter(new HologramAdapter(this, hologramController, hologramOptions, placeHolderController));
             }
 
             BreakAnimationOptions breakAnimationOptions = getDeathChestConfig().breakAnimationOptions();
             if (breakAnimationOptions.enabled()) {
-                this.deathChestController.registerAdapter(new BreakAnimationAdapter(this, animationService, breakAnimationOptions));
+                this.deathChestController.registerAdapter(new BreakAnimationAdapter(this, breakAnimationService, breakAnimationOptions));
             }
 
+            ParticleOptions particleOptions = getDeathChestConfig().particleOptions();
+            if (particleOptions.enabled()) {
+                this.deathChestController.registerAdapter(new ParticleAdapter(this, particleOptions));
+            }
+
+            debug(0, "Loading chests...");
             this.deathChestController.loadChests(); // Loads the chests to the cache
 
         } catch (IOException e) {
@@ -229,14 +257,17 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         }
 
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            debug(0, "Registering PlaceHolder API Expansion...");
             new LastDeathChestLocationExpansion(this).register();
         }
 
         // Checks for updates
         if (this.deathChestConfig.updateChecker()) {
+            debug(0, "Starting update checker...");
             enableUpdateChecker();
         }
 
+        debug(0, "Starting metrics...");
         new Metrics(this, BSTATS_ID);
     }
 
@@ -246,8 +277,8 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
     private void enableUpdateChecker() {
         this.updateController = new UpdateController(this);
         this.updateController.subscribe(new ConsoleNotificationView(this, getLogger()));
-        this.updateController.subscribe(new AdminNotificationView());
-        getServer().getPluginManager().registerEvents(new AdminJoinNotificationView(updateController), this);
+        this.updateController.subscribe(new AdminNotificationView(this));
+        getServer().getPluginManager().registerEvents(new AdminJoinNotificationView(this, updateController), this);
     }
 
     /**
@@ -255,17 +286,26 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
      * recreate and the old config file will rename to config.yml.old.
      */
     private void checkConfigVersion() {
+
         // Recreate the config when the config version is too old.
         if (getConfig().getInt("config-version", 0) != DeathChestConfig.CONFIG_VERSION) {
+            debug(1, "Found old configuration file.");
             File configFile = new File(getDataFolder(), "config.yml");
             if (configFile.isFile()) {
                 File oldConfigFile = new File(getDataFolder(), "config.yml.old");
                 boolean b = configFile.renameTo(oldConfigFile);
+                debug(1, "Found old configuration file.");
+                debug(1, "Renamed the config.yml -> config.yml.old");
                 if (!b) {
                     throw new IllegalStateException("Failed to rename the configuration file to old.");
                 }
             }
         }
+    }
+
+    @Override
+    public boolean isDebugMode() {
+        return deathChestConfig != null && deathChestConfig.debug() || Boolean.getBoolean("deathchest.debug");
     }
 
     @Override
@@ -287,7 +327,16 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
     public void reload() {
         saveDefaultConfig();
         reloadConfig();
+        debug(1, "Parsing configuration file...");
         this.deathChestConfig = DeathChestConfig.load(getConfig());
+        if (isDebugMode()) {
+            Gson gson = new GsonBuilder()
+                    .setPrettyPrinting()
+                    .setDateFormat(DATE_FORMAT_CONFIG, DATE_FORMAT_CONFIG)
+                    .registerTypeAdapter(Duration.class, new DurationAdapter())
+                    .create();
+            debug(1, "Configuration: " + gson.toJson(this.deathChestConfig));
+        }
     }
 
     /**
@@ -336,9 +385,8 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         return hologramController;
     }
 
-    @Override
-    public AnimationService getAnimationService() {
-        return animationService;
+    public BreakAnimationService getBreakAnimationService() {
+        return breakAnimationService;
     }
 
     @Override

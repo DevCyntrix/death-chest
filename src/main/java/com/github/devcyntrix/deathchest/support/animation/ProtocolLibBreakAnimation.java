@@ -5,7 +5,7 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.BlockPosition;
-import com.github.devcyntrix.deathchest.api.animation.AnimationService;
+import com.github.devcyntrix.deathchest.api.animation.BreakAnimationService;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Range;
 import java.lang.reflect.InvocationTargetException;
 import java.util.stream.Stream;
 
-public class ProtocolLibAnimation implements AnimationService {
+public class ProtocolLibBreakAnimation implements BreakAnimationService {
 
 
     @Override

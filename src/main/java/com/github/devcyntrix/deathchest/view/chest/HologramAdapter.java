@@ -1,6 +1,7 @@
 package com.github.devcyntrix.deathchest.view.chest;
 
 import com.github.devcyntrix.deathchest.DeathChestModel;
+import com.github.devcyntrix.deathchest.DeathChestPlugin;
 import com.github.devcyntrix.deathchest.config.HologramOptions;
 import com.github.devcyntrix.deathchest.controller.HologramController;
 import com.github.devcyntrix.deathchest.controller.PlaceHolderController;
@@ -8,7 +9,6 @@ import com.github.devcyntrix.deathchest.tasks.HologramRunnable;
 import com.github.devcyntrix.deathchest.util.ChestAdapter;
 import com.github.devcyntrix.hologram.api.Hologram;
 import com.github.devcyntrix.hologram.api.HologramTextLine;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.LinkedHashMap;
@@ -16,13 +16,13 @@ import java.util.Map;
 
 public class HologramAdapter implements ChestAdapter {
 
-    private final Plugin plugin;
+    private final DeathChestPlugin plugin;
     private final HologramController controller;
     private final HologramOptions options;
 
     private final PlaceHolderController placeHolderController;
 
-    public HologramAdapter(Plugin plugin, HologramController controller, HologramOptions options, PlaceHolderController placeHolderController) {
+    public HologramAdapter(DeathChestPlugin plugin, HologramController controller, HologramOptions options, PlaceHolderController placeHolderController) {
         this.plugin = plugin;
         this.controller = controller;
         this.options = options;
@@ -40,6 +40,7 @@ public class HologramAdapter implements ChestAdapter {
         if (blueprints.isEmpty())
             return;
 
+        plugin.debug(0, "Starting hologram updater...");
         BukkitTask bukkitTask = new HologramRunnable(plugin, model, blueprints, placeHolderController).runTaskTimerAsynchronously(plugin, 20, 20);
         model.getTasks().add(bukkitTask::cancel);
     }

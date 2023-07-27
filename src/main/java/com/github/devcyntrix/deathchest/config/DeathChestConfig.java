@@ -9,6 +9,7 @@ import java.time.Duration;
 
 public record DeathChestConfig(
         @SerializedName("config-version") int configVersion,
+        @SerializedName("debug") boolean debug,
         @SerializedName("update-checker") boolean updateChecker,
         @SerializedName("duration-format") @NotNull String durationFormat,
         @SerializedName("expiration") @Nullable Duration expiration,
@@ -24,12 +25,13 @@ public record DeathChestConfig(
         @SerializedName("world-filter") @NotNull WorldFilterConfig worldFilterConfig,
         @SerializedName("blast-protection") boolean blastProtection,
         @SerializedName("chest-protection") @NotNull ChestProtectionOptions chestProtectionOptions,
-        @SerializedName("preferred-animation-service") @Nullable String preferredAnimationService) {
+        @SerializedName("preferred-animation-service") @Nullable String preferredBlockBreakAnimationService) {
 
     public static final int CONFIG_VERSION = 2;
 
     public static DeathChestConfig load(FileConfiguration config) {
         int configVersion = config.getInt("config-version");
+        boolean debug = config.getBoolean("debug", false);
         boolean updateCheck = config.getBoolean("update-checker", true);
         String durationFormat = config.getString("duration-format", "mm:ss");
 
@@ -81,7 +83,7 @@ public record DeathChestConfig(
 
         String preferredAnimationService = config.getString("preferred-animation-service");
 
-        return new DeathChestConfig(configVersion, updateCheck, durationFormat, expiration, permission, dropItemsAfterExpiration, inventoryOptions, hologramOptions, particleOptions, breakAnimationOptions, playerNotificationOptions, globalNotificationOptions, changeDeathMessageOptions, worldFilterConfig, blastProtection, chestProtectionOptions, preferredAnimationService);
+        return new DeathChestConfig(configVersion, debug, updateCheck, durationFormat, expiration, permission, dropItemsAfterExpiration, inventoryOptions, hologramOptions, particleOptions, breakAnimationOptions, playerNotificationOptions, globalNotificationOptions, changeDeathMessageOptions, worldFilterConfig, blastProtection, chestProtectionOptions, preferredAnimationService);
     }
 
 }
