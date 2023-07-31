@@ -34,6 +34,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -98,6 +99,9 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
     private DeathChestStorage deathChestStorage;
     private DeathChestController deathChestController;
 
+    @Getter
+    private BukkitAudiences audiences;
+
     /**
      * This method cleanups the whole plugin
      */
@@ -160,6 +164,8 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
     @Override
     public void onEnable() {
         placeholderAPIEnabled = Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI");
+
+        this.audiences = BukkitAudiences.create(this);
 
         debug(0, "Checking config version...");
         checkConfigVersion();

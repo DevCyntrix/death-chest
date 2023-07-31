@@ -23,6 +23,9 @@ repositories {
 dependencies {
     compileOnly("com.google.inject:guice:7.0.0")
     compileOnly("org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT")
+    compileOnly("net.kyori:adventure-platform-bukkit:4.3.0")
+    compileOnly("net.kyori:adventure-text-minimessage:4.14.0")
+    compileOnly("net.kyori:adventure-text-serializer-legacy:4.14.0")
 
     // Command library
     compileOnly("cloud.commandframework:cloud-core:1.7.1")
@@ -72,7 +75,6 @@ tasks {
         filesMatching("plugin.yml") {
             expand(Pair("projectVersion", project.version))
         }
-
     }
     runServer {
         minecraftVersion("1.19.4")

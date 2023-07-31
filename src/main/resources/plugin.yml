@@ -9,6 +9,10 @@ libraries:
   - 'com.google.inject:guice:7.0.0'
   - 'cloud.commandframework:cloud-core:1.7.1'
   - 'cloud.commandframework:cloud-bukkit:1.7.1'
+  - 'net.kyori:adventure-platform-bukkit:4.3.0'
+  - 'net.kyori:adventure-text-minimessage:4.14.0'
+  - 'net.kyori:adventure-text-serializer-legacy:4.14.0'
+
 #commands:
 #  deathchest:
 #    description: The admin command for reloading the plugin's configuration
