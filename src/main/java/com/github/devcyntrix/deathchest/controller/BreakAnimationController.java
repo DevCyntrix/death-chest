@@ -10,7 +10,6 @@ import java.util.stream.Stream;
 
 public class BreakAnimationController implements BreakAnimationService {
 
-
     @Override
     public void spawnBlockBreakAnimation(int entityId, @NotNull Vector location, @Range(from = -1, to = 9) int state, @NotNull Stream<? extends Player> players) {
 
