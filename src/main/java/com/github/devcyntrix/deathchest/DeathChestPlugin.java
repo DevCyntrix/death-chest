@@ -386,10 +386,6 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         return hologramController;
     }
 
-    public BreakAnimationService getBreakAnimationService() {
-        return breakAnimationService;
-    }
-
     @Override
     public @NotNull ProtectionService getProtectionService() {
         return protectionService;
