@@ -31,7 +31,7 @@ public class YamlStorage implements DeathChestStorage {
     @Override
     public ConfigurationSection getDefaultOptions() {
         ConfigurationSection section = new MemoryConfiguration();
-        section.addDefault("file", "chests.yml");
+        section.addDefault("file", "saved-chests.yml");
         section.addDefault("folder", "chests");
         return section;
     }
@@ -49,22 +49,26 @@ public class YamlStorage implements DeathChestStorage {
      * Migrates the chests out of the saved-chests.yml file to the chests folder which separates the chests by world
      *
      * @param fromFile the saved-chests file
-     * @param toFolder the chests folder
      */
     private void migrateChests(DeathChestPlugin plugin, File fromFile) {
         Preconditions.checkArgument(fromFile.isFile());
+        System.out.println("Migrating the deathchests...");
 
         // Loading saved chests of the file
         YamlConfiguration configuration = YamlConfiguration.loadConfiguration(fromFile);
         List<?> chests = configuration.getList("chests", Collections.emptyList());
+        System.out.println(chests.size() + " chests found");
 
         Set<DeathChestModel> deathChests = new HashSet<>();
         for (Object chest : chests) {
             if (!(chest instanceof Map<?, ?> map))
                 continue;
+            System.out.println("deserializing...");
             DeathChestModel deserialize = DeathChestModel.deserialize((Map<String, Object>) map, plugin.getDeathChestConfig().inventoryOptions());
-            if (deserialize == null)
+            if (deserialize == null) {
+                System.out.println("FAILED");
                 continue;
+            }
             deathChests.add(deserialize);
         }
 
@@ -78,7 +82,16 @@ public class YamlStorage implements DeathChestStorage {
                 continue;
             iterator.remove();
 
-            YamlConfiguration yamlConfiguration = map.computeIfAbsent(next.getWorld(), world -> new YamlConfiguration());
+            YamlConfiguration yamlConfiguration = map.computeIfAbsent(next.getWorld(), world -> {
+                try {
+                    File file = getFile(world, false);
+                    if (file.isFile())
+                        return YamlConfiguration.loadConfiguration(file);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                return new YamlConfiguration();
+            });
             List<Map<?, ?>> chests1 = (List<Map<?, ?>>) yamlConfiguration.getList("chests", new ArrayList<>());
             chests1.add(next.serialize());
         }
@@ -128,6 +141,8 @@ public class YamlStorage implements DeathChestStorage {
             if (file.isFile()) {
                 migrateChests(plugin, file);
             }
+        } else {
+            System.out.println("No saved file found");
         }
 
         // Load all chests of loaded worlds

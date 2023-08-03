@@ -39,7 +39,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
-import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
@@ -226,7 +225,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
             debug(0, "Using death chest yaml storage");
             this.deathChestStorage = new YamlStorage();
             debug(0, "Initializing death chest storage...");
-            this.deathChestStorage.init(this, new MemoryConfiguration());
+            this.deathChestStorage.init(this, deathChestStorage.getDefaultOptions());
 
 
             this.deathChestController = new DeathChestController(this, getLogger(), this.auditManager, this.deathChestStorage);
