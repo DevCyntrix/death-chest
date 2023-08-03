@@ -4,11 +4,13 @@ import com.github.devcyntrix.deathchest.DeathChestModel;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
 import com.github.devcyntrix.deathchest.api.event.DeathChestSpawnEvent;
 import com.github.devcyntrix.deathchest.config.*;
+import com.google.common.base.Preconditions;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.apache.commons.text.StringSubstitutor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -137,10 +139,29 @@ public class SpawnChestListener implements Listener {
         try {
             boolean protectedChest = deathChestConfig.chestProtectionOptions().enabled() && player.hasPermission(deathChestConfig.chestProtectionOptions().permission());
             plugin.debug(1, "Protected chest: %s".formatted(true));
-            DeathChestModel deathChest = plugin.createDeathChest(loc, createdAt, expireAt, player, protectedChest, event.getDrops().toArray(new ItemStack[0]));
 
-            DeathChestSpawnEvent deathChestSpawnEvent = new DeathChestSpawnEvent(player, deathChest);
-            Bukkit.getPluginManager().callEvent(deathChestSpawnEvent);
+            ItemStack[] items = event.getDrops().toArray(new ItemStack[0]);
+            World world = loc.getWorld();
+            Preconditions.checkNotNull(world);
+
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                DeathChestModel deathChest = null;
+                try {
+                    deathChest = plugin.createDeathChest(loc, createdAt, expireAt, player, protectedChest, items);
+                } catch (Exception e) {
+                    plugin.getLogger().severe("Items dropped because of an error while creating the death chest");
+                    for (ItemStack content : items) {
+                        world.dropItemNaturally(loc, content);
+                    }
+                    e.printStackTrace();
+                }
+
+                if (deathChest != null) {
+                    DeathChestSpawnEvent deathChestSpawnEvent = new DeathChestSpawnEvent(player, deathChest);
+                    Bukkit.getPluginManager().callEvent(deathChestSpawnEvent);
+                }
+            });
+
             // Clears the drops
             plugin.debug(1, "Clearing drops...");
             event.getDrops().clear();
