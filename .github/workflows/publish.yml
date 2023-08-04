@@ -1,8 +1,10 @@
 name: Hangar Publish
 
 on:
-  push:
-    tags: [ .* ]
+  release:
+    types:
+      - prereleased
+      - released
 
 jobs:
   build:
