@@ -32,7 +32,3 @@ jobs:
         with:
           path: ./build/libs/*
           if-no-files-found: error
-      - name: Publish with Gradle
-        uses: gradle/gradle-build-action@0d13054264b0bb894ded474f08ebb30921341cee
-        with:
-          arguments: publishAllPublicationsToHangar
