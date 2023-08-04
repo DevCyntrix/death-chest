@@ -4,7 +4,6 @@ import com.github.devcyntrix.deathchest.DeathChestModel;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
 import com.github.devcyntrix.deathchest.api.storage.DeathChestStorage;
 import com.github.devcyntrix.deathchest.controller.PlaceholderController;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
@@ -28,7 +27,6 @@ import java.util.stream.Collectors;
 public class YamlStorage implements DeathChestStorage {
 
     private final PlaceholderController placeHolderController;
-    private File chestsFolder;
     private final Multimap<World, DeathChestModel> deathChestsCache = HashMultimap.create();
 
     public YamlStorage(PlaceholderController placeHolderController) {
@@ -37,15 +35,12 @@ public class YamlStorage implements DeathChestStorage {
 
     @Override
     public ConfigurationSection getDefaultOptions() {
-        ConfigurationSection section = new MemoryConfiguration();
-        section.addDefault("file", "saved-chests.yml");
-        section.addDefault("folder", "chests");
-        return section;
+        return new MemoryConfiguration();
     }
 
     private File getFile(World world, boolean create) throws IOException {
-        Preconditions.checkNotNull(this.chestsFolder);
-        File file = new File(this.chestsFolder, world.getName() + ".yml");
+        File worldFolder = world.getWorldFolder();
+        File file = new File(worldFolder, "death-chests.yml");
         if (create && !file.isFile() && !file.createNewFile())
             throw new IOException("Failed to create file \"%s\"".formatted(file));
 
@@ -57,98 +52,44 @@ public class YamlStorage implements DeathChestStorage {
      *
      * @param fromFile the saved-chests file
      */
-    private void migrateChests(DeathChestPlugin plugin, File fromFile, Logger logger) {
-        Preconditions.checkArgument(fromFile.isFile());
+    private void migrateChests(DeathChestPlugin plugin, File[] files, Logger logger) {
         logger.info("Starting death chest migration...");
 
-        // Loading saved chests of the file
-        YamlConfiguration configuration = YamlConfiguration.loadConfiguration(fromFile);
-        List<?> chests = configuration.getList("chests", Collections.emptyList());
-        logger.info(chests.size() + " chests found");
+        for (File file : files) {
+            String name = file.getName();
+            String realName = name.substring(0, name.lastIndexOf('.'));
 
-        Set<DeathChestModel> deathChests = new HashSet<>();
-        for (Object chest : chests) {
-            if (!(chest instanceof Map<?, ?> map))
-                continue;
-            DeathChestModel deserialize = DeathChestModel.deserialize((Map<String, Object>) map, plugin.getDeathChestConfig().inventoryOptions(), this.placeHolderController);
-            if (deserialize == null) {
-                logger.warning("Failed to deserialize a death chest");
+            World world = Bukkit.getWorld(realName);
+            if (world == null) {
                 continue;
             }
-            deathChests.add(deserialize);
-        }
 
-        // Separate the chests by world
-        Map<World, YamlConfiguration> map = new HashMap<>();
-
-        Iterator<DeathChestModel> iterator = deathChests.iterator();
-        while (iterator.hasNext()) {
-            DeathChestModel next = iterator.next();
-            if (next.getWorld() == null)
-                continue;
-            iterator.remove();
-
-            YamlConfiguration yamlConfiguration = map.computeIfAbsent(next.getWorld(), world -> {
-                try {
-                    File file = getFile(world, false);
-                    if (file.isFile())
-                        return YamlConfiguration.loadConfiguration(file);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                return new YamlConfiguration();
-            });
-            List<Map<?, ?>> chests1 = (List<Map<?, ?>>) yamlConfiguration.getList("chests", new ArrayList<>());
-            chests1.add(next.serialize());
-        }
-
-        // Save chests in separate files
-        for (World world : map.keySet()) {
             try {
-                File worldFile = getFile(world, true);
-                map.get(world).save(worldFile);
+                File newLocation = getFile(world, false);
+                if (!file.renameTo(newLocation))
+                    logger.severe("Failed to move the file \"" + file + "\" to \"" + newLocation + "\".");
             } catch (IOException e) {
-                logger.severe("Failed to save chests in world \"" + world.getName() + "\" during migration");
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
         }
-
-        // Save all not migrated chests
-        configuration = new YamlConfiguration();
-        configuration.set("chests", deathChests.stream()
-                .map(DeathChestModel::serialize)
-                .toList());
-        try {
-            configuration.save(fromFile);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        if (deathChests.isEmpty() && !fromFile.renameTo(new File(fromFile.getParent(), fromFile.getName() + ".old"))) {
-            logger.severe("Failed to rename the old storage file");
-        }
-
 
     }
 
     @Override
     public void init(@NotNull DeathChestPlugin plugin, @NotNull ConfigurationSection section) throws IOException {
+        Logger logger = plugin.getLogger();
 
         String filename = section.getString("folder", "chests");
-        this.chestsFolder = new File(plugin.getDataFolder(), filename);
-        if (!this.chestsFolder.isDirectory() && !this.chestsFolder.mkdirs())
-            throw new IOException("Cannot create folder \"" + this.chestsFolder + "\"");
-
-
-        // Migration
-        String savedChests = section.getString("file");
-        if (savedChests != null) {
-            File file = new File(plugin.getDataFolder(), savedChests);
-            if (file.isFile()) {
-                migrateChests(plugin, file, plugin.getLogger());
+        File chestsFolder = new File(plugin.getDataFolder(), filename);
+        File[] files = chestsFolder.listFiles();
+        if (files != null) {
+            migrateChests(plugin, files, logger);
+            files = chestsFolder.listFiles();
+            if (files != null && files.length == 0) {
+                if (!chestsFolder.delete()) {
+                    logger.info("Failed to delete old \"" + chestsFolder + "\" folder");
+                }
             }
-        } else {
-            plugin.getLogger().info("No save file found");
         }
 
         // Load all chests of loaded worlds

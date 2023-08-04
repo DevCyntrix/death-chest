@@ -44,7 +44,7 @@ public class CompatibilityManager {
                 if (!load.isValid(plugin.getServer()))
                     continue;
                 if (!load.activate(plugin)) {
-                    plugin.getLogger().severe("Something went wrong during the activation of " + rc.getSimpleName());
+                    plugin.getLogger().severe("Something went wrong while activating " + rc.getSimpleName());
                     continue;
                 }
                 this.instances.put(rc, load);
@@ -61,7 +61,7 @@ public class CompatibilityManager {
             if (!compatibility.isEnabled())
                 continue;
             if (!compatibility.deactivate(plugin)) {
-                plugin.getLogger().severe("Something went wrong during the deactivation of " + compatibility.getClass().getSimpleName());
+                plugin.getLogger().severe("Something went wrong while deactivating " + compatibility.getClass().getSimpleName());
             }
         }
     }
