@@ -1,7 +1,7 @@
 package com.github.devcyntrix.deathchest.listener;
 
+import com.github.devcyntrix.deathchest.DeathChestModel;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
-import com.github.devcyntrix.deathchest.api.DeathChest;
 import com.github.devcyntrix.deathchest.api.event.DeathChestDestroyEvent;
 import com.github.devcyntrix.deathchest.api.event.DeathChestSpawnEvent;
 import org.bukkit.entity.Player;
@@ -24,10 +24,10 @@ public class LastDeathChestListener implements Listener {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
-        Optional<DeathChest> first = this.plugin.getChests()
-                .filter(deathChest -> deathChest.getPlayer() != null)
-                .filter(deathChest -> player.equals(deathChest.getPlayer()))
-                .max(Comparator.comparingLong(DeathChest::getCreatedAt));
+        Optional<DeathChestModel> first = this.plugin.getChests()
+                .filter(deathChest -> deathChest.getOwner() != null)
+                .filter(deathChest -> player.equals(deathChest.getOwner()))
+                .max(Comparator.comparingLong(DeathChestModel::getCreatedAt));
         if (first.isEmpty())
             return;
         plugin.getLastDeathChests().put(player, first.get());
@@ -36,8 +36,8 @@ public class LastDeathChestListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onSpawn(DeathChestSpawnEvent event) {
         Player player = event.getPlayer();
-        DeathChest deathChest = event.getDeathChest();
-        DeathChest oldChest = plugin.getLastDeathChests().get(player);
+        DeathChestModel deathChest = event.getDeathChest();
+        DeathChestModel oldChest = plugin.getLastDeathChests().get(player);
         if (oldChest == null) {
             plugin.getLastDeathChests().put(player, deathChest);
             return;
@@ -49,17 +49,17 @@ public class LastDeathChestListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onDestroy(DeathChestDestroyEvent event) {
-        if (event.getDeathChest().getPlayer() == null)
+        if (event.getDeathChest().getOwner() == null)
             return;
 
-        Player player = event.getDeathChest().getPlayer().getPlayer();
+        Player player = event.getDeathChest().getOwner().getPlayer();
         if (player == null)
             return;
 
-        Optional<DeathChest> first = this.plugin.getChests()
-                .filter(deathChest -> deathChest.getPlayer() != null)
-                .filter(deathChest -> event.getDeathChest().getPlayer().equals(deathChest.getPlayer()))
-                .max(Comparator.comparingLong(DeathChest::getCreatedAt));
+        Optional<DeathChestModel> first = this.plugin.getChests()
+                .filter(deathChest -> deathChest.getOwner() != null)
+                .filter(deathChest -> event.getDeathChest().getOwner().equals(deathChest.getOwner()))
+                .max(Comparator.comparingLong(DeathChestModel::getCreatedAt));
         if (first.isEmpty()) {
             plugin.getLastDeathChests().remove(player);
             return;

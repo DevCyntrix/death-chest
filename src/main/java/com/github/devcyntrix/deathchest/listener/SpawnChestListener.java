@@ -1,24 +1,26 @@
 package com.github.devcyntrix.deathchest.listener;
 
+import com.github.devcyntrix.deathchest.DeathChestModel;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
-import com.github.devcyntrix.deathchest.api.DeathChest;
 import com.github.devcyntrix.deathchest.api.event.DeathChestSpawnEvent;
 import com.github.devcyntrix.deathchest.config.*;
+import com.google.common.base.Preconditions;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.apache.commons.text.StringSubstitutor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
@@ -34,6 +36,13 @@ public class SpawnChestListener implements Listener {
         this.plugin = plugin;
     }
 
+    private final Set<Player> set = Collections.newSetFromMap(new WeakHashMap<>());
+
+    @EventHandler
+    public void onRespawn(PlayerRespawnEvent event) {
+        set.remove(event.getPlayer());
+    }
+
     /**
      * Creates the death chest if the player dies.
      * It only spawns a chest if the player has the permission to build in the region.
@@ -44,66 +53,68 @@ public class SpawnChestListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onDeath(PlayerDeathEvent event) {
 
-        ChangeDeathMessageOptions changeDeathMessageOptions = plugin.getDeathChestConfig().changeDeathMessageOptions();
-        if (changeDeathMessageOptions.enabled()) {
-            if (changeDeathMessageOptions.message() == null) {
-                event.setDeathMessage(null);
-                return;
-            }
-            Player player = event.getEntity();
-            Location location = player.getLocation();
-            if (location.getWorld() == null) {
-                return; // Invalid location
-            }
-
-            StringSubstitutor substitutor = new StringSubstitutor(Map.of(
-                    "x", location.getBlockX(),
-                    "y", location.getBlockY(),
-                    "z", location.getBlockZ(),
-                    "world", location.getWorld().getName(),
-                    "player_name", player.getName(),
-                    "player_displayname", player.getDisplayName()));
-            event.setDeathMessage(Arrays.stream(changeDeathMessageOptions.message()).map(substitutor::replace).map(s -> {
-                if (DeathChestPlugin.isPlaceholderAPIEnabled()) {
-                    return PlaceholderAPI.setPlaceholders(player, s);
-                }
-                return s;
-            }).collect(Collectors.joining("\n")));
-        }
-
-        if (event.getKeepInventory())
-            return;
-        event.getDrops().removeIf(itemStack -> itemStack.getType() == Material.AIR); // Prevent spawning an empty chest
-        if (event.getDrops().isEmpty())
-            return;
+        plugin.debug(0, "Spawning death chest...");
 
         Player player = event.getEntity();
-        Location deathLocation = new Location(
-                player.getWorld(),
-                player.getLocation().getX(),
-                Math.round(player.getLocation().getY()),
-                player.getLocation().getZ()
-        );
-
-        if (!plugin.getDeathChestConfig().worldFilterConfig().test(deathLocation.getWorld()))
+        Location location = player.getLocation();
+        plugin.debug(1, "Checking multiple deaths at once...");
+        if (set.contains(player)) {
+            event.getDrops().clear();
             return;
+        }
+        set.add(player);
 
+        ChangeDeathMessageOptions changeDeathMessageOptions = plugin.getDeathChestConfig().changeDeathMessageOptions();
+        if (changeDeathMessageOptions.enabled()) {
+            plugin.debug(1, "Changing death message...");
+            if (changeDeathMessageOptions.message() != null && location.getWorld() != null) {
+                StringSubstitutor substitutor = new StringSubstitutor(Map.of("x", location.getBlockX(), "y", location.getBlockY(), "z", location.getBlockZ(), "world", location.getWorld().getName(), "player_name", player.getName(), "player_display_name", player.getDisplayName()));
+                event.setDeathMessage(Arrays.stream(changeDeathMessageOptions.message()).map(substitutor::replace).map(s -> {
+                    if (DeathChestPlugin.isPlaceholderAPIEnabled()) {
+                        return PlaceholderAPI.setPlaceholders(player, s);
+                    }
+                    return s;
+                }).collect(Collectors.joining("\n")));
+            } else {
+                event.setDeathMessage(null); // Disable death message
+            }
+        }
+
+        plugin.debug(1, "Checking keep inventory...");
+        if (event.getKeepInventory()) return;
+        plugin.debug(1, "Removing air...");
+        boolean removed = event.getDrops().removeIf(itemStack -> Material.AIR.equals(itemStack.getType()));// Prevent spawning an empty chest
+        if (removed) {
+            plugin.debug(2, "Inventory has been updated.");
+        }
+        plugin.debug(1, "Checking empty inventory...");
+        if (event.getDrops().isEmpty()) {
+            plugin.debug(1, "Inventory was empty: spawning no chest.");
+            return;
+        }
+
+        Location deathLocation = new Location(player.getWorld(), player.getLocation().getX(), Math.round(player.getLocation().getY()), player.getLocation().getZ());
+
+        plugin.debug(1, "Checking world filter...");
+        if (!plugin.getDeathChestConfig().worldFilterConfig().test(deathLocation.getWorld())) return;
+
+        plugin.debug(1, "Checking world height limitations...");
         // Check Minecraft limitation of block positions
         if (deathLocation.getBlockY() <= player.getWorld().getMinHeight()) // Min build height
             return;
         if (deathLocation.getBlockY() >= player.getWorld().getMaxHeight()) // Max build height
             return;
 
-        // Check protection
+        plugin.debug(1, "Checking protection service...");
         boolean build = plugin.getProtectionService().canBuild(player, deathLocation, Material.CHEST);
-        if (!build)
-            return;
+        if (!build) return;
 
+        plugin.debug(1, "Getting expiration time...");
         DeathChestConfig deathChestConfig = plugin.getDeathChestConfig();
         Duration expiration = deathChestConfig.expiration();
-        if (expiration == null)
-            expiration = Duration.ofSeconds(-1);
+        if (expiration == null) expiration = Duration.ofSeconds(-1);
 
+        plugin.debug(1, "Checking no expiration permission...");
         NoExpirationPermission permission = deathChestConfig.noExpirationPermission();
         boolean expires = permission == null || !permission.enabled() || !player.hasPermission(permission.permission());
         long createdAt = System.currentTimeMillis();
@@ -116,6 +127,7 @@ public class SpawnChestListener implements Listener {
         while (!plugin.canPlaceChestAt(loc)) {
             if (System.currentTimeMillis() - start > 1000) {
                 loc.setY(loc.getWorld().getHighestBlockYAt(loc.getBlockX(), loc.getBlockZ()));
+                plugin.debug(1, "Finding a valid location took longer than 1 second.");
                 break;
             }
 
@@ -125,12 +137,33 @@ public class SpawnChestListener implements Listener {
         }
 
         try {
-            boolean protectedChest = player.hasPermission(deathChestConfig.chestProtectionOptions().permission());
-            DeathChest deathChest = plugin.createDeathChest(loc, createdAt, expireAt, player, protectedChest, event.getDrops().toArray(new ItemStack[0]));
+            boolean protectedChest = deathChestConfig.chestProtectionOptions().enabled() && player.hasPermission(deathChestConfig.chestProtectionOptions().permission());
+            plugin.debug(1, "Protected chest: %s".formatted(true));
 
-            DeathChestSpawnEvent deathChestSpawnEvent = new DeathChestSpawnEvent(player, deathChest);
-            Bukkit.getPluginManager().callEvent(deathChestSpawnEvent);
+            ItemStack[] items = event.getDrops().toArray(new ItemStack[0]);
+            World world = loc.getWorld();
+            Preconditions.checkNotNull(world);
+
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                DeathChestModel deathChest = null;
+                try {
+                    deathChest = plugin.createDeathChest(loc, createdAt, expireAt, player, protectedChest, items);
+                } catch (Exception e) {
+                    plugin.getLogger().severe("Items dropped because of an error while creating the death chest");
+                    for (ItemStack content : items) {
+                        world.dropItemNaturally(loc, content);
+                    }
+                    e.printStackTrace();
+                }
+
+                if (deathChest != null) {
+                    DeathChestSpawnEvent deathChestSpawnEvent = new DeathChestSpawnEvent(player, deathChest);
+                    Bukkit.getPluginManager().callEvent(deathChestSpawnEvent);
+                }
+            });
+
             // Clears the drops
+            plugin.debug(1, "Clearing drops...");
             event.getDrops().clear();
         } catch (Exception e) {
             e.printStackTrace();
@@ -139,37 +172,23 @@ public class SpawnChestListener implements Listener {
         // Player notification
         PlayerNotificationOptions playerNotificationOptions = deathChestConfig.playerNotificationOptions();
         if (playerNotificationOptions.enabled() && playerNotificationOptions.messages() != null) {
-            if (deathLocation.getWorld() == null) {
-                return; // Invalid location
+            if (deathLocation.getWorld() != null) {
+                StringSubstitutor substitutor = new StringSubstitutor(Map.of("x", deathLocation.getBlockX(), "y", deathLocation.getBlockY(), "z", deathLocation.getBlockZ(), "chest_x", loc.getBlockX(), "chest_y", loc.getBlockY(), "chest_z", loc.getBlockZ(), "world", deathLocation.getWorld().getName()));
+                playerNotificationOptions.showNotification(player, substitutor);
+            } else {
+                plugin.debug(1, "Invalid world during player notification");
             }
-            StringSubstitutor substitutor = new StringSubstitutor(Map.of(
-                    "x", deathLocation.getBlockX(),
-                    "y", deathLocation.getBlockY(),
-                    "z", deathLocation.getBlockZ(),
-                    "chest_x", loc.getBlockX(),
-                    "chest_y", loc.getBlockY(),
-                    "chest_z", loc.getBlockZ(),
-                    "world", deathLocation.getWorld().getName()));
-            playerNotificationOptions.showNotification(player, substitutor);
         }
 
         // Global notification
         GlobalNotificationOptions globalNotificationOptions = deathChestConfig.globalNotificationOptions();
         if (globalNotificationOptions.enabled() && globalNotificationOptions.messages() != null) {
-            if (deathLocation.getWorld() == null) {
-                return; // Invalid location
+            if (deathLocation.getWorld() != null) {
+                StringSubstitutor substitutor = new StringSubstitutor(Map.of("x", deathLocation.getBlockX(), "y", deathLocation.getBlockY(), "z", deathLocation.getBlockZ(), "chest_x", loc.getBlockX(), "chest_y", loc.getBlockY(), "chest_z", loc.getBlockZ(), "world", deathLocation.getWorld().getName(), "player_name", player.getName(), "player_display_name", player.getDisplayName()));
+                globalNotificationOptions.showNotification(player, substitutor);
+            } else {
+                plugin.debug(1, "Invalid world during player notification");
             }
-            StringSubstitutor substitutor = new StringSubstitutor(Map.of(
-                    "x", deathLocation.getBlockX(),
-                    "y", deathLocation.getBlockY(),
-                    "z", deathLocation.getBlockZ(),
-                    "chest_x", loc.getBlockX(),
-                    "chest_y", loc.getBlockY(),
-                    "chest_z", loc.getBlockZ(),
-                    "world", deathLocation.getWorld().getName(),
-                    "player_name", player.getName(),
-                    "player_displayname", player.getDisplayName()));
-            globalNotificationOptions.showNotification(player, substitutor);
         }
 
 

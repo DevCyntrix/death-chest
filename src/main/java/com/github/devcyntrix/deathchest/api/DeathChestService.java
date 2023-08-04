@@ -1,39 +1,51 @@
 package com.github.devcyntrix.deathchest.api;
 
-import com.github.devcyntrix.deathchest.api.animation.AnimationService;
-import com.github.devcyntrix.deathchest.api.hologram.HologramService;
+import com.github.devcyntrix.deathchest.DeathChestModel;
+import com.github.devcyntrix.deathchest.api.animation.BreakAnimationService;
 import com.github.devcyntrix.deathchest.api.protection.ProtectionService;
+import com.github.devcyntrix.hologram.api.HologramService;
 import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.stream.Stream;
 
-public interface DeathChestService {
+public interface DeathChestService extends Plugin {
 
-    @Nullable DeathChest getLastChest(@NotNull Player player);
+    boolean isDebugMode();
+
+    default void debug(int indents, Object... message) {
+        if (!isDebugMode())
+            return;
+        for (Object o : message) {
+            getLogger().info("[DEBUG] " + "  ".repeat(indents) + o);
+        }
+    }
+
+    @Nullable DeathChestModel getLastChest(@NotNull Player player);
 
     boolean canPlaceChestAt(@NotNull Location location);
 
-    @NotNull DeathChest createDeathChest(@NotNull Location location, ItemStack @NotNull ... items);
+    @NotNull DeathChestModel createDeathChest(@NotNull Location location, ItemStack @NotNull ... items);
 
-    @NotNull DeathChest createDeathChest(@NotNull Location location, @Nullable OfflinePlayer player, ItemStack @NotNull ... items);
+    @NotNull DeathChestModel createDeathChest(@NotNull Location location, @Nullable Player player, ItemStack @NotNull ... items);
 
-    @NotNull DeathChest createDeathChest(@NotNull Location location, long expireAt, @Nullable OfflinePlayer player, ItemStack @NotNull ... items);
+    @NotNull DeathChestModel createDeathChest(@NotNull Location location, long expireAt, @Nullable Player player, ItemStack @NotNull ... items);
 
-    @NotNull DeathChest createDeathChest(@NotNull DeathChestSnapshot snapshot);
-
-    default @NotNull DeathChest createDeathChest(@NotNull Location location, long createdAt, long expireAt, @Nullable OfflinePlayer player, ItemStack @NotNull ... items) {
+    default @NotNull DeathChestModel createDeathChest(@NotNull Location location, long createdAt, long expireAt, @Nullable Player player, ItemStack @NotNull ... items) {
         return createDeathChest(location, createdAt, expireAt, player, false, items);
     }
 
-    @NotNull DeathChest createDeathChest(@NotNull Location location, long createdAt, long expireAt, @Nullable OfflinePlayer player, boolean isProtected, ItemStack @NotNull ... items);
+    @NotNull DeathChestModel createDeathChest(@NotNull Location location, long createdAt, long expireAt, @Nullable Player player, boolean isProtected, ItemStack @NotNull ... items);
 
-    @NotNull Stream<@NotNull DeathChest> getChests();
+    @NotNull Stream<@NotNull DeathChestModel> getChests();
+
+    @NotNull Stream<@NotNull DeathChestModel> getChests(@NotNull World world);
 
     void saveChests() throws IOException;
 
@@ -43,11 +55,11 @@ public interface DeathChestService {
 
     @Nullable HologramService getHologramService();
 
-    default boolean hasAnimation() {
-        return getAnimationService() != null;
+    default boolean hasBreakAnimation() {
+        return getBreakAnimationService() != null;
     }
 
-    @Nullable AnimationService getAnimationService();
+    @Nullable BreakAnimationService getBreakAnimationService();
 
     @NotNull ProtectionService getProtectionService();
 }

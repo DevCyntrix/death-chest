@@ -1,36 +1,39 @@
 package com.github.devcyntrix.deathchest.tasks;
 
-import com.github.devcyntrix.deathchest.DeathChestPlugin;
-import com.github.devcyntrix.deathchest.api.DeathChest;
-import com.github.devcyntrix.deathchest.api.hologram.HologramTextLine;
-import me.clip.placeholderapi.PlaceholderAPI;
-import org.apache.commons.text.StringSubstitutor;
+import com.github.devcyntrix.deathchest.DeathChestModel;
+import com.github.devcyntrix.deathchest.controller.PlaceHolderController;
+import com.github.devcyntrix.hologram.api.HologramTextLine;
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Map;
 
 public class HologramRunnable extends BukkitRunnable {
 
-    private final DeathChest chest;
+    private final Plugin plugin;
+    private final DeathChestModel chest;
     private final Map<String, HologramTextLine> blueprints;
-    private final StringSubstitutor substitutor;
+    private final PlaceHolderController controller;
 
-    public HologramRunnable(DeathChest chest, Map<String, HologramTextLine> blueprints, StringSubstitutor substitutor) {
+    public HologramRunnable(Plugin plugin, DeathChestModel chest, Map<String, HologramTextLine> blueprints, PlaceHolderController controller) {
+        this.plugin = plugin;
         this.chest = chest;
         this.blueprints = blueprints;
-        this.substitutor = substitutor;
+        this.controller = controller;
     }
 
     @Override
     public void run() {
         // Updates the hologram lines
         blueprints.forEach((text, line) -> {
-            if (substitutor != null) text = substitutor.replace(text);
-            if (DeathChestPlugin.isPlaceholderAPIEnabled())
-                text = PlaceholderAPI.setPlaceholders(chest.getPlayer(), text);
-            String finalText = text;
-            Bukkit.getScheduler().runTask(chest.getPlugin(), () -> line.rename(finalText));
+            Bukkit.getScheduler().runTask(plugin, () -> line.rename(controller.replace(chest, text)));
         });
+    }
+
+    @Override
+    public synchronized void cancel() throws IllegalStateException {
+        this.blueprints.forEach((s, hologramTextLine) -> hologramTextLine.remove());
+        super.cancel();
     }
 }

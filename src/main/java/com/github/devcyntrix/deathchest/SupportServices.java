@@ -1,10 +1,10 @@
 package com.github.devcyntrix.deathchest;
 
 import com.comphenix.protocol.ProtocolLibrary;
-import com.github.devcyntrix.deathchest.api.animation.AnimationService;
+import com.github.devcyntrix.deathchest.api.animation.BreakAnimationService;
 import com.github.devcyntrix.deathchest.api.protection.ProtectionService;
-import com.github.devcyntrix.deathchest.support.animation.PaperAnimation;
-import com.github.devcyntrix.deathchest.support.animation.ProtocolLibAnimation;
+import com.github.devcyntrix.deathchest.support.animation.PaperBreakAnimation;
+import com.github.devcyntrix.deathchest.support.animation.ProtocolLibBreakAnimation;
 import com.github.devcyntrix.deathchest.support.protection.*;
 import com.github.devcyntrix.deathchest.util.PaperTest;
 import org.bukkit.Bukkit;
@@ -12,13 +12,15 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
 public final class SupportServices {
 
-    private static final Map<String, Function<Plugin, AnimationService>> animationServiceMap = Map.of(
-            "ProtocolLib", plugin -> ProtocolLibrary.getProtocolManager() != null ? new ProtocolLibAnimation() : null
+    private static final Map<String, Function<Plugin, BreakAnimationService>> animationServiceMap = Map.of(
+            "ProtocolLib", plugin -> ProtocolLibrary.getProtocolManager() != null ? new ProtocolLibBreakAnimation() : null
     );
 
     private static final Map<String, Function<Plugin, ProtectionService>> protectionServiceMap = Map.of(
@@ -29,20 +31,26 @@ public final class SupportServices {
             "GriefDefender", plugin -> new GriefDefenderProtectionService()
     );
 
-    public static @Nullable AnimationService getAnimationService(@NotNull Plugin plugin, @Nullable String preferred) {
+    public static @Nullable BreakAnimationService getBlockBreakAnimationService(@NotNull DeathChestPlugin plugin, @Nullable String preferred) {
         if (PaperTest.isPaper()) {
-            return new PaperAnimation();
+            plugin.debug(1, "Using paper block break animation service");
+            return new PaperBreakAnimation();
         }
         return getService(animationServiceMap, plugin, preferred);
     }
 
-    public static @Nullable ProtectionService getProtectionService(@NotNull Plugin plugin) {
-        ProtectionService[] services = protectionServiceMap.entrySet().stream()
-                .filter(entry -> Bukkit.getPluginManager().isPluginEnabled(entry.getKey()))
-                .map(Map.Entry::getValue)
-                .map(f -> f.apply(plugin))
-                .toArray(ProtectionService[]::new);
-        return new CombinedProtectionService(services);
+    public static @NotNull ProtectionService getProtectionService(@NotNull DeathChestPlugin plugin) {
+        List<ProtectionService> services = new ArrayList<>();
+        for (Map.Entry<String, Function<Plugin, ProtectionService>> entry : protectionServiceMap.entrySet()) {
+            if (!Bukkit.getPluginManager().isPluginEnabled(entry.getKey()))
+                continue;
+            ProtectionService apply = entry.getValue().apply(plugin);
+            if (apply == null)
+                continue;
+            plugin.debug(1, "Using " + entry.getKey() + " protection service");
+            services.add(apply);
+        }
+        return new CombinedProtectionService(services.toArray(ProtectionService[]::new));
     }
 
     private static <T> @Nullable T getService(@NotNull Map<String, Function<Plugin, T>> map, @NotNull Plugin plugin, @Nullable String preferred) {

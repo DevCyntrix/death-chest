@@ -1,7 +1,6 @@
 package com.github.devcyntrix.deathchest.command.admin;
 
 import cloud.commandframework.Command;
-import cloud.commandframework.CommandManager;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
 import com.github.devcyntrix.deathchest.api.audit.AuditAction;
 import com.github.devcyntrix.deathchest.api.audit.AuditItem;

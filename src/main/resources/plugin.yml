@@ -1,0 +1,37 @@
+name: DeathChest
+version: ${projectVersion}
+main: 'com.github.devcyntrix.deathchest.DeathChestPlugin'
+author: CyntrixAlgorithm
+softdepend: ['WorldGuard', 'ProtocolLib', 'GriefPrevention', 'GriefDefender', 'PlaceholderAPI', 'RedProtect']
+api-version: 1.17
+libraries:
+  - 'org.apache.commons:commons-text:1.9'
+  - 'com.google.inject:guice:7.0.0'
+  - 'cloud.commandframework:cloud-core:1.7.1'
+  - 'cloud.commandframework:cloud-bukkit:1.7.1'
+  - 'net.kyori:adventure-platform-bukkit:4.3.0'
+  - 'net.kyori:adventure-text-minimessage:4.14.0'
+  - 'net.kyori:adventure-text-serializer-legacy:4.14.0'
+
+#commands:
+#  deathchest:
+#    description: The admin command for reloading the plugin's configuration
+#    permission: 'deathchest.command.deathchest'
+
+permissions:
+  'deathchest.command.report':
+    description: 'The permission to create, read and delete reports of the plugin'
+    default: op
+  'deathchest.command.deleteInWorld':
+    description: 'The permission to delete all chests in all or a specific worlds'
+    default: op
+  'deathchest.command.reload':
+    description: 'The permission to reload the configuration file of the DeathChest plugin'
+    default: op
+  'deathchest.admin':
+    default: op
+    children:
+      - 'deathchest.command.deathchest'
+      - 'deathchest.command.report'
+      - 'deathchest.command.deleteInWorld'
+      - 'eathchest.command.reload'

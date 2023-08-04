@@ -1,13 +1,24 @@
 package com.github.devcyntrix.deathchest.config;
 
+import com.github.devcyntrix.deathchest.DeathChestHolder;
+import com.github.devcyntrix.deathchest.DeathChestModel;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
 
 public record InventoryOptions(@NotNull String title, @NotNull InventorySize size) {
 
+    public Inventory createInventory(DeathChestModel model, Function<String, String> placeholder, ItemStack... stacks) {
+        String title = placeholder.apply(title());
+        var inventory = Bukkit.createInventory(new DeathChestHolder(model), size().getSize(stacks.length), title);
+        inventory.setContents(stacks);
+        return inventory;
+    }
 
     public static InventoryOptions load(ConfigurationSection section) {
         if (section == null)

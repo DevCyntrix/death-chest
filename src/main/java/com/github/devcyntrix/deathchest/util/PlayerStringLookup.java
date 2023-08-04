@@ -1,40 +1,39 @@
 package com.github.devcyntrix.deathchest.util;
 
+import com.github.devcyntrix.deathchest.DeathChestModel;
 import org.apache.commons.text.lookup.StringLookup;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 public class PlayerStringLookup implements StringLookup {
 
-    @Nullable
-    private final OfflinePlayer player;
     @NotNull
-    private final Supplier<String> duration;
+    private final DeathChestModel model;
+    @NotNull
+    private final Function<Long, String> duration;
 
-    public PlayerStringLookup(@Nullable OfflinePlayer player, @NotNull Supplier<String> duration) {
-        this.player = player;
+    public PlayerStringLookup(@NotNull DeathChestModel model, @NotNull Function<Long, String> duration) {
+        this.model = model;
         this.duration = duration;
     }
 
     @Override
     public String lookup(String key) {
         if (key.equals("player_name")) {
-            if (player == null)
+            if (model.getOwner() == null)
                 return "Unknown";
-            return player.getName();
+            return model.getOwner().getName();
         }
         if (key.equals("player_displayname")) {
-            if (player == null)
+            if (model.getOwner() == null)
                 return "Unknown";
-            Player oP = player.getPlayer();
-            return oP != null ? oP.getDisplayName() : player.getName();
+            Player oP = model.getOwner().getPlayer();
+            return oP != null ? oP.getDisplayName() : model.getOwner().getName();
         }
         if (key.equals("duration"))
-            return duration.get();
+            return duration.apply(model.getExpireAt());
         return null;
     }
 }

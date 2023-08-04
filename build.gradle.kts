@@ -1,12 +1,14 @@
+import io.papermc.hangarpublishplugin.model.Platforms
+
 plugins {
     `java-library`
-    id("xyz.jpenilla.run-paper") version "2.0.1"
-    id("net.minecrell.plugin-yml.bukkit") version "0.6.0"
-    id("com.github.johnrengelman.shadow") version "7.1.2"
+    id("xyz.jpenilla.run-paper") version "2.1.0"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("io.papermc.hangar-publish-plugin") version "0.0.5"
 }
 
 group = "com.github.devcyntrix"
-version = "1.5.24"
+version = "2.0.0-rc1"
 
 repositories {
     mavenCentral()
@@ -22,7 +24,15 @@ repositories {
 }
 
 dependencies {
+    compileOnly("com.google.inject:guice:7.0.0")
     compileOnly("org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT")
+    compileOnly("net.kyori:adventure-platform-bukkit:4.3.0")
+    compileOnly("net.kyori:adventure-text-minimessage:4.14.0")
+    compileOnly("net.kyori:adventure-text-serializer-legacy:4.14.0")
+
+    // Command library
+    compileOnly("cloud.commandframework:cloud-core:1.7.1")
+    compileOnly("cloud.commandframework:cloud-bukkit:1.7.1")
 
     // Command library
     compileOnly("cloud.commandframework:cloud-core:1.7.1")
@@ -66,52 +76,57 @@ tasks {
     }
     processResources {
         filteringCharset = Charsets.UTF_8.name()
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+        filesMatching("plugin.yml") {
+            expand(Pair("projectVersion", project.version))
+        }
     }
     runServer {
-        minecraftVersion("1.19.4")
+        minecraftVersion("1.20.1")
     }
     test {
         useJUnitPlatform()
     }
 }
 
-bukkit {
-    name = "DeathChest"
-    main = "com.github.devcyntrix.deathchest.DeathChestPlugin"
-    apiVersion = "1.13"
-    website = "https://www.spigotmc.org/resources/death-chest.101066/"
-    authors = listOf("CyntrixAlgorithm")
-    softDepend = listOf(
-        "WorldGuard",
-        "ProtocolLib",
-        "GriefPrevention",
-        "GriefDefender",
-        "PlaceholderAPI",
-        "RedProtect"
-    )
-    libraries = listOf(
-        "org.apache.commons:commons-text:1.9",
-        "cloud.commandframework:cloud-core:1.7.1",
-        "cloud.commandframework:cloud-bukkit:1.7.1"
-    )
+hangarPublish {
+    publications.register("DeathChest") {
+        version.set(project.version as String)
+        namespace("CyntrixAlgorithm", "DeathChest")
+        changelog.set("https://github.com/DevCyntrix/death-chest/blob/main/CHANGELOG")
 
-    permissions {
-        register("deathchest.command.report") {
-            description = "The permission to create, read and delete reports of the plugin"
+        apiKey.set(System.getenv("API_KEY"))
+
+        if (!project.version.toString().contains('-')) {
+            channel.set("Release")
+        } else {
+            channel.set("Snapshot")
         }
-        register("deathchest.command.deleteInWorld") {
-            description = "The permission to delete all chests in all or a specific worlds"
+
+        platforms {
+            register(Platforms.PAPER) {
+                jar.set(tasks.jar.flatMap { it.archiveFile })
+                platformVersions.set(listOf("1.17-1.20.1"))
+                dependencies.url("ProtocolLib", "https://www.spigotmc.org/resources/protocollib.1997/") {
+                    required.set(false)
+                }
+                dependencies.url("PlaceholderAPI", "https://www.spigotmc.org/resources/placeholderapi.6245/") {
+                    required.set(false)
+                }
+                dependencies.url("GriefPrevention", "https://www.spigotmc.org/resources/griefprevention.1884/") {
+                    required.set(false)
+                }
+                dependencies.url("RedProtect", "https://www.spigotmc.org/resources/redprotect-anti-grief-server-protection-region-management-1-7-1-19.15841/") {
+                    required.set(false)
+                }
+                dependencies.url("GriefDefender", "https://www.spigotmc.org/resources/1-12-2-1-19-4-griefdefender-claim-plugin-grief-prevention-protection.68900/") {
+                    required.set(false)
+                }
+                dependencies.url("WorldGuard", "https://dev.bukkit.org/projects/worldguard") {
+                    required.set(false)
+                }
+            }
         }
-        register("deathchest.command.reload") {
-            description = "The permission to reload the configuration file of the DeathChest plugin"
-        }
-        register("deathchest.admin") {
-            children = listOf(
-                "deathchest.command.deathchest",
-                "deathchest.command.report",
-                "deathchest.command.deleteInWorld",
-                "deathchest.command.reload"
-            )
-        }
+
     }
 }
