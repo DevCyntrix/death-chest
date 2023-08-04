@@ -3,6 +3,7 @@ name: Hangar Publish
 on:
   push:
     tags: [ .* ]
+    branches: [ main ]
 
 jobs:
   build:
@@ -14,6 +15,15 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@0d13054264b0bb894ded474f08ebb30921341cee
+        with:
+          arguments: build
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v3.0.0
+        with:
+          path: ./build/libs/*
+          if-no-files-found: error
       - name: Publish with Gradle to Hangar
         uses: gradle/gradle-build-action@0d13054264b0bb894ded474f08ebb30921341cee
         with:
