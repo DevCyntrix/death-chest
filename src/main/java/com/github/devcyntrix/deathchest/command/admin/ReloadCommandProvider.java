@@ -24,7 +24,6 @@ public class ReloadCommandProvider implements CommandProvider {
                 .permission("deathchest.admin")
                 .permission("deathchest.command.reload")
                 .handler(commandContext -> {
-                    plugin.reload();
                     plugin.getAuditManager().audit(
                             new AuditItem(
                                     new Date(),
@@ -32,6 +31,7 @@ public class ReloadCommandProvider implements CommandProvider {
                                     new ReloadInfo(commandContext.getSender())
                             )
                     );
+                    plugin.reload();
                     commandContext.getSender().sendMessage(
                             plugin.getPrefix() + "§cThe plugin has been successfully reloaded"
                     );
