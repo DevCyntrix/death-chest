@@ -41,10 +41,26 @@ public class ItemBlacklistListener implements Listener {
 
         event.setCancelled(true);
 
-
         if (event.getSlot() < 9 * 6 - 9) {
+            if (event.isRightClick()) {
+                blacklist.getList().removeIf(itemStack -> itemStack.isSimilar(event.getCurrentItem()));
+                blacklist.updateInventory();
+                return;
+            }
+
             // Blacklisted items
         } else {
+            if (event.getSlot() == 53 && ItemBlacklist.NEXT_PAGE.isSimilar(event.getCurrentItem())) {
+                blacklist.setPage(blacklist.getPage() + 1);
+                blacklist.updateInventory();
+                return;
+            }
+            if (event.getSlot() == 45 && ItemBlacklist.PREV_PAGE.isSimilar(event.getCurrentItem())) {
+                blacklist.setPage(blacklist.getPage() - 1);
+                blacklist.updateInventory();
+                return;
+            }
+
             if (event.getSlot() == 9 * 6 - 3) {
                 ItemStack itemToAdd = event.getInventory().getItem(9 * 6 - 5);
 
@@ -76,11 +92,11 @@ public class ItemBlacklistListener implements Listener {
                     updateApplyItem(event.getInventory(), null);
                     return;
                 }
-
             }
 
         }
     }
+
 
 //    @EventHandler
 //    public void onDrag(InventoryDragEvent event) {

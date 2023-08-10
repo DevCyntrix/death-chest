@@ -5,6 +5,7 @@ import cloud.commandframework.CommandManager;
 import cloud.commandframework.bukkit.BukkitCommandManager;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
+import com.github.devcyntrix.deathchest.command.admin.BlacklistCommandProvider;
 import com.github.devcyntrix.deathchest.command.admin.DeleteinworldCommandProvider;
 import com.github.devcyntrix.deathchest.command.admin.ReloadCommandProvider;
 import com.github.devcyntrix.deathchest.command.admin.report.*;
@@ -43,6 +44,10 @@ public class CommandRegistry {
         commandManager.command(
                 new DeleteinworldCommandProvider(plugin)
                         .provide(rootCommand.literal("deleteinworld"))
+        );
+        commandManager.command(
+                new BlacklistCommandProvider(plugin)
+                        .provide(rootCommand.literal("blacklist"))
         );
 
         Command.Builder<CommandSender> reportCommandBuilder = new ReportCommandProvider().provide(
