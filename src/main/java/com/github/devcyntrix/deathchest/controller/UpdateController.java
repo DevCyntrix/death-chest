@@ -3,6 +3,7 @@ package com.github.devcyntrix.deathchest.controller;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
 import com.github.devcyntrix.deathchest.util.UpdateChecker;
 import com.google.inject.Inject;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
@@ -12,6 +13,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+/**
+ * Checks for the newest version by using the SpigotMC API
+ */
+@Getter
 public class UpdateController implements Closeable {
 
     private String newestVersion;
@@ -36,10 +41,6 @@ public class UpdateController implements Closeable {
 
     public void subscribe(@NotNull Consumer<String> subscriber) {
         subscriberList.add(subscriber);
-    }
-
-    public String getNewestVersion() {
-        return newestVersion;
     }
 
     @Override
