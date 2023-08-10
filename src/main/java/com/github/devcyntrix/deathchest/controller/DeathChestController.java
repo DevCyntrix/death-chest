@@ -150,14 +150,6 @@ public class DeathChestController implements Closeable {
 
     @Override
     public void close() throws IOException {
-        // Unload audit manager
-        if (this.auditManager != null) {
-            try {
-                auditManager.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
         unloadChests(true);
     }
 
