@@ -80,7 +80,7 @@ public class DeathChestController implements Closeable {
                 });
         logger.info(this.loadedChests.row(world).size() + " death chests loaded in world \"" + world.getName() + "\"");
         long time = System.currentTimeMillis();
-        logger.info("  From this %d expired".formatted(this.loadedChests.row(world).values().stream().filter(model1 -> model1.getExpireAt() < time).count()));
+        logger.info("  Of these %d have expired".formatted(this.loadedChests.row(world).values().stream().filter(model1 -> model1.getExpireAt() < time).count()));
     }
 
     public DeathChestModel createChest(@NotNull Location location, long expireAt, @Nullable Player player, ItemStack @NotNull ... items) {
