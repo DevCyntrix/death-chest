@@ -3,6 +3,7 @@ package com.github.devcyntrix.deathchest.support.storage;
 import com.github.devcyntrix.deathchest.DeathChestModel;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
 import com.github.devcyntrix.deathchest.api.storage.DeathChestStorage;
+import com.github.devcyntrix.deathchest.controller.PlaceHolderController;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
@@ -25,8 +26,13 @@ import java.util.stream.Collectors;
  */
 public class YamlStorage implements DeathChestStorage {
 
+    private final PlaceHolderController placeHolderController;
     private File chestsFolder;
     private final Multimap<World, DeathChestModel> deathChestsCache = HashMultimap.create();
+
+    public YamlStorage(PlaceHolderController placeHolderController) {
+        this.placeHolderController = placeHolderController;
+    }
 
     @Override
     public ConfigurationSection getDefaultOptions() {
@@ -39,9 +45,9 @@ public class YamlStorage implements DeathChestStorage {
     private File getFile(World world, boolean create) throws IOException {
         Preconditions.checkNotNull(this.chestsFolder);
         File file = new File(this.chestsFolder, world.getName() + ".yml");
-        if (create && !file.isFile()) {
-            file.createNewFile();
-        }
+        if (create && !file.isFile() && !file.createNewFile())
+            throw new IOException("Failed to create file \"%s\"".formatted(file));
+
         return file;
     }
 
@@ -64,7 +70,7 @@ public class YamlStorage implements DeathChestStorage {
             if (!(chest instanceof Map<?, ?> map))
                 continue;
             System.out.println("deserializing...");
-            DeathChestModel deserialize = DeathChestModel.deserialize((Map<String, Object>) map, plugin.getDeathChestConfig().inventoryOptions());
+            DeathChestModel deserialize = DeathChestModel.deserialize((Map<String, Object>) map, plugin.getDeathChestConfig().inventoryOptions(), this.placeHolderController);
             if (deserialize == null) {
                 System.out.println("FAILED");
                 continue;
@@ -130,9 +136,9 @@ public class YamlStorage implements DeathChestStorage {
 
         String filename = section.getString("folder", "chests");
         this.chestsFolder = new File(plugin.getDataFolder(), filename);
-        if (!this.chestsFolder.isDirectory()) {
-            this.chestsFolder.mkdirs();
-        }
+        if (!this.chestsFolder.isDirectory() && !this.chestsFolder.mkdirs())
+            throw new IOException("Cannot create folder \"" + this.chestsFolder + "\"");
+
 
         // Migration
         String savedChests = section.getString("file");
@@ -153,7 +159,7 @@ public class YamlStorage implements DeathChestStorage {
             YamlConfiguration configuration = YamlConfiguration.loadConfiguration(worldFile);
             List<Map<String, Object>> chests = (List<Map<String, Object>>) configuration.getList("chests", Collections.emptyList());
             Set<DeathChestModel> list = chests.stream()
-                    .map(map -> DeathChestModel.deserialize(map, plugin.getDeathChestConfig().inventoryOptions()))
+                    .map(map -> DeathChestModel.deserialize(map, plugin.getDeathChestConfig().inventoryOptions(), this.placeHolderController))
                     .filter(Objects::nonNull)
                     .collect(Collectors.toSet());
             this.deathChestsCache.putAll(world, list);

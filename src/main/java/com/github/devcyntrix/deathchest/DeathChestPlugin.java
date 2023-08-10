@@ -93,6 +93,8 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
     private DeathChestStorage deathChestStorage;
     private DeathChestController deathChestController;
 
+    private LastDeathChestLocationExpansion expansion;
+
     @Getter
     private BukkitAudiences audiences;
 
@@ -102,13 +104,47 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
     @Override
     public void onDisable() {
 
+        PluginManager pluginManager = Bukkit.getPluginManager();
+        try {
+            ChestProtectionOptions protectionOptions = getDeathChestConfig().chestProtectionOptions();
+            if (protectionOptions.enabled()) {
+                debug(0, "Disabling chest protection...");
+                debug(1, "Removing permissions...");
+                if (pluginManager.getPermission(protectionOptions.permission()) != null) {
+                    pluginManager.removePermission(protectionOptions.permission());
+                    debug(2, "Permission \"%s\" removed.".formatted(protectionOptions.permission()));
+                } else {
+                    getLogger().warning("Expected configured permission but the permission \"%s\" wasn't registered.".formatted(protectionOptions.permission()));
+                }
+                if (pluginManager.getPermission(protectionOptions.bypassPermission()) != null) {
+                    pluginManager.removePermission(protectionOptions.bypassPermission());
+                    debug(2, "Permission \"%s\" removed.".formatted(protectionOptions.bypassPermission()));
+                } else {
+                    getLogger().warning("Expected configured permission but the permission \"%s\" wasn't registered.".formatted(protectionOptions.bypassPermission()));
+                }
+            }
+        } catch (Exception e) {
+            getLogger().warning("Failed to remove the permission of the chest-protection");
+            e.printStackTrace();
+        }
+
+        if (this.expansion != null && this.expansion.unregister())
+            getLogger().info("PlaceHolder API expansion successfully unregistered");
+
         if (this.updateController != null) {
             this.updateController.close();
+            this.updateController = null;
         }
+
+        ServicesManager servicesManager = getServer().getServicesManager();
+        debug(0, "Removing death chest service...");
+        servicesManager.unregisterAll(this);
 
         if (this.hologramController != null) {
             this.hologramController.close();
+            this.updateController = null;
         }
+
 
         if (this.deathChestController != null) {
             try {
@@ -116,6 +152,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            this.deathChestConfig = null;
         }
 
         if (this.deathChestStorage != null) {
@@ -128,8 +165,9 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
             try {
                 this.deathChestStorage.close();
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
+            this.deathChestStorage = null;
         }
 
         // Try to remove all holograms
@@ -142,6 +180,9 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
                 });
 
         HandlerList.unregisterAll((Listener) this);
+
+        if (this.audiences != null)
+            this.audiences.close();
     }
 
     @Override
@@ -157,14 +198,22 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
     @SneakyThrows
     @Override
     public void onEnable() {
-        placeholderAPIEnabled = Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI");
-
-        this.audiences = BukkitAudiences.create(this);
-
-        debug(0, "Checking config version...");
-        checkConfigVersion();
         debug(0, "Loading configuration file...");
-        reload();
+        reloadConfig();
+
+        initializeServices();
+
+        debug(0, "Registering commands...");
+        CommandRegistry.create(this).registerCommands(this);
+
+        debug(0, "Starting metrics...");
+        new Metrics(this, BSTATS_ID);
+
+    }
+
+    private void initializeServices() {
+        placeholderAPIEnabled = Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI");
+        this.audiences = BukkitAudiences.create(this);
 
         debug(0, "Creating hologram controller...");
         this.hologramController = new HologramController(this);
@@ -207,18 +256,16 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         debug(0, "Registering death chest service...");
         servicesManager.register(DeathChestService.class, this, this, ServicePriority.Normal);
 
-        debug(0, "Registering commands...");
-        // Registers the deathchest command
-        CommandRegistry.create(this).registerCommands(this);
-
         this.reportManager = new GsonReportManager(new File(getDataFolder(), "reports"));
         debug(0, "Using gson report manager");
         this.auditManager = new GsonAuditManager(new File(getDataFolder(), "audits"));
         debug(0, "Using gson audit manager");
 
         try {
+            this.placeHolderController = new PlaceHolderController(getDeathChestConfig());
+
             debug(0, "Using death chest yaml storage");
-            this.deathChestStorage = new YamlStorage();
+            this.deathChestStorage = new YamlStorage(this.placeHolderController);
             debug(0, "Initializing death chest storage...");
             this.deathChestStorage.init(this, deathChestStorage.getDefaultOptions());
 
@@ -231,7 +278,6 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
             this.deathChestController.registerAdapter(new CloseInventoryAdapter());
             this.deathChestController.registerAdapter(new ExpirationAdapter(this));
 
-            this.placeHolderController = new PlaceHolderController(getDeathChestConfig());
 
             HologramOptions hologramOptions = getDeathChestConfig().hologramOptions();
             if (hologramOptions.enabled()) {
@@ -250,35 +296,26 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
 
             debug(0, "Loading chests...");
             this.deathChestController.loadChests(); // Loads the chests to the cache
-
         } catch (IOException e) {
             getLogger().severe("Failed to initialize the storage system. Please check your configuration file.");
             throw new RuntimeException(e);
         }
 
-        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+
+        if (isPlaceholderAPIEnabled()) {
             debug(0, "Registering PlaceHolder API Expansion...");
-            new LastDeathChestLocationExpansion(this).register();
+            this.expansion = new LastDeathChestLocationExpansion(this);
+            this.expansion.register();
         }
 
         // Checks for updates
         if (this.deathChestConfig.updateChecker()) {
             debug(0, "Starting update checker...");
-            enableUpdateChecker();
+            this.updateController = new UpdateController(this);
+            this.updateController.subscribe(new ConsoleNotificationView(this, getLogger()));
+            this.updateController.subscribe(new AdminNotificationView(this));
+            getServer().getPluginManager().registerEvents(new AdminJoinNotificationView(this, updateController), this);
         }
-
-        debug(0, "Starting metrics...");
-        new Metrics(this, BSTATS_ID);
-    }
-
-    /**
-     * Checks for the newest version by using the SpigotMC api
-     */
-    private void enableUpdateChecker() {
-        this.updateController = new UpdateController(this);
-        this.updateController.subscribe(new ConsoleNotificationView(this, getLogger()));
-        this.updateController.subscribe(new AdminNotificationView(this));
-        getServer().getPluginManager().registerEvents(new AdminJoinNotificationView(this, updateController), this);
     }
 
     /**
@@ -325,8 +362,17 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
      * Reloads the configuration file of the plugin
      */
     public void reload() {
-        saveDefaultConfig();
+        onDisable();
         reloadConfig();
+        initializeServices();
+    }
+
+    @Override
+    public void reloadConfig() {
+        super.reloadConfig();
+        debug(0, "Checking config version...");
+        checkConfigVersion();
+        saveDefaultConfig();
         debug(1, "Parsing configuration file...");
         this.deathChestConfig = DeathChestConfig.load(getConfig());
         if (isDebugMode()) {
