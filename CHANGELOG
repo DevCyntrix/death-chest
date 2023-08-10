@@ -3,3 +3,4 @@
 + Mini message support for some chat messages
 + Check for multiple invocations of the death event to prevent multiple death chest for the same death (item duping)
 + Cloud command framework
++ Add conversion of dropped exp to Bottle o' Enchanting
