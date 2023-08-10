@@ -18,7 +18,9 @@ public class GsonAuditManager extends Thread implements AuditManager {
 
     public GsonAuditManager(File folder) {
         this.folder = folder;
-        this.folder.mkdirs();
+        if (!this.folder.isDirectory() && !this.folder.mkdirs())
+            throw new RuntimeException("Cannot create audit folder \"%s\"".formatted(folder));
+        start();
     }
 
     @Override

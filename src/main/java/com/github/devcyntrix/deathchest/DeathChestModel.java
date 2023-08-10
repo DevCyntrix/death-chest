@@ -1,6 +1,7 @@
 package com.github.devcyntrix.deathchest;
 
 import com.github.devcyntrix.deathchest.config.InventoryOptions;
+import com.github.devcyntrix.deathchest.controller.PlaceHolderController;
 import com.github.devcyntrix.hologram.api.Hologram;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
@@ -48,7 +49,7 @@ public final class DeathChestModel {
 
     private transient Set<Closeable> tasks = new HashSet<>();
 
-    public DeathChestModel(Location location, long createdAt, long expireAt, OfflinePlayer owner, boolean isProtected) {
+    public DeathChestModel(Location location, long createdAt, long expireAt, @Nullable OfflinePlayer owner, boolean isProtected) {
         this.location = location;
         this.createdAt = createdAt;
         this.expireAt = expireAt;
@@ -121,7 +122,7 @@ public final class DeathChestModel {
         return map;
     }
 
-    public static DeathChestModel deserialize(Map<String, Object> map, InventoryOptions options) {
+    public static DeathChestModel deserialize(Map<String, Object> map, InventoryOptions options, PlaceHolderController controller) {
         long createdAt = Long.parseLong(map.get("createdAt").toString());
         long expireAt = Long.parseLong(map.get("expireAt").toString());
 
@@ -144,7 +145,8 @@ public final class DeathChestModel {
             return null;
         var itemStacks = stacks.toArray(ItemStack[]::new);
         var model = new DeathChestModel(location, createdAt, expireAt, owner, isProtected);
-        model.setInventory(options.createInventory(model, s -> s, itemStacks));
+
+        model.setInventory(options.createInventory(model, s -> controller.replace(model, s), itemStacks));
         return model;
     }
 

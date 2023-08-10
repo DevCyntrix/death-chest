@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+/**
+ * Checks for the newest version by using the SpigotMC API
+ */
 public class UpdateController implements Closeable {
 
     private String newestVersion;
@@ -36,10 +39,6 @@ public class UpdateController implements Closeable {
 
     public void subscribe(@NotNull Consumer<String> subscriber) {
         subscriberList.add(subscriber);
-    }
-
-    public String getNewestVersion() {
-        return newestVersion;
     }
 
     @Override

@@ -52,7 +52,6 @@ public class DeathChestController implements Closeable {
         this.plugin = plugin;
         this.logger = logger;
         this.auditManager = auditManager;
-        this.auditManager.start();
         this.storage = storage;
 
         this.durationFormat = (expireAt) -> {
@@ -85,7 +84,7 @@ public class DeathChestController implements Closeable {
     }
 
     public DeathChestModel createChest(@NotNull Location location, long expireAt, @Nullable Player player, ItemStack @NotNull ... items) {
-        boolean protectedChest = player.hasPermission(getConfig().chestProtectionOptions().permission());
+        boolean protectedChest = player != null && player.hasPermission(getConfig().chestProtectionOptions().permission());
         return createChest(location, System.currentTimeMillis(), expireAt, player, protectedChest, items);
     }
 
