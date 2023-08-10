@@ -145,7 +145,6 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
             this.updateController = null;
         }
 
-
         if (this.deathChestController != null) {
             try {
                 this.deathChestController.close();
@@ -168,6 +167,14 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
                 e.printStackTrace();
             }
             this.deathChestStorage = null;
+        }
+
+        if (this.auditManager != null) {
+            try {
+                auditManager.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         // Try to remove all holograms
