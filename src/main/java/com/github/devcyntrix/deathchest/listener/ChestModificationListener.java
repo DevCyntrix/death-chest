@@ -1,6 +1,5 @@
 package com.github.devcyntrix.deathchest.listener;
 
-import com.github.devcyntrix.deathchest.DeathChestHolder;
 import com.github.devcyntrix.deathchest.DeathChestModel;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
 import com.github.devcyntrix.deathchest.config.ChestProtectionOptions;
@@ -11,10 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.inventory.InventoryMoveItemEvent;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.BlockInventoryHolder;
 
 public class ChestModificationListener implements Listener {
 
@@ -22,25 +18,6 @@ public class ChestModificationListener implements Listener {
 
     public ChestModificationListener(DeathChestPlugin plugin) {
         this.plugin = plugin;
-    }
-
-    /**
-     * Cancels that a hopper can move items into the chest inventory
-     *
-     * @param event the event from the Bukkit API
-     */
-    @EventHandler(ignoreCancelled = true)
-    public void onHopperMoveItem(InventoryMoveItemEvent event) {
-
-        var inv = event.getDestination();
-        if (inv.getType() != InventoryType.CHEST) return;
-
-        var holder = inv.getHolder();
-        if (holder == null) return;
-
-        if (holder instanceof BlockInventoryHolder bh && bh.getInventory() instanceof DeathChestHolder) {
-            event.setCancelled(true);
-        }
     }
 
 
