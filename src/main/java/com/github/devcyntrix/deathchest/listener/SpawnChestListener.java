@@ -21,9 +21,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.time.Duration;
 import java.util.*;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
@@ -102,7 +99,6 @@ public class SpawnChestListener implements Listener {
             return;
         }
 
-        Player player = event.getEntity();
         Location deathLocation = new Location(
                 player.getWorld(),
                 player.getLocation().getX(),
@@ -112,12 +108,10 @@ public class SpawnChestListener implements Listener {
 
         if (!plugin.getDeathChestConfig().worldFilterConfig().test(deathLocation.getWorld()))
             return;
-        }
-
-        Location deathLocation = new Location(player.getWorld(), player.getLocation().getX(), Math.round(player.getLocation().getY()), player.getLocation().getZ());
 
         plugin.debug(1, "Checking world filter...");
-        if (!plugin.getDeathChestConfig().worldFilterConfig().test(deathLocation.getWorld())) return;
+        if (!plugin.getDeathChestConfig().worldFilterConfig().test(deathLocation.getWorld()))
+            return;
 
         plugin.debug(1, "Checking world height limitations...");
         // Check Minecraft limitation of block positions
@@ -128,12 +122,15 @@ public class SpawnChestListener implements Listener {
 
         plugin.debug(1, "Checking protection service...");
         boolean build = plugin.getProtectionService().canBuild(player, deathLocation, Material.CHEST);
-        if (!build) return;
+        if (!build)
+            return;
 
         plugin.debug(1, "Getting expiration time...");
         DeathChestConfig deathChestConfig = plugin.getDeathChestConfig();
         Duration expiration = deathChestConfig.expiration();
-        if (expiration == null) expiration = Duration.ofSeconds(-1);
+        if (expiration == null)
+            expiration = Duration.ofSeconds(-1);
+
 
         plugin.debug(1, "Checking no expiration permission...");
         NoExpirationPermission permission = deathChestConfig.noExpirationPermission();
