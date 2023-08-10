@@ -15,6 +15,7 @@ public record DeathChestConfig(
         @SerializedName("expiration") @Nullable Duration expiration,
         @SerializedName("no-expiration-permission") @Nullable NoExpirationPermission noExpirationPermission,
         @SerializedName("drop-items-after-expiration") boolean dropItemsAfterExpiration,
+        @SerializedName("convert-exp-to-bottles") boolean convertExpToBottles,
         @SerializedName("inventory") @NotNull InventoryOptions inventoryOptions,
         @SerializedName("hologram") @NotNull HologramOptions hologramOptions,
         @SerializedName("particle") @NotNull ParticleOptions particleOptions,
@@ -53,6 +54,7 @@ public record DeathChestConfig(
         }
 
         boolean dropItemsAfterExpiration = config.getBoolean("drop-items-after-expiration", false);
+        boolean convertExpToBottles = config.getBoolean("convert-exp-to-bottles", false);
 
         // Inventory
         InventoryOptions inventoryOptions = InventoryOptions.load(config.getConfigurationSection("inventory"));
@@ -83,7 +85,7 @@ public record DeathChestConfig(
 
         String preferredAnimationService = config.getString("preferred-animation-service");
 
-        return new DeathChestConfig(configVersion, debug, updateCheck, durationFormat, expiration, permission, dropItemsAfterExpiration, inventoryOptions, hologramOptions, particleOptions, breakAnimationOptions, playerNotificationOptions, globalNotificationOptions, changeDeathMessageOptions, worldFilterConfig, blastProtection, chestProtectionOptions, preferredAnimationService);
+        return new DeathChestConfig(configVersion, debug, updateCheck, durationFormat, expiration, permission, dropItemsAfterExpiration, convertExpToBottles, inventoryOptions, hologramOptions, particleOptions, breakAnimationOptions, playerNotificationOptions, globalNotificationOptions, changeDeathMessageOptions, worldFilterConfig, blastProtection, chestProtectionOptions, preferredAnimationService);
     }
 
 }
