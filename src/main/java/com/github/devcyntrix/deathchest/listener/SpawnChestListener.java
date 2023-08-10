@@ -131,7 +131,6 @@ public class SpawnChestListener implements Listener {
         if (expiration == null)
             expiration = Duration.ofSeconds(-1);
 
-
         plugin.debug(1, "Checking no expiration permission...");
         NoExpirationPermission permission = deathChestConfig.noExpirationPermission();
         boolean expires = permission == null || !permission.enabled() || !player.hasPermission(permission.permission());
@@ -158,7 +157,6 @@ public class SpawnChestListener implements Listener {
             boolean protectedChest = deathChestConfig.chestProtectionOptions().enabled() && player.hasPermission(deathChestConfig.chestProtectionOptions().permission());
             plugin.debug(1, "Protected chest: %s".formatted(true));
 
-            ItemStack[] items = event.getDrops().toArray(new ItemStack[0]);
             World world = loc.getWorld();
             Preconditions.checkNotNull(world);
 

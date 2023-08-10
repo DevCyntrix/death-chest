@@ -1,5 +1,7 @@
 package com.github.devcyntrix.deathchest.blacklist;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -22,6 +24,9 @@ public class ItemBlacklist implements InventoryHolder {
 
     public static final ItemStack DENY_ITEM = new ItemStack(Material.RED_STAINED_GLASS_PANE);
 
+    public static final ItemStack NEXT_PAGE = new ItemStack(Material.ARROW);
+    public static final ItemStack PREV_PAGE = new ItemStack(Material.ARROW);
+
     static {
         ItemMeta itemMeta = ADD_ITEM.getItemMeta();
         itemMeta.setDisplayName("§rAdd item");
@@ -38,12 +43,25 @@ public class ItemBlacklist implements InventoryHolder {
         itemMeta.setDisplayName("§cItem not found");
         DENY_ITEM.setItemMeta(itemMeta);
 
+        itemMeta = NEXT_PAGE.getItemMeta();
+        itemMeta.setDisplayName("§7Next page");
+        NEXT_PAGE.setItemMeta(itemMeta);
+
+        itemMeta = PREV_PAGE.getItemMeta();
+        itemMeta.setDisplayName("§7Previous page");
+        PREV_PAGE.setItemMeta(itemMeta);
+
     }
 
 
     private final File file;
+    @Getter
     private final Set<ItemStack> list = new HashSet<>();
     private final Inventory inventory;
+
+    @Getter
+    @Setter
+    private int page;
 
     public ItemBlacklist(File file) {
         this.file = file;
@@ -115,10 +133,6 @@ public class ItemBlacklist implements InventoryHolder {
         return result;
     }
 
-    public Set<ItemStack> getList() {
-        return list;
-    }
-
     public void updateInventory() {
         renderBackground();
 
@@ -128,8 +142,21 @@ public class ItemBlacklist implements InventoryHolder {
         list.forEach(stack -> stack.setAmount(1));
 
         AtomicInteger i = new AtomicInteger();
-        list.stream().limit(this.inventory.getSize() - 9)
-                .forEach(stack -> inventory.setItem(i.getAndIncrement(), stack));
+        list.stream()
+                .skip((this.inventory.getSize() - 9L) * page)
+                .limit(this.inventory.getSize() - 9L)
+                .forEach(stack -> {
+                    inventory.setItem(i.getAndIncrement(), stack);
+                });
+
+
+        if (getList().size() > (9 * 5 + 1) * (page + 1)) {
+            getInventory().setItem(53, NEXT_PAGE);
+        }
+
+        if (page > 0) {
+            getInventory().setItem(45, PREV_PAGE);
+        }
 
     }
 
