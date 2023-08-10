@@ -272,6 +272,10 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
             pluginManager.registerEvents(new ConvertExpToBottleListener(), this);
         }
 
+        if (deathChestConfig.convertExpToBottles()) {
+            pluginManager.registerEvents(new ConvertExpToBottleListener(), this);
+        }
+
         ServicesManager servicesManager = getServer().getServicesManager();
         debug(0, "Registering death chest service...");
         servicesManager.register(DeathChestService.class, this, this, ServicePriority.Normal);
