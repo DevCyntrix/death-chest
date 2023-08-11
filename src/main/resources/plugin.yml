@@ -2,7 +2,7 @@ name: DeathChest
 version: ${projectVersion}
 main: 'com.github.devcyntrix.deathchest.DeathChestPlugin'
 author: CyntrixAlgorithm
-softdepend: ['WorldGuard', 'ProtocolLib', 'GriefPrevention', 'GriefDefender', 'PlaceholderAPI', 'RedProtect']
+softdepend: [ 'WorldGuard', 'ProtocolLib', 'GriefPrevention', 'GriefDefender', 'PlaceholderAPI', 'RedProtect', 'minePlots' ]
 api-version: 1.17
 libraries:
   - 'org.apache.commons:commons-text:1.9'
