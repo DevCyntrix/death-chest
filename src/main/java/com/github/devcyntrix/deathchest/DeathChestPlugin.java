@@ -37,6 +37,7 @@ import lombok.SneakyThrows;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
@@ -409,7 +410,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
      */
     @Override
     public boolean canPlaceChestAt(@NotNull Location location) {
-        return deathChestController.getChest(location) == null && !location.getBlock().getType().isSolid();
+        return deathChestController.getChest(location) == null && !location.getBlock().getType().isSolid() && location.getBlock().getType() != Material.NETHER_PORTAL;
     }
 
     @Override
