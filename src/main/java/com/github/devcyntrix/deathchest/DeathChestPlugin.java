@@ -5,11 +5,14 @@ import com.github.devcyntrix.deathchest.api.animation.BreakAnimationService;
 import com.github.devcyntrix.deathchest.api.audit.AuditManager;
 import com.github.devcyntrix.deathchest.api.protection.ProtectionService;
 import com.github.devcyntrix.deathchest.api.report.ReportManager;
+import com.github.devcyntrix.deathchest.api.storage.DeathChestStorage;
 import com.github.devcyntrix.deathchest.audit.GsonAuditManager;
-import com.github.devcyntrix.deathchest.command.DeathChestCommand;
-import com.github.devcyntrix.deathchest.config.BreakAnimationOptions;
 import com.github.devcyntrix.deathchest.command.CommandRegistry;
 import com.github.devcyntrix.deathchest.config.*;
+import com.github.devcyntrix.deathchest.config.BreakAnimationOptions;
+import com.github.devcyntrix.deathchest.command.CommandRegistry;
+import com.github.devcyntrix.deathchest.config.ChestProtectionOptions;
+import com.github.devcyntrix.deathchest.config.DeathChestConfig;
 import com.github.devcyntrix.deathchest.controller.DeathChestController;
 import com.github.devcyntrix.deathchest.controller.HologramController;
 import com.github.devcyntrix.deathchest.controller.PlaceHolderController;
@@ -35,6 +38,7 @@ import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
@@ -99,15 +103,6 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
 
     @Getter
     private BukkitAudiences audiences;
-
-    @Nullable
-    private UpdateController updateController;
-
-    private PlaceHolderController placeHolderController;
-
-    private HologramController hologramController;
-
-    private DeathChestController deathChestController;
 
     /**
      * This method cleanups the whole plugin

@@ -101,25 +101,12 @@ public final class DeathChestModel {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DeathChestModel that = (DeathChestModel) o;
-        return createdAt == that.createdAt && Objects.equal(location, that.location) && Objects.equal(owner.getUniqueId(), that.owner.getUniqueId());
+        return createdAt == that.createdAt && Objects.equal(location, that.location) && Objects.equal(owner, that.owner);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(location, createdAt, owner.getUniqueId());
-    }
-
-    @NotNull
-    public Map<String, Object> serialize() {
-        Map<String, Object> map = new HashMap<>();
-        map.put("location", getLocation());
-        map.put("createdAt", getCreatedAt());
-        map.put("expireAt", getExpireAt());
-        if (getOwner() != null)
-            map.put("player", getOwner().getUniqueId().toString());
-        map.put("protected", isProtected());
-        map.put("items", getInventory().getContents());
-        return map;
+        return Objects.hashCode(location, createdAt, owner);
     }
 
     @NotNull

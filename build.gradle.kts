@@ -33,6 +33,7 @@ dependencies {
     // Command library
     compileOnly("cloud.commandframework:cloud-core:1.7.1")
     compileOnly("cloud.commandframework:cloud-bukkit:1.7.1")
+
     // Protection Support
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.7")
     compileOnly("com.plotsquared:PlotSquared-Core:6.8.1") { isTransitive = false }

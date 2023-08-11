@@ -148,63 +148,6 @@ public class DeathChestController implements Closeable {
     }
 
 
-    public DeathChestModel createChest(@NotNull Location location, long expireAt, @Nullable Player player, ItemStack @NotNull ... items) {
-        boolean protectedChest = player.hasPermission(getConfig().chestProtectionOptions().permission());
-        return createChest(location, System.currentTimeMillis(), expireAt, player, protectedChest, items);
-    }
-
-    public @NotNull DeathChestModel createChest(@NotNull Location location, long createdAt, long expireAt, @Nullable Player player, boolean isProtected, ItemStack @NotNull ... items) {
-        DeathChestModel model = new DeathChestModel(location, createdAt, expireAt, player, isProtected);
-        StringSubstitutor substitutor = new StringSubstitutor(new PlayerStringLookup(model, durationFormat));
-
-        // Creates inventory
-        InventoryOptions inventoryOptions = getConfig().inventoryOptions();
-
-        model.setInventory(inventoryOptions.createInventory(model, title -> {
-            title = substitutor.replace(title);
-            if (DeathChestPlugin.isPlaceholderAPIEnabled()) {
-                title = PlaceholderAPI.setPlaceholders(player, title);
-            }
-            return title;
-        }, items));
-
-        for (ChestAdapter listener : listeners) {
-            listener.onCreate(model);
-        }
-
-        this.loadedChests.put(model.getWorld(), model.getLocation(), model);
-
-        if (auditManager != null)
-            auditManager.audit(new AuditItem(new Date(), AuditAction.CREATE_CHEST, new CreateChestInfo(model)));
-
-        return model;
-    }
-
-    public @Nullable DeathChestModel getChest(@NotNull Location location) {
-        return this.loadedChests.get(location.getWorld(), location);
-    }
-
-    public @NotNull Collection<DeathChestModel> getChests() {
-        return this.loadedChests.values();
-    }
-
-    public @NotNull Collection<DeathChestModel> getChests(World world) {
-        return this.loadedChests.row(world).values();
-    }
-
-    public void destroyChest(DeathChestModel model) {
-
-        for (ChestAdapter listener : this.listeners) {
-            listener.onDestroy(model);
-        }
-        model.cancelTasks();
-
-        this.loadedChests.remove(model.getWorld(), model.getLocation()); // Remove from cache
-        this.storage.remove(model); // Remove from database
-        Bukkit.getPluginManager().callEvent(new DeathChestDestroyEvent(model));
-    }
-
-
     @Override
     public void close() throws IOException {
         unloadChests(true);
