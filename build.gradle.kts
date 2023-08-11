@@ -44,8 +44,6 @@ dependencies {
     compileOnly("pl.minecodes.plots:plugin-api:4.0.0")
 
 
-    compileOnly("com.griefdefender:api:2.1.0-SNAPSHOT")
-
     // Animation Support
     compileOnly("com.comphenix.protocol:ProtocolLib:4.7.0") { isTransitive = false }
 
