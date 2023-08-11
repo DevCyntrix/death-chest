@@ -122,7 +122,9 @@ public class GsonReportManager implements ReportManager {
             return;
 
         for (File file : files) {
-            file.delete();
+            if (!file.delete()) {
+                LOG.warning("Failed to delete file: " + file);
+            }
         }
     }
 

@@ -81,22 +81,37 @@ public class SpawnChestListener implements Listener {
         }
 
         plugin.debug(1, "Checking keep inventory...");
-        if (event.getKeepInventory()) return;
+        if (event.getKeepInventory())
+            return;
         plugin.debug(1, "Removing air...");
-        boolean removed = event.getDrops().removeIf(itemStack -> Material.AIR.equals(itemStack.getType()));// Prevent spawning an empty chest
+        boolean removed = event.getDrops().removeIf(itemStack -> itemStack.getType() == Material.AIR); // Prevent spawning an empty chest
         if (removed) {
             plugin.debug(2, "Inventory has been updated.");
         }
-        plugin.debug(1, "Checking empty inventory...");
-        if (event.getDrops().isEmpty()) {
-            plugin.debug(1, "Inventory was empty: spawning no chest.");
+        ItemStack[] items = event.getDrops().stream()
+                .filter(Objects::nonNull)
+                .filter(stack -> plugin.getBlacklist().isValidItem(stack))
+                .toArray(ItemStack[]::new);
+
+        if (items.length == 0) {
+            plugin.debug(1, "Clearing drops because the inventory was empty after removing blacklisted items");
+            event.getDrops().clear();
             return;
         }
 
-        Location deathLocation = new Location(player.getWorld(), player.getLocation().getX(), Math.round(player.getLocation().getY()), player.getLocation().getZ());
+        Location deathLocation = new Location(
+                player.getWorld(),
+                player.getLocation().getX(),
+                Math.round(player.getLocation().getY()),
+                player.getLocation().getZ()
+        );
+
+        if (!plugin.getDeathChestConfig().worldFilterConfig().test(deathLocation.getWorld()))
+            return;
 
         plugin.debug(1, "Checking world filter...");
-        if (!plugin.getDeathChestConfig().worldFilterConfig().test(deathLocation.getWorld())) return;
+        if (!plugin.getDeathChestConfig().worldFilterConfig().test(deathLocation.getWorld()))
+            return;
 
         plugin.debug(1, "Checking world height limitations...");
         // Check Minecraft limitation of block positions
@@ -107,12 +122,14 @@ public class SpawnChestListener implements Listener {
 
         plugin.debug(1, "Checking protection service...");
         boolean build = plugin.getProtectionService().canBuild(player, deathLocation, Material.CHEST);
-        if (!build) return;
+        if (!build)
+            return;
 
         plugin.debug(1, "Getting expiration time...");
         DeathChestConfig deathChestConfig = plugin.getDeathChestConfig();
         Duration expiration = deathChestConfig.expiration();
-        if (expiration == null) expiration = Duration.ofSeconds(-1);
+        if (expiration == null)
+            expiration = Duration.ofSeconds(-1);
 
         plugin.debug(1, "Checking no expiration permission...");
         NoExpirationPermission permission = deathChestConfig.noExpirationPermission();
@@ -140,7 +157,6 @@ public class SpawnChestListener implements Listener {
             boolean protectedChest = deathChestConfig.chestProtectionOptions().enabled() && player.hasPermission(deathChestConfig.chestProtectionOptions().permission());
             plugin.debug(1, "Protected chest: %s".formatted(true));
 
-            ItemStack[] items = event.getDrops().toArray(new ItemStack[0]);
             World world = loc.getWorld();
             Preconditions.checkNotNull(world);
 

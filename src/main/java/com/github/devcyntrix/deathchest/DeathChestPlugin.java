@@ -1,5 +1,6 @@
 package com.github.devcyntrix.deathchest;
 
+import com.github.devcyntrix.api.event.InventoryChangeSlotItemListener;
 import com.github.devcyntrix.deathchest.api.DeathChestService;
 import com.github.devcyntrix.deathchest.api.animation.BreakAnimationService;
 import com.github.devcyntrix.deathchest.api.audit.AuditManager;
@@ -7,6 +8,8 @@ import com.github.devcyntrix.deathchest.api.protection.ProtectionService;
 import com.github.devcyntrix.deathchest.api.report.ReportManager;
 import com.github.devcyntrix.deathchest.api.storage.DeathChestStorage;
 import com.github.devcyntrix.deathchest.audit.GsonAuditManager;
+import com.github.devcyntrix.deathchest.blacklist.ItemBlacklist;
+import com.github.devcyntrix.deathchest.blacklist.ItemBlacklistListener;
 import com.github.devcyntrix.deathchest.command.CommandRegistry;
 import com.github.devcyntrix.deathchest.config.*;
 import com.github.devcyntrix.deathchest.controller.DeathChestController;
@@ -17,7 +20,6 @@ import com.github.devcyntrix.deathchest.listener.*;
 import com.github.devcyntrix.deathchest.report.GsonReportManager;
 import com.github.devcyntrix.deathchest.support.storage.YamlStorage;
 import com.github.devcyntrix.deathchest.util.LastDeathChestLocationExpansion;
-import com.github.devcyntrix.deathchest.util.Metrics;
 import com.github.devcyntrix.deathchest.util.WorldGuardDeathChestFlag;
 import com.github.devcyntrix.deathchest.util.adapter.DurationAdapter;
 import com.github.devcyntrix.deathchest.view.chest.*;
@@ -31,6 +33,7 @@ import com.google.gson.GsonBuilder;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -81,6 +84,8 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
 
     private AuditManager auditManager;
 
+    private ItemBlacklist blacklist;
+
     @Getter
     private final Map<Player, DeathChestModel> lastDeathChests = new WeakHashMap<>();
 
@@ -100,11 +105,20 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
     private BukkitAudiences audiences;
 
     /**
-     * This method cleanups the whole plugin
+     * This method cleans the whole plugin up
      */
     @Override
     public void onDisable() {
 
+        if (this.blacklist != null) {
+            try {
+                this.blacklist.save();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // Save all chests
         PluginManager pluginManager = Bukkit.getPluginManager();
         try {
             ChestProtectionOptions protectionOptions = getDeathChestConfig().chestProtectionOptions();
@@ -252,6 +266,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
             getLogger().warning("Failed to register the permission of the chest-protection");
             e.printStackTrace();
         }
+        this.blacklist = new ItemBlacklist(new File(getDataFolder(), "blacklist.yml"));
 
         debug(0, "Registering event listeners...");
         pluginManager.registerEvents(new SpawnChestListener(this), this);
@@ -259,6 +274,9 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         pluginManager.registerEvents(new ChestDestroyListener(this), this);
         pluginManager.registerEvents(new LastDeathChestListener(this), this);
         pluginManager.registerEvents(new WorldListener(this), this);
+        pluginManager.registerEvents(new ItemBlacklistListener(blacklist), this);
+        pluginManager.registerEvents(new InventoryChangeSlotItemListener(), this);
+        pluginManager.registerEvents(new InventoryChangeSlotItemListener(blacklist), this);
 
         if (deathChestConfig.convertExpToBottles()) {
             pluginManager.registerEvents(new ConvertExpToBottleListener(), this);
