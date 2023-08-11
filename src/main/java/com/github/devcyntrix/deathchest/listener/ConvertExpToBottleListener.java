@@ -1,6 +1,5 @@
 package com.github.devcyntrix.deathchest.listener;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -16,7 +15,6 @@ public class ConvertExpToBottleListener implements Listener {
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
         int droppedExp = event.getDroppedExp();
-        Bukkit.broadcastMessage(droppedExp + " exp points dropped");
         int numberOfBottles = droppedExp / 7; // Seven is the average of experience points which drops a Bottle o' Enchanting (https://minecraft.fandom.com/wiki/Bottle_o%27_Enchanting#Usage)
 
         do {
