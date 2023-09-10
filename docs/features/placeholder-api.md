@@ -4,9 +4,9 @@ description: https://www.spigotmc.org/resources/placeholderapi.6245/
 
 # PlaceHolder API
 
-<figure><img src="../.gitbook/assets/papi-hologram-with-chest" alt=""><figcaption><p>Shows a hologram with PAPI support if the player has a death chest</p></figcaption></figure>
+<figure><img src="../.gitbook/assets/papi-hologram-with-chest.png" alt=""><figcaption><p>Shows a hologram with PAPI support if the player has a death chest</p></figcaption></figure>
 
-<figure><img src="../.gitbook/assets/papi-hologram-without-chest" alt=""><figcaption><p>Shows a hologram with PAPI support if the player has no death chest</p></figcaption></figure>
+<figure><img src="../.gitbook/assets/papi-hologram-without-chest.png" alt=""><figcaption><p>Shows a hologram with PAPI support if the player has no death chest</p></figcaption></figure>
 
 ### Placeholders
 

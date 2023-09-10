@@ -6,7 +6,7 @@ description: This feature makes the chest disappear after a certain time
 
 If you don't want to vary far away from the minecraft logic you can use the minecraft expiration. This lets the chest disappear after a certain time.
 
-<figure><img src="../.gitbook/assets/chest-with-hologram" alt="" width="294"><figcaption><p>Shows the time when the chest disappear</p></figcaption></figure>
+<figure><img src="../.gitbook/assets/chest-with-hologram.png" alt="" width="294"><figcaption><p>Shows the time when the chest disappear</p></figcaption></figure>
 
 If you want to change the expiration time you can edit it in the configuration file (plugins/DeathChest/config.yml):
 
