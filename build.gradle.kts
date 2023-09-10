@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "com.github.devcyntrix"
-version = "2.0.0"
+version = "2.0.1"
 
 repositories {
     mavenCentral()
@@ -33,9 +33,6 @@ dependencies {
     compileOnly("cloud.commandframework:cloud-core:1.7.1")
     compileOnly("cloud.commandframework:cloud-bukkit:1.7.1")
 
-    // Command library
-    compileOnly("cloud.commandframework:cloud-core:1.7.1")
-    compileOnly("cloud.commandframework:cloud-bukkit:1.7.1")
     implementation("org.bstats:bstats-bukkit:3.0.2")
 
     // Protection Support

@@ -136,6 +136,11 @@ public class SpawnChestListener implements Listener {
         boolean expires = permission == null || !permission.enabled() || !player.hasPermission(permission.permission());
         long createdAt = System.currentTimeMillis();
         long expireAt = !expiration.isNegative() && !expiration.isZero() && expires ? createdAt + expiration.toMillis() : -1;
+        if(expireAt <= 0) {
+            plugin.debug(1, "The chest will never expire");
+        } else {
+            plugin.debug(1, "The chest will expire at " + new Date(expireAt));
+        }
 
         Location loc = deathLocation.getBlock().getLocation();
         ThreadLocalRandom random = ThreadLocalRandom.current();
@@ -155,7 +160,7 @@ public class SpawnChestListener implements Listener {
 
         try {
             boolean protectedChest = deathChestConfig.chestProtectionOptions().enabled() && player.hasPermission(deathChestConfig.chestProtectionOptions().permission());
-            plugin.debug(1, "Protected chest: %s".formatted(true));
+            plugin.debug(1, "Protected chest: %s".formatted(protectedChest));
 
             World world = loc.getWorld();
             Preconditions.checkNotNull(world);
