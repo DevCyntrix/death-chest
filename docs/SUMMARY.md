@@ -1,4 +1,25 @@
 # Table of contents
 
-* [Death Chest](README.md)
-* [Page](page.md)
+* [Documentation](README.md)
+* [Installation](installation.md)
+
+## Features
+
+* [Claim Protections](features/claim-protections.md)
+* [Block break animation](features/block-break-animation.md)
+* [Particle animation](features/particle-animation.md)
+* [Holograms](features/holograms.md)
+* [Inventory](features/inventory.md)
+* [Experience points convertation](features/experience-points-convertation.md)
+* [Expiration](features/expiration.md)
+* [Player notification](features/player-notification.md)
+* [Global notification](features/global-notification.md)
+* [Change death message](features/change-death-message.md)
+* [World filter](features/world-filter.md)
+* [Blast protection](features/blast-protection.md)
+* [Chest Protection](features/chest-protection.md)
+* [PlaceHolder API](features/placeholder-api.md)
+
+***
+
+* [❓ FAQ](faq.md)
