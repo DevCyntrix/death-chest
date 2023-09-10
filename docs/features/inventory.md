@@ -4,7 +4,7 @@ description: Documenation of the inventory which opens if you right click the de
 
 # Inventory
 
-<figure><img src="../.gitbook/assets/2023-09-03_18.37.57.png" alt=""><figcaption><p>Depicts the inventory of the death chest</p></figcaption></figure>
+<figure><img src="../.gitbook/assets/chest-inventory.png" alt=""><figcaption><p>Depicts the inventory of the death chest</p></figcaption></figure>
 
 The inventory contains all dropped items. You can modify the inventory by editing the following properties in the configuration file (plugins/DeathChest/config.yml):
 
