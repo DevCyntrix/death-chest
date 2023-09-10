@@ -1,25 +1,10 @@
 # Death Chest
 
-[![MIT License](https://img.shields.io/github/license/DevCyntrix/death-chest)](LICENSE)
-[![Discord](https://img.shields.io/discord/899027136046841958?label=Discord)](https://discord.gg/SdDeWUB8F6)
+[![https://img.shields.io/discord/899027136046841958?label=Discord](https://img.shields.io/discord/899027136046841958?label=Discord)](https://discord.com/invite/xv4fswzrea) 
+[![https://img.shields.io/badge/Documentation-green?label=Click%20to%20read](https://img.shields.io/badge/Documentation-green?label=Click%20to%20read)](https://deathchest.helixdevs.de/)
 
-A spigot plugin for spawning a chest when the player dies. It supports Holographic Displays, Decent Holograms,
-ProtocolLib, WorldGuard, GriefPrevention and PlotSquared for additional features
+A spigot plugin for spawning a chest when a player dies to save the items. By default a expiration time of 5 minutes is configured. In the configuration file you have a lot of properties to fit the plugin to your server design. It also supports holograms, particle and block breaking effects. 
 
-## PAPI Placeholders
-
-```
-%deathchest_last_location%
-```
-
-You can configure the format of the location and the fallback message in the papi config by adding this properties:
-
-```yaml
-expansions:
-  DeathChest:
-    location_format: '<x> <y> <z> <world>'
-    fallback_message: '&cChest not found'
-```
 
 ## Configuration
 
@@ -46,62 +31,3 @@ fully customizable in the configuration file. It has also a support with specifi
 ### Block break animation
 
 This plugin has a support for ProtocolLib which is needed to activate the block breaking animation.
-
-## API
-
-You have to add this plugin as a dependency or soft dependency. Then you can get the death chest service.
-
-```java
-public class TestPlugin extends JavaPlugin {
-
-    @Override
-    public void onEnable() {
-        DeathChestService load = getServer().getServicesManager().load(DeathChestService.class);
-        if (load != null) {
-            // Code
-        }
-    }
-
-}
-```
-
-With the service you can create new death chests.
-
-```java
-public class TestPlugin extends JavaPlugin {
-
-    @Override
-    public void onEnable() {
-        DeathChestService load = getServer().getServicesManager().load(DeathChestService.class);
-        if (load != null) {
-            DeathChest chest = load.createDeathChest(location, items); // This creates a new chest with the items in the world
-        }
-    }
-
-}
-```
-
-Or you can use the service in other events.
-
-```java
-public class TestPlugin extends JavaPlugin implements Listener {
-
-    private DeathChestService deathChestService;
-
-    @Override
-    public void onEnable() {
-        this.deathChestService = getServer().getServicesManager().load(DeathChestService.class);
-        if (this.deathChestService != null) {
-            getServer().getPluginManager().registerEvents(this, this); // Registers only if the service is available
-        }
-    }
-
-    @EventHandler
-    public void onQuit(PlayerQuitEvent event) {
-        Player player = event.getPlayer();
-        ItemStack[] items = null; // Items code here
-        this.deathChestService.createDeathChest(player.getLocation(), items); // This creates a new chest with the items in the world
-    }
-
-}
-```
