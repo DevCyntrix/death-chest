@@ -1,6 +1,6 @@
 # Particle animation
 
-<figure><img src="../.gitbook/assets/2023-09-03_18.28.52_2.png" alt="" width="387"><figcaption><p>Particle animation around the chest</p></figcaption></figure>
+<figure><img src="../.gitbook/assets/chest-with-particle.png" alt="" width="387"><figcaption><p>Particle animation around the chest</p></figcaption></figure>
 
 You can configure the particle animation in the configuration file (plugins/DeathChest/config.yml):
 
