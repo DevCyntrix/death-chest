@@ -1,6 +1,7 @@
 # Table of contents
 
-* [Documentation](README.md)
+* [Death Chest](README.md)
+* [Documentation](documentation.md)
 * [Installation](installation.md)
 
 ## Features
