@@ -16,6 +16,8 @@ public class ExpirationAdapter implements ChestAdapter {
 
     @Override
     public void onCreate(DeathChestModel model) {
+        if (!model.isExpiring())
+            return;
         long untilDeletion = Math.max(0, model.getExpireAt() - System.currentTimeMillis());
 
         ExpirationRunnable runnable = new ExpirationRunnable(plugin, plugin.getAuditManager(), model);
@@ -25,7 +27,6 @@ public class ExpirationAdapter implements ChestAdapter {
 
     @Override
     public void onDestroy(DeathChestModel model) {
-
 
     }
 

@@ -21,6 +21,7 @@ no-expiration-permission:
 drop-items-after-expiration: false
 
 # This will calculate the count of bottles by using the average experience points drops of a Bottle o' Enchanting and adds it to the dropped loot
+# Set the value to 'true' if you want to activate this feature
 convert-exp-to-bottles: false
 
 # Here you can modify the inventory which opens when you right-click the death chest. You can use color codes with '&'
@@ -40,6 +41,7 @@ inventory:
 # or you set the 'enabled' option to false
 # This feature is only available if you have a supported hologram plugin installed.
 hologram:
+  # Set the value to 'false' if you want to deactivate this feature
   enabled: true
   # If you add lines you have to increase this value. This values depends on the hologram
   # plugin and the distance between the plugin
@@ -56,6 +58,7 @@ hologram:
 # This section is for handling the particle function in this plugin. You can remove this section to disable the feature,
 # or you set the 'enabled' option to false
 particle:
+  # Set the value to 'false' if you want to deactivate this feature
   enabled: true
   radius: 1.0
   count: 32
@@ -66,6 +69,7 @@ particle:
 # or you set the 'enabled' option to false
 # This feature is only available if you have ProtocolLib installed.
 break-effect:
+  # Set the value to 'false' if you want to deactivate this feature
   enabled: true
   view-distance: 20.0
 
@@ -75,6 +79,7 @@ break-effect:
 # You can send the death coordination by using the placeholders: ${x} ${y}, ${z} and ${world}
 # Also you can send the chest coordination by using the placeholders: ${chest_x}, ${chest_y} and ${chest_z}
 player-notification:
+  # Set the value to 'false' if you want to deactivate this feature
   enabled: true
   message: |-
     &7You died. Your items were put into a chest which disappears after &c10 minutes&7! ${x} ${y} ${z}
@@ -85,6 +90,7 @@ player-notification:
 # ${x}, ${y}, ${z}, ${world} : shows the coordinates of the death location
 # ${chest_x}, ${chest_y}, ${chest_z} : shows the coordinates of the chest
 global-notification:
+  # Set the value to 'true' if you want to activate this feature
   enabled: false
   message: |-
     &7${player_name} died at ${x} ${y} ${z} in ${world}
@@ -96,6 +102,7 @@ global-notification:
 # (coordinates of the chest isn't available for here)
 # To disable the death message change "enabled" to true and remove the message option.
 change-death-message:
+  # Set the value to 'true' if you want to activate this feature
   enabled: false
   message: |-
     &7${player_name} died at ${x} ${y} ${z} in ${world}
@@ -113,6 +120,7 @@ blast-protection: false
 # This option protects the death chest against thieves if the player has the specific permission and the thief
 # not the bypass permission.
 chest-protection:
+  # Set the value to 'true' if you want to activate this feature
   enabled: false
   permission: 'deathchest.thiefprotected'
   bypass-permission: 'deathchest.thiefprotected.bypass'
