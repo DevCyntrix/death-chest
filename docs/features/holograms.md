@@ -1,6 +1,6 @@
 # Holograms
 
-<figure><img src="../.gitbook/assets/chest-with-hologram" alt="" width="441"><figcaption><p>Depicts the holograms above the death chest</p></figcaption></figure>
+<figure><img src="../.gitbook/assets/chest-with-hologram.png" alt="" width="441"><figcaption><p>Depicts the holograms above the death chest</p></figcaption></figure>
 
 The plugin supports a hologram to display the name of the dead player and the expiration time. You can configure the following properties in the configuration file (plugins/DeathChest/config.yml):
 
