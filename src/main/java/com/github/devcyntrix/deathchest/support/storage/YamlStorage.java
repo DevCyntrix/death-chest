@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Supplier;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -56,23 +57,22 @@ public class YamlStorage implements DeathChestStorage {
      *
      * @param fromFile the saved-chests file
      */
-    private void migrateChests(DeathChestPlugin plugin, File fromFile) {
+    private void migrateChests(DeathChestPlugin plugin, File fromFile, Logger logger) {
         Preconditions.checkArgument(fromFile.isFile());
-        System.out.println("Migrating the deathchests...");
+        logger.info("Starting death chest migration...");
 
         // Loading saved chests of the file
         YamlConfiguration configuration = YamlConfiguration.loadConfiguration(fromFile);
         List<?> chests = configuration.getList("chests", Collections.emptyList());
-        System.out.println(chests.size() + " chests found");
+        logger.info(chests.size() + " chests found");
 
         Set<DeathChestModel> deathChests = new HashSet<>();
         for (Object chest : chests) {
             if (!(chest instanceof Map<?, ?> map))
                 continue;
-            System.out.println("deserializing...");
             DeathChestModel deserialize = DeathChestModel.deserialize((Map<String, Object>) map, plugin.getDeathChestConfig().inventoryOptions(), this.placeHolderController);
             if (deserialize == null) {
-                System.out.println("FAILED");
+                logger.warning("Failed to deserialize a death chest");
                 continue;
             }
             deathChests.add(deserialize);
@@ -108,7 +108,7 @@ public class YamlStorage implements DeathChestStorage {
                 File worldFile = getFile(world, true);
                 map.get(world).save(worldFile);
             } catch (IOException e) {
-                plugin.getLogger().severe("Failed to save chests in world \"" + world.getName() + "\" during migration");
+                logger.severe("Failed to save chests in world \"" + world.getName() + "\" during migration");
                 throw new RuntimeException(e);
             }
         }
@@ -125,7 +125,7 @@ public class YamlStorage implements DeathChestStorage {
         }
 
         if (deathChests.isEmpty() && !fromFile.renameTo(new File(fromFile.getParent(), fromFile.getName() + ".old"))) {
-            plugin.getLogger().severe("Failed to rename the old storage file");
+            logger.severe("Failed to rename the old storage file");
         }
 
 
@@ -145,7 +145,7 @@ public class YamlStorage implements DeathChestStorage {
         if (savedChests != null) {
             File file = new File(plugin.getDataFolder(), savedChests);
             if (file.isFile()) {
-                migrateChests(plugin, file);
+                migrateChests(plugin, file, plugin.getLogger());
             }
         } else {
             System.out.println("No saved file found");
