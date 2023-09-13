@@ -27,7 +27,8 @@ public final class SupportServices {
             "WorldGuard", plugin -> new WorldGuardProtection(),
             "PlotSquared", plugin -> new PlotSquaredProtection(),
             "GriefPrevention", plugin -> new GriefPreventionProtection(),
-            "RedProtect", plugin -> new RedProtection()
+            "RedProtect", plugin -> new RedProtection(),
+            "minePlots", plugin -> new MinePlotsProtectionService()
     );
 
     public static @Nullable BreakAnimationService getBlockBreakAnimationService(@NotNull DeathChestPlugin plugin, @Nullable String preferred) {

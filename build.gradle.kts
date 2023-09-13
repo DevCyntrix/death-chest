@@ -19,6 +19,9 @@ repositories {
     maven("https://repo.dmulloy2.net/repository/public/")
     maven("https://raw.githubusercontent.com/FabioZumbi12/RedProtect/mvn-repo/")
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
+
+    maven("https://repository.minecodes.pl/releases")
+
     maven("https://jitpack.io")
 }
 
@@ -42,6 +45,7 @@ dependencies {
     compileOnly("com.github.TechFortress:GriefPrevention:16.18") { isTransitive = false }
     compileOnly("br.net.fabiozumbi12.RedProtect:RedProtect-Core:7.7.3") { isTransitive = false }
     compileOnly("br.net.fabiozumbi12.RedProtect:RedProtect-Spigot:7.7.3") { isTransitive = false }
+    compileOnly("pl.minecodes.plots:plugin-api:4.0.0")
 
     // Animation Support
     compileOnly("com.comphenix.protocol:ProtocolLib:4.7.0") { isTransitive = false }
