@@ -84,7 +84,8 @@ public class SpawnChestListener implements Listener {
         if (event.getKeepInventory())
             return;
         plugin.debug(1, "Removing air...");
-        boolean removed = event.getDrops().removeIf(itemStack -> itemStack.getType() == Material.AIR); // Prevent spawning an empty chest
+        boolean removed = event.getDrops()
+                .removeIf(itemStack -> itemStack.getType() == Material.AIR || itemStack.getAmount() <= 0); // Prevent spawning an empty chest
         if (removed) {
             plugin.debug(2, "Inventory has been updated.");
         }
