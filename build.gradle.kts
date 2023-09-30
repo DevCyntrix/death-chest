@@ -82,7 +82,7 @@ tasks {
         }
     }
     runServer {
-        minecraftVersion("1.20.1")
+        minecraftVersion("1.20.2")
     }
     test {
         useJUnitPlatform()
@@ -109,7 +109,7 @@ hangarPublish {
         platforms {
             register(Platforms.PAPER) {
                 jar.set(tasks.shadowJar.flatMap { it.archiveFile })
-                platformVersions.set(listOf("1.17-1.20.1"))
+                platformVersions.set(listOf("1.17-1.20.2"))
                 dependencies.url("ProtocolLib", "https://www.spigotmc.org/resources/protocollib.1997/") {
                     required.set(false)
                 }
@@ -126,6 +126,9 @@ hangarPublish {
                     required.set(false)
                 }
                 dependencies.url("WorldGuard", "https://dev.bukkit.org/projects/worldguard") {
+                    required.set(false)
+                }
+                dependencies.url("minePlots", "https://builtbybit.com/resources/mineplots.21646/") {
                     required.set(false)
                 }
             }
