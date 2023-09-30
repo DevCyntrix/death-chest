@@ -11,6 +11,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.stream.Stream;
 
@@ -18,12 +19,12 @@ public class BreakAnimationAdapter implements ChestAdapter {
 
     @NotNull
     private final DeathChestPlugin plugin;
-    @NotNull
+    @Nullable
     private final BreakAnimationService service;
     @NotNull
     private final BreakAnimationOptions options;
 
-    public BreakAnimationAdapter(@NotNull DeathChestPlugin plugin, @NotNull BreakAnimationService service, @NotNull BreakAnimationOptions options) {
+    public BreakAnimationAdapter(@NotNull DeathChestPlugin plugin, @Nullable BreakAnimationService service, @NotNull BreakAnimationOptions options) {
         this.plugin = plugin;
         this.service = service;
         this.options = options;
@@ -31,10 +32,12 @@ public class BreakAnimationAdapter implements ChestAdapter {
 
     @Override
     public void onCreate(DeathChestModel model) {
-        model.setBreakingEntityId(EntityIdHelper.increaseAndGet());
-        plugin.debug(0, "Starting block break animation using entity id %d".formatted(model.getBreakingEntityId()));
-        BukkitTask bukkitTask = new BreakAnimationRunnable(plugin, model, service, options).runTaskTimerAsynchronously(plugin, 20, 20);
-        model.getTasks().add(bukkitTask::cancel);
+        if(service != null) {
+            model.setBreakingEntityId(EntityIdHelper.increaseAndGet());
+            plugin.debug(0, "Starting block break animation using entity id %d".formatted(model.getBreakingEntityId()));
+            BukkitTask bukkitTask = new BreakAnimationRunnable(plugin, model, service, options).runTaskTimerAsynchronously(plugin, 20, 20);
+            model.getTasks().add(bukkitTask::cancel);
+        }
     }
 
     @Override
