@@ -23,6 +23,7 @@ drop-items-after-expiration: false
 # This will calculate the count of bottles by using the average experience points drops of a Bottle o' Enchanting and adds it to the dropped loot
 # Set the value to 'true' if you want to activate this feature
 convert-exp-to-bottles: false
+save-all-exp: false
 
 # Here you can modify the inventory which opens when you right-click the death chest. You can use color codes with '&'
 # in the title and change the inventory size by changing the size value.
