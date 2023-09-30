@@ -8,7 +8,10 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class RedProtection implements ProtectionService {
+/**
+ * <a href="https://www.spigotmc.org/resources/redprotect-anti-grief-server-protection-region-management-1-7-1-19.15841/">Redprotect</a>
+ */
+public class RedProtectProtection implements ProtectionService {
 
     private final RedProtect protect = RedProtect.get();
 

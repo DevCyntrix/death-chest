@@ -9,11 +9,14 @@ import org.jetbrains.annotations.NotNull;
 import pl.minecodes.plots.api.plot.PlotApi;
 import pl.minecodes.plots.api.plot.PlotServiceApi;
 
-public class MinePlotsProtectionService implements ProtectionService {
+/**
+ * <a href="https://builtbybit.com/resources/mineplots.21646/">minePlots</a>
+ */
+public class MinePlotsProtection implements ProtectionService {
 
     private PlotServiceApi api;
 
-    public MinePlotsProtectionService() {
+    public MinePlotsProtection() {
         this.api = Bukkit.getServicesManager().load(PlotServiceApi.class);
         if (this.api == null)
             throw new IllegalStateException();
