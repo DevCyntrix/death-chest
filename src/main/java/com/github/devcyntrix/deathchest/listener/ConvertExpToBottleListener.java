@@ -1,5 +1,9 @@
 package com.github.devcyntrix.deathchest.listener;
 
+import com.github.devcyntrix.deathchest.DeathChestPlugin;
+import com.github.devcyntrix.deathchest.config.DeathChestConfig;
+import com.github.devcyntrix.deathchest.util.ExpUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -12,10 +16,22 @@ import org.bukkit.inventory.ItemStack;
  */
 public class ConvertExpToBottleListener implements Listener {
 
+    private final DeathChestPlugin plugin;
+
+    public ConvertExpToBottleListener(DeathChestPlugin plugin) {
+        this.plugin = plugin;
+    }
+
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
-        int droppedExp = event.getDroppedExp();
-        int numberOfBottles = droppedExp / 7; // Seven is the average of experience points which drops a Bottle o' Enchanting (https://minecraft.fandom.com/wiki/Bottle_o%27_Enchanting#Usage)
+        DeathChestConfig config = plugin.getDeathChestConfig();
+
+        int exp = event.getDroppedExp();
+        if(config.saveAllExp()) {
+            exp = ExpUtil.getPlayerExp(event.getEntity());
+        }
+
+        int numberOfBottles = exp / 7; // Seven is the average of experience points which drops a Bottle o' Enchanting (https://minecraft.fandom.com/wiki/Bottle_o%27_Enchanting#Usage)
 
         do {
             int size = Math.min(numberOfBottles, 64);
