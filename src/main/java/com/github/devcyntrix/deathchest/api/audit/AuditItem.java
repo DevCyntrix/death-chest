@@ -9,6 +9,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Date;
 
@@ -18,6 +19,7 @@ public record AuditItem(Date date, AuditAction action, AuditInfo info) {
             .registerTypeAdapter(ItemStack.class, new ItemStackAdapter())
             .registerTypeAdapter(Location.class, new LocationAdapter())
             .registerTypeAdapter(Inventory.class, new InventoryAdapter())
+            .registerTypeHierarchyAdapter(ItemMeta.class, new ItemMetaAdapter())
             .registerTypeHierarchyAdapter(LivingEntity.class, new LivingEntityAdapter())
             .registerTypeHierarchyAdapter(CommandSender.class, new CommandSenderAdapter())
             //.registerTypeHierarchyAdapter(Entity.class, new EntityAdapter())
