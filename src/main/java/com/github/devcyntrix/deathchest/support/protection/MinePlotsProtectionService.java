@@ -6,6 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import pl.minecodes.plots.api.plot.PlotApi;
 import pl.minecodes.plots.api.plot.PlotServiceApi;
 
 public class MinePlotsProtectionService implements ProtectionService {
@@ -20,6 +21,7 @@ public class MinePlotsProtectionService implements ProtectionService {
 
     @Override
     public boolean canBuild(@NotNull Player player, @NotNull Location location, @NotNull Material material) {
-        return api.getPlot(location).hasAccess(player);
+        PlotApi plot = api.getPlot(location);
+        return plot == null || plot.hasAccess(player);
     }
 }
