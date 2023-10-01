@@ -1,4 +1,20 @@
+---
+layout:
+  title:
+    visible: false
+  description:
+    visible: false
+  tableOfContents:
+    visible: true
+  outline:
+    visible: true
+  pagination:
+    visible: true
+---
+
 # Death Chest
+
+<figure><img src=".gitbook/assets/deathchest-logo.png" alt=""><figcaption></figcaption></figure>
 
 [![https://img.shields.io/discord/899027136046841958?label=Discord](https://img.shields.io/discord/899027136046841958?label=Discord)](https://discord.com/invite/xv4fswzrea) [![https://img.shields.io/badge/Documentation-green?label=Click%20to%20read](https://img.shields.io/badge/Documentation-green?label=Click%20to%20read)](https://deathchest.helixdevs.de/)
 
