@@ -10,7 +10,7 @@ import com.github.devcyntrix.deathchest.api.event.DeathChestDestroyEvent;
 import com.github.devcyntrix.deathchest.api.storage.DeathChestStorage;
 import com.github.devcyntrix.deathchest.config.DeathChestConfig;
 import com.github.devcyntrix.deathchest.config.InventoryOptions;
-import com.github.devcyntrix.deathchest.util.ChestAdapter;
+import com.github.devcyntrix.deathchest.util.ChestView;
 import com.github.devcyntrix.deathchest.util.PlayerStringLookup;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
@@ -41,7 +41,7 @@ public class DeathChestController implements Closeable {
     private final AuditManager auditManager;
     private final DeathChestStorage storage;
 
-    private final Set<ChestAdapter> listeners = new HashSet<>();
+    private final Set<ChestView> listeners = new HashSet<>();
 
     protected final Table<World, Location, DeathChestModel> loadedChests = HashBasedTable.create();
     //protected final Set<DeathChestModel> loadedChests = new CopyOnWriteArraySet<>();
@@ -61,7 +61,7 @@ public class DeathChestController implements Closeable {
         };
     }
 
-    public void registerAdapter(ChestAdapter adapter) {
+    public void registerAdapter(ChestView adapter) {
         this.listeners.add(adapter);
     }
 
@@ -73,7 +73,7 @@ public class DeathChestController implements Closeable {
     public void loadChests(World world) {
         this.storage.getChests(world)
                 .forEach(model -> {
-                    for (ChestAdapter listener : listeners) {
+                    for (ChestView listener : listeners) {
                         listener.onLoad(model);
                     }
                     this.loadedChests.put(model.getWorld(), model.getLocation(), model);
@@ -103,7 +103,7 @@ public class DeathChestController implements Closeable {
             return title;
         }, items));
 
-        for (ChestAdapter listener : listeners) {
+        for (ChestView listener : listeners) {
             listener.onCreate(model);
         }
 
@@ -134,7 +134,7 @@ public class DeathChestController implements Closeable {
         model.setDeleting(true);
 
         model.cancelTasks();
-        for (ChestAdapter listener : this.listeners) {
+        for (ChestView listener : this.listeners) {
             listener.onDestroy(model);
         }
 

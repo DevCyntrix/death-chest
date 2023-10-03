@@ -2,7 +2,7 @@ package com.github.devcyntrix.deathchest.view.chest;
 
 import com.github.devcyntrix.deathchest.DeathChestModel;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
-import com.github.devcyntrix.deathchest.util.ChestAdapter;
+import com.github.devcyntrix.deathchest.util.ChestView;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -12,11 +12,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-public class BlockAdapter implements ChestAdapter, Listener {
+public class BlockView implements ChestView, Listener {
 
     private final DeathChestPlugin plugin;
 
-    public BlockAdapter(DeathChestPlugin plugin) {
+    public BlockView(DeathChestPlugin plugin) {
         this.plugin = plugin;
     }
 

@@ -69,6 +69,7 @@ public class ItemBlacklist implements InventoryHolder {
             YamlConfiguration yamlConfiguration = YamlConfiguration.loadConfiguration(file);
             this.list.addAll((Collection<? extends ItemStack>) yamlConfiguration.getList("blacklist", new ArrayList<>()));
         }
+        this.list.removeIf(Objects::isNull);
 
         this.inventory = Bukkit.createInventory(this, 9 * 6, "Blacklist");
         inventory.setMaxStackSize(1);

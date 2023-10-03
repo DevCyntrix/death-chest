@@ -6,7 +6,7 @@ import com.github.devcyntrix.deathchest.config.HologramOptions;
 import com.github.devcyntrix.deathchest.controller.HologramController;
 import com.github.devcyntrix.deathchest.controller.PlaceHolderController;
 import com.github.devcyntrix.deathchest.tasks.HologramRunnable;
-import com.github.devcyntrix.deathchest.util.ChestAdapter;
+import com.github.devcyntrix.deathchest.util.ChestView;
 import com.github.devcyntrix.hologram.api.Hologram;
 import com.github.devcyntrix.hologram.api.HologramTextLine;
 import org.bukkit.scheduler.BukkitTask;
@@ -14,7 +14,7 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class HologramAdapter implements ChestAdapter {
+public class HologramView implements ChestView {
 
     private final DeathChestPlugin plugin;
     private final HologramController controller;
@@ -22,7 +22,7 @@ public class HologramAdapter implements ChestAdapter {
 
     private final PlaceHolderController placeHolderController;
 
-    public HologramAdapter(DeathChestPlugin plugin, HologramController controller, HologramOptions options, PlaceHolderController placeHolderController) {
+    public HologramView(DeathChestPlugin plugin, HologramController controller, HologramOptions options, PlaceHolderController placeHolderController) {
         this.plugin = plugin;
         this.controller = controller;
         this.options = options;

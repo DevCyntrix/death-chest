@@ -5,7 +5,7 @@ import com.github.devcyntrix.deathchest.DeathChestPlugin;
 import com.github.devcyntrix.deathchest.api.animation.BreakAnimationService;
 import com.github.devcyntrix.deathchest.config.BreakAnimationOptions;
 import com.github.devcyntrix.deathchest.tasks.BreakAnimationRunnable;
-import com.github.devcyntrix.deathchest.util.ChestAdapter;
+import com.github.devcyntrix.deathchest.util.ChestView;
 import com.github.devcyntrix.deathchest.util.EntityIdHelper;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.stream.Stream;
 
-public class BreakAnimationAdapter implements ChestAdapter {
+public class BreakAnimationView implements ChestView {
 
     @NotNull
     private final DeathChestPlugin plugin;
@@ -24,7 +24,7 @@ public class BreakAnimationAdapter implements ChestAdapter {
     @NotNull
     private final BreakAnimationOptions options;
 
-    public BreakAnimationAdapter(@NotNull DeathChestPlugin plugin, @Nullable BreakAnimationService service, @NotNull BreakAnimationOptions options) {
+    public BreakAnimationView(@NotNull DeathChestPlugin plugin, @Nullable BreakAnimationService service, @NotNull BreakAnimationOptions options) {
         this.plugin = plugin;
         this.service = service;
         this.options = options;

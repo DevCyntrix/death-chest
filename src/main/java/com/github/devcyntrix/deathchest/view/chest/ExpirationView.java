@@ -3,14 +3,14 @@ package com.github.devcyntrix.deathchest.view.chest;
 import com.github.devcyntrix.deathchest.DeathChestModel;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
 import com.github.devcyntrix.deathchest.tasks.ExpirationRunnable;
-import com.github.devcyntrix.deathchest.util.ChestAdapter;
+import com.github.devcyntrix.deathchest.util.ChestView;
 import org.bukkit.scheduler.BukkitTask;
 
-public class ExpirationAdapter implements ChestAdapter {
+public class ExpirationView implements ChestView {
 
     private final DeathChestPlugin plugin;
 
-    public ExpirationAdapter(DeathChestPlugin plugin) {
+    public ExpirationView(DeathChestPlugin plugin) {
         this.plugin = plugin;
     }
 

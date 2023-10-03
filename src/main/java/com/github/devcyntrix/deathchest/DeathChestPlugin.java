@@ -18,7 +18,7 @@ import com.github.devcyntrix.deathchest.controller.PlaceHolderController;
 import com.github.devcyntrix.deathchest.controller.UpdateController;
 import com.github.devcyntrix.deathchest.listener.*;
 import com.github.devcyntrix.deathchest.report.GsonReportManager;
-import com.github.devcyntrix.deathchest.support.lock.LocketteXCompatibility;
+import com.github.devcyntrix.deathchest.support.lock.LWCCompatibility;
 import com.github.devcyntrix.deathchest.support.storage.YamlStorage;
 import com.github.devcyntrix.deathchest.util.LastDeathChestLocationExpansion;
 import com.github.devcyntrix.deathchest.util.WorldGuardDeathChestFlag;
@@ -203,6 +203,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
                 });
 
         HandlerList.unregisterAll((Listener) this);
+        LWCCompatibility.terminate(this);
 
         if (this.audiences != null)
             this.audiences.close();
@@ -298,27 +299,27 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
 
 
             this.deathChestController = new DeathChestController(this, getLogger(), this.auditManager, this.deathChestStorage);
-            BlockAdapter adapter = new BlockAdapter(this);
+            BlockView adapter = new BlockView(this);
             this.deathChestController.registerAdapter(adapter);
             getServer().getPluginManager().registerEvents(adapter, this);
 
-            this.deathChestController.registerAdapter(new CloseInventoryAdapter());
-            this.deathChestController.registerAdapter(new ExpirationAdapter(this));
+            this.deathChestController.registerAdapter(new CloseInventoryView());
+            this.deathChestController.registerAdapter(new ExpirationView(this));
 
 
             HologramOptions hologramOptions = getDeathChestConfig().hologramOptions();
             if (hologramOptions.enabled()) {
-                this.deathChestController.registerAdapter(new HologramAdapter(this, hologramController, hologramOptions, placeHolderController));
+                this.deathChestController.registerAdapter(new HologramView(this, hologramController, hologramOptions, placeHolderController));
             }
 
             BreakAnimationOptions breakAnimationOptions = getDeathChestConfig().breakAnimationOptions();
             if (breakAnimationOptions.enabled()) {
-                this.deathChestController.registerAdapter(new BreakAnimationAdapter(this, breakAnimationService, breakAnimationOptions));
+                this.deathChestController.registerAdapter(new BreakAnimationView(this, breakAnimationService, breakAnimationOptions));
             }
 
             ParticleOptions particleOptions = getDeathChestConfig().particleOptions();
             if (particleOptions.enabled()) {
-                this.deathChestController.registerAdapter(new ParticleAdapter(this, particleOptions));
+                this.deathChestController.registerAdapter(new ParticleView(this, particleOptions));
             }
 
             debug(0, "Loading chests...");
@@ -335,9 +336,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
             this.expansion.register();
         }
 
-        if (pluginManager.isPluginEnabled("LocketteX")) {
-            LocketteXCompatibility.init(this);
-        }
+        SupportServices.initializeCompatibilities(this);
 
         // Checks for updates
         if (this.deathChestConfig.updateChecker()) {

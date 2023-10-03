@@ -2,7 +2,7 @@ package com.github.devcyntrix.deathchest.util;
 
 import com.github.devcyntrix.deathchest.DeathChestModel;
 
-public interface ChestAdapter {
+public interface ChestView {
 
     void onCreate(DeathChestModel model);
 

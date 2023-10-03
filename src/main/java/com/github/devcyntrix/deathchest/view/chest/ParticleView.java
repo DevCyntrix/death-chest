@@ -4,19 +4,19 @@ import com.github.devcyntrix.deathchest.DeathChestModel;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
 import com.github.devcyntrix.deathchest.config.ParticleOptions;
 import com.github.devcyntrix.deathchest.tasks.ParticleRunnable;
-import com.github.devcyntrix.deathchest.util.ChestAdapter;
+import com.github.devcyntrix.deathchest.util.ChestView;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.scheduler.BukkitTask;
 
-public class ParticleAdapter implements ChestAdapter {
+public class ParticleView implements ChestView {
 
     private final DeathChestPlugin plugin;
     private final ParticleOptions options;
 
-    public ParticleAdapter(DeathChestPlugin plugin, ParticleOptions options) {
+    public ParticleView(DeathChestPlugin plugin, ParticleOptions options) {
         this.plugin = plugin;
         this.options = options;
     }
