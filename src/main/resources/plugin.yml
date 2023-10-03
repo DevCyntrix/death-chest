@@ -3,7 +3,7 @@ version: ${projectVersion}
 main: 'com.github.devcyntrix.deathchest.DeathChestPlugin'
 author: CyntrixAlgorithm
 website: 'https://www.spigotmc.org/resources/death-chest.101066/'
-softdepend: ['WorldGuard', 'ProtocolLib', 'GriefPrevention', 'GriefDefender', 'PlaceholderAPI', 'RedProtect', 'minePlots']
+softdepend: [ 'WorldGuard', 'ProtocolLib', 'GriefPrevention', 'GriefDefender', 'PlaceholderAPI', 'RedProtect', 'minePlots', 'LocketteX' ]
 api-version: 1.17
 libraries:
   - 'org.apache.commons:commons-text:1.9'

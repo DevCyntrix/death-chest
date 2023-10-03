@@ -18,6 +18,7 @@ import com.github.devcyntrix.deathchest.controller.PlaceHolderController;
 import com.github.devcyntrix.deathchest.controller.UpdateController;
 import com.github.devcyntrix.deathchest.listener.*;
 import com.github.devcyntrix.deathchest.report.GsonReportManager;
+import com.github.devcyntrix.deathchest.support.lock.LocketteXCompatibility;
 import com.github.devcyntrix.deathchest.support.storage.YamlStorage;
 import com.github.devcyntrix.deathchest.util.LastDeathChestLocationExpansion;
 import com.github.devcyntrix.deathchest.util.WorldGuardDeathChestFlag;
@@ -332,6 +333,10 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
             debug(0, "Registering PlaceHolder API Expansion...");
             this.expansion = new LastDeathChestLocationExpansion(this);
             this.expansion.register();
+        }
+
+        if (pluginManager.isPluginEnabled("LocketteX")) {
+            LocketteXCompatibility.init(this);
         }
 
         // Checks for updates

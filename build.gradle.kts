@@ -131,6 +131,9 @@ hangarPublish {
                 dependencies.url("minePlots", "https://builtbybit.com/resources/mineplots.21646/") {
                     required.set(false)
                 }
+                dependencies.url("LocketteX", "https://www.spigotmc.org/resources/lockettex-optimized-simple-chest-protection-plugin.73184/") {
+                    required.set(false)
+                }
             }
         }
 
