@@ -139,7 +139,9 @@ public class ItemBlacklist implements InventoryHolder {
         inventory.clear(inventory.getSize() - 5);
         inventory.setItem(inventory.getSize() - 3, DENY_ITEM);
 
-        list.forEach(stack -> stack.setAmount(1));
+        list.stream()
+                .filter(Objects::nonNull) // check for nonnull if you downgrade the server
+                .forEach(stack -> stack.setAmount(1));
 
         AtomicInteger i = new AtomicInteger();
         list.stream()

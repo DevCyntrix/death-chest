@@ -19,7 +19,7 @@ public class AdminNotificationView implements Consumer<String> {
                 .filter(player -> player.hasPermission("deathchest.update"))
                 .forEach(player -> {
                     player.sendMessage(this.plugin.getPrefix() + "§cA new version " + version + " is out.");
-                    player.sendMessage(this.plugin.getPrefix() + "§cPlease update the plugin at https://www.spigotmc.org/resources/death-chest.101066/");
+                    player.sendMessage(this.plugin.getPrefix() + "§cPlease update the plugin at " + plugin.getDescription().getWebsite());
                 });
     }
 }

@@ -144,7 +144,7 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         }
 
         if (this.expansion != null && this.expansion.unregister())
-            getLogger().info("PlaceHolder API expansion successfully unregistered");
+            getLogger().info("PlaceHolder API expansion has successfully unregistered");
 
         if (this.updateController != null) {
             this.updateController.close();
@@ -277,10 +277,6 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
         pluginManager.registerEvents(new ItemBlacklistListener(blacklist), this);
         pluginManager.registerEvents(new InventoryChangeSlotItemListener(), this);
         pluginManager.registerEvents(new InventoryChangeSlotItemListener(blacklist), this);
-
-        if (deathChestConfig.convertExpToBottles()) {
-            pluginManager.registerEvents(new ConvertExpToBottleListener(this), this);
-        }
 
         ServicesManager servicesManager = getServer().getServicesManager();
         debug(0, "Registering death chest service...");

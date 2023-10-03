@@ -22,10 +22,10 @@ public class AdminJoinNotificationView implements Listener {
         Player player = event.getPlayer();
         if (controller.getNewestVersion() == null)
             return;
-        if (!player.hasPermission("deathchest.admin"))
+        if (!player.hasPermission("deathchest.update"))
             return;
         player.sendMessage(plugin.getPrefix() + "§cA new version " + controller.getNewestVersion() + " is out.");
-        player.sendMessage(plugin.getPrefix() + "§cPlease update the plugin at https://www.spigotmc.org/resources/death-chest.101066/");
+        player.sendMessage(plugin.getPrefix() + "§cPlease update the plugin at " + plugin.getDescription().getWebsite());
     }
 
 }

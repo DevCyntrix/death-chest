@@ -18,6 +18,6 @@ public class ConsoleNotificationView implements Consumer<String> {
     @Override
     public void accept(String version) {
         logger.warning("New version " + version + " is out. You are still running " + plugin.getDescription().getVersion());
-        logger.warning("Please update the plugin at https://www.spigotmc.org/resources/death-chest.101066/");
+        logger.warning("Please update the plugin at " + plugin.getDescription().getWebsite());
     }
 }

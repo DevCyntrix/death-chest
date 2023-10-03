@@ -2,6 +2,7 @@ name: DeathChest
 version: ${projectVersion}
 main: 'com.github.devcyntrix.deathchest.DeathChestPlugin'
 author: CyntrixAlgorithm
+website: 'https://www.spigotmc.org/resources/death-chest.101066/'
 softdepend: ['WorldGuard', 'ProtocolLib', 'GriefPrevention', 'GriefDefender', 'PlaceholderAPI', 'RedProtect', 'minePlots']
 api-version: 1.17
 libraries:
@@ -24,10 +25,13 @@ permissions:
     description: 'The permission to create, read and delete reports of the plugin'
     default: op
   'deathchest.command.deleteInWorld':
-    description: 'The permission to delete all chests in all or a specific worlds'
+    description: 'The permission to delete all chests in all or a specific world'
     default: op
   'deathchest.command.reload':
     description: 'The permission to reload the configuration file of the DeathChest plugin'
+    default: op
+  'deathchest.update':
+    description: 'Notifies the player about plugin updates.'
     default: op
   'deathchest.admin':
     default: op
