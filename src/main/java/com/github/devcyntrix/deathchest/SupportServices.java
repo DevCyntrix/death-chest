@@ -5,6 +5,8 @@ import com.github.devcyntrix.deathchest.api.animation.BreakAnimationService;
 import com.github.devcyntrix.deathchest.api.protection.ProtectionService;
 import com.github.devcyntrix.deathchest.support.animation.PaperBreakAnimation;
 import com.github.devcyntrix.deathchest.support.animation.ProtocolLibBreakAnimation;
+import com.github.devcyntrix.deathchest.support.lock.LWCCompatibility;
+import com.github.devcyntrix.deathchest.support.lock.LocketteXCompatibility;
 import com.github.devcyntrix.deathchest.support.protection.*;
 import com.github.devcyntrix.deathchest.util.PaperTest;
 import org.bukkit.Bukkit;
@@ -15,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public final class SupportServices {
@@ -30,6 +33,25 @@ public final class SupportServices {
             "RedProtect", plugin -> new RedProtectProtection(),
             "minePlots", plugin -> new MinePlotsProtection()
     );
+
+    private static final Map<String, Consumer<DeathChestPlugin>> compatibilityMap = Map.of(
+            "LocketteX", LocketteXCompatibility::init,
+            "LWC", LWCCompatibility::init
+    );
+
+    public static void initializeCompatibilities(DeathChestPlugin plugin) {
+        compatibilityMap.forEach((s, deathChestPluginConsumer) -> {
+            if (Bukkit.getPluginManager().isPluginEnabled(s)) {
+                plugin.getLogger().info("Initializing the compatibility for %s".formatted(s));
+                try {
+                    deathChestPluginConsumer.accept(plugin);
+                } catch (Exception e) {
+                    plugin.getLogger().severe("Failed to initialize the compatibility for %s".formatted(s));
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
 
     public static @Nullable BreakAnimationService getBlockBreakAnimationService(@NotNull DeathChestPlugin plugin, @Nullable String preferred) {
         if (PaperTest.isPaper()) {

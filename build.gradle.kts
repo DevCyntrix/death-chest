@@ -53,6 +53,9 @@ dependencies {
     // Placeholder API
     compileOnly("me.clip:placeholderapi:2.11.2") { isTransitive = false }
 
+    // Lock
+    compileOnly("com.griefcraft:lwc:2.3.2-dev")
+
     compileOnly("org.apache.commons:commons-text:1.10.0")
     compileOnly("org.jetbrains:annotations:23.0.0")
 

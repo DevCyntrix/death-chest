@@ -3,6 +3,7 @@ package com.github.devcyntrix.deathchest.support.lock;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
@@ -30,6 +31,9 @@ public final class LocketteXCompatibility {
                     Location location = (Location) subclass.getMethod("getLocation").invoke(event);
                     if (plugin.getDeathChestController().getChest(location) != null) {
                         subclass.getMethod("setCancelled", boolean.class).invoke(event, true);
+
+                        Player player = (Player) subclass.getMethod("getPlayer").invoke(event);
+                        player.sendMessage(plugin.getPrefix() + "§cYou cannot lock this chest.");
                     }
                 } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                     e.printStackTrace();
