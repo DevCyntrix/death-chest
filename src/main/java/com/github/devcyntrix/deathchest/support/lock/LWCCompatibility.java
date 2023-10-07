@@ -1,26 +1,54 @@
 package com.github.devcyntrix.deathchest.support.lock;
 
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
+import com.github.devcyntrix.deathchest.api.compatibility.Compatibility;
+import com.github.devcyntrix.deathchest.controller.DeathChestController;
 import com.griefcraft.lwc.LWC;
 import com.griefcraft.scripting.JavaModule;
 import com.griefcraft.scripting.event.LWCProtectionRegisterEvent;
+import lombok.AllArgsConstructor;
+import org.bukkit.Server;
 
-public final class LWCCompatibility {
+public class LWCCompatibility extends Compatibility {
 
-    public static void init(DeathChestPlugin plugin) {
-        LWC.getInstance().getModuleLoader().registerModule(plugin, new JavaModule() {
-            @Override
-            public void onRegisterProtection(LWCProtectionRegisterEvent event) {
-                if (plugin.getDeathChestController().getChest(event.getBlock().getLocation()) != null) {
-                    event.setCancelled(true);
-                    event.getPlayer().sendMessage(plugin.getPrefix() + "§cYou cannot lock this chest.");
-                }
-            }
-        });
+    @Override
+    public boolean isValid(Server server) {
+        boolean lwc = server.getPluginManager().isPluginEnabled("LWC");
+        System.out.println("VALID " + lwc);
+        return lwc;
     }
 
-    public static void terminate(DeathChestPlugin plugin) {
-        LWC.getInstance().getModuleLoader().removeModules(plugin);
+    @Override
+    protected void enable(DeathChestPlugin plugin) {
+        try {
+            Class.forName("com.griefcraft.lwc.LWC");
+            LWC.getInstance().getModuleLoader().registerModule(plugin, new LWCModule(plugin));
+        } catch (ClassNotFoundException e) {
+        }
+    }
+
+    @Override
+    protected void disable(DeathChestPlugin plugin) {
+        try {
+            Class.forName("com.griefcraft.lwc.LWC");
+            LWC.getInstance().getModuleLoader().removeModules(plugin);
+        } catch (ClassNotFoundException e) {
+        }
+    }
+
+    @AllArgsConstructor
+    public static class LWCModule extends JavaModule {
+
+        private final DeathChestPlugin plugin;
+
+        @Override
+        public void onRegisterProtection(LWCProtectionRegisterEvent event) {
+            DeathChestController controller = plugin.getDeathChestController();
+            if (controller.getChest(event.getBlock().getLocation()) != null) {
+                event.setCancelled(true);
+                event.getPlayer().sendMessage(plugin.getPrefix() + "§cYou cannot lock this chest.");
+            }
+        }
     }
 
 }

@@ -1,8 +1,10 @@
 package com.github.devcyntrix.deathchest.support.lock;
 
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
+import com.github.devcyntrix.deathchest.api.compatibility.Compatibility;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Server;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
@@ -11,11 +13,19 @@ import org.bukkit.event.Listener;
 
 import java.lang.reflect.InvocationTargetException;
 
-public final class LocketteXCompatibility {
+public final class LocketteXCompatibility extends Compatibility {
 
     private static final String eventClassPath = "pro.dracarys.LocketteX.api.PlayerProtectBlockEvent";
 
-    public static void init(DeathChestPlugin plugin) {
+    private Listener instance;
+
+    @Override
+    public boolean isValid(Server server) {
+        return server.getPluginManager().isPluginEnabled("LocketteX");
+    }
+
+    @Override
+    protected void enable(DeathChestPlugin plugin) {
         try {
             Class<?> aClass1 = Class.forName(eventClassPath);
             if (!Event.class.isAssignableFrom(aClass1)) {
@@ -24,7 +34,7 @@ public final class LocketteXCompatibility {
                 return;
             }
             Class<? extends Event> subclass = aClass1.asSubclass(Event.class);
-            Listener instance = new Listener() {
+            instance = new Listener() {
             };
             Bukkit.getPluginManager().registerEvent(subclass, instance, EventPriority.NORMAL, (listener, event) -> {
                 try {
@@ -46,4 +56,8 @@ public final class LocketteXCompatibility {
         }
     }
 
+    @Override
+    protected void disable(DeathChestPlugin plugin) {
+        HandlerList.unregisterAll(instance);
+    }
 }

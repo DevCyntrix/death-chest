@@ -4,6 +4,8 @@ import com.github.devcyntrix.api.event.InventoryChangeSlotItemListener;
 import com.github.devcyntrix.deathchest.api.DeathChestService;
 import com.github.devcyntrix.deathchest.api.animation.BreakAnimationService;
 import com.github.devcyntrix.deathchest.api.audit.AuditManager;
+import com.github.devcyntrix.deathchest.api.compatibility.CompatibilityLoader;
+import com.github.devcyntrix.deathchest.api.compatibility.CompatibilityManager;
 import com.github.devcyntrix.deathchest.api.protection.ProtectionService;
 import com.github.devcyntrix.deathchest.api.report.ReportManager;
 import com.github.devcyntrix.deathchest.api.storage.DeathChestStorage;
@@ -19,6 +21,7 @@ import com.github.devcyntrix.deathchest.controller.UpdateController;
 import com.github.devcyntrix.deathchest.listener.*;
 import com.github.devcyntrix.deathchest.report.GsonReportManager;
 import com.github.devcyntrix.deathchest.support.lock.LWCCompatibility;
+import com.github.devcyntrix.deathchest.support.lock.LocketteXCompatibility;
 import com.github.devcyntrix.deathchest.support.storage.YamlStorage;
 import com.github.devcyntrix.deathchest.util.LastDeathChestLocationExpansion;
 import com.github.devcyntrix.deathchest.util.WorldGuardDeathChestFlag;
@@ -41,8 +44,6 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
-import org.bukkit.event.HandlerList;
-import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
@@ -67,7 +68,7 @@ import static com.github.devcyntrix.deathchest.api.report.ReportManager.DATE_FOR
  * You are welcome to contribute to this plugin!
  */
 @Getter
-public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChestService {
+public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
 
     public static final int RESOURCE_ID = 101066;
     public static final int BSTATS_ID = 14866;
@@ -104,6 +105,8 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
 
     @Getter
     private BukkitAudiences audiences;
+
+    private CompatibilityManager compatibilityManager;
 
     /**
      * This method cleans the whole plugin up
@@ -202,8 +205,9 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
                     }
                 });
 
-        HandlerList.unregisterAll((Listener) this);
-        LWCCompatibility.terminate(this);
+        if (this.compatibilityManager != null) {
+            this.compatibilityManager.disableCompatibilities();
+        }
 
         if (this.audiences != null)
             this.audiences.close();
@@ -336,7 +340,11 @@ public class DeathChestPlugin extends JavaPlugin implements Listener, DeathChest
             this.expansion.register();
         }
 
-        SupportServices.initializeCompatibilities(this);
+        CompatibilityLoader loader = new CompatibilityLoader();
+        this.compatibilityManager = new CompatibilityManager(this, loader);
+        this.compatibilityManager.registerCompatibility(LWCCompatibility.class);
+        this.compatibilityManager.registerCompatibility(LocketteXCompatibility.class);
+        this.compatibilityManager.enableCompatibilities();
 
         // Checks for updates
         if (this.deathChestConfig.updateChecker()) {
