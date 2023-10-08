@@ -71,8 +71,17 @@ public class ChestHologramTest {
         if (!enabled)
             return;
         Assertions.assertEquals(hologramOptions.lines().size(), armorStands.size());
+    }
 
+    @Test
+    public void removeHologram() {
+        World world = model.getWorld();
+        Assertions.assertNotNull(world);
 
+        plugin.getDeathChestController().destroyChest(model);
+
+        Collection<ArmorStand> armorStands = world.getEntitiesByClass(ArmorStand.class);
+        Assertions.assertTrue(armorStands.isEmpty());
     }
 
 }
