@@ -26,7 +26,7 @@ jobs:
       - name: Build with Gradle
         uses: gradle/gradle-build-action@0d13054264b0bb894ded474f08ebb30921341cee
         with:
-          arguments: build
+          arguments: test build
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v3.0.0
         with:
