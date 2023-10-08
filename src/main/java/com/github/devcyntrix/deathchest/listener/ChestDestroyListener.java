@@ -26,14 +26,11 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 public class ChestDestroyListener implements Listener {
 
     private final DeathChestPlugin plugin;
-
 
     public ChestDestroyListener(DeathChestPlugin plugin) {
         this.plugin = plugin;
@@ -104,10 +101,10 @@ public class ChestDestroyListener implements Listener {
             return;
         }
 
-        for (ItemStack content : model.getInventory().getContents()) {
-            if (content == null) continue;
-            model.getWorld().dropItemNaturally(model.getLocation(), content);
-        }
+        Arrays.stream(model.getInventory().getContents())
+                .filter(Objects::nonNull)
+                .forEach(itemStack -> model.getWorld().dropItemNaturally(model.getLocation(), itemStack));
+
         this.plugin.getAuditManager().audit(new AuditItem(new Date(), AuditAction.DESTROY_CHEST, new DestroyChestInfo(model, DestroyReason.BREAK, Map.of("player", player))));
         model.getInventory().clear();
 

@@ -10,8 +10,8 @@ import com.github.devcyntrix.deathchest.api.event.DeathChestDestroyEvent;
 import com.github.devcyntrix.deathchest.api.storage.DeathChestStorage;
 import com.github.devcyntrix.deathchest.config.DeathChestConfig;
 import com.github.devcyntrix.deathchest.config.InventoryOptions;
+import com.github.devcyntrix.deathchest.util.ChestModelStringLookup;
 import com.github.devcyntrix.deathchest.util.ChestView;
-import com.github.devcyntrix.deathchest.util.PlayerStringLookup;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import me.clip.placeholderapi.PlaceholderAPI;
@@ -90,7 +90,7 @@ public class DeathChestController implements Closeable {
 
     public @NotNull DeathChestModel createChest(@NotNull Location location, long createdAt, long expireAt, @Nullable Player player, boolean isProtected, ItemStack @NotNull ... items) {
         DeathChestModel model = new DeathChestModel(location, createdAt, expireAt, player, isProtected);
-        StringSubstitutor substitutor = new StringSubstitutor(new PlayerStringLookup(model, durationFormat));
+        StringSubstitutor substitutor = new StringSubstitutor(new ChestModelStringLookup(model, durationFormat));
 
         // Creates inventory
         InventoryOptions inventoryOptions = getConfig().inventoryOptions();

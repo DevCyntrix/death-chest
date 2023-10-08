@@ -1,7 +1,7 @@
 package com.github.devcyntrix.deathchest;
 
 import com.github.devcyntrix.deathchest.config.InventoryOptions;
-import com.github.devcyntrix.deathchest.controller.PlaceHolderController;
+import com.github.devcyntrix.deathchest.controller.PlaceholderController;
 import com.github.devcyntrix.hologram.api.Hologram;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
@@ -122,7 +122,7 @@ public final class DeathChestModel {
         return map;
     }
 
-    public static DeathChestModel deserialize(Map<String, Object> map, InventoryOptions options, PlaceHolderController controller) {
+    public static DeathChestModel deserialize(Map<String, Object> map, InventoryOptions options, PlaceholderController controller) {
         long createdAt = Long.parseLong(map.get("createdAt").toString());
         long expireAt = Long.parseLong(map.get("expireAt").toString());
 

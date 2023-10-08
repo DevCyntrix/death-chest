@@ -12,6 +12,7 @@ version = "2.0.3"
 
 repositories {
     mavenCentral()
+    maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
     maven("https://maven.enginehub.org/repo/")
 
@@ -61,6 +62,19 @@ dependencies {
 
     compileOnly("org.projectlombok:lombok:1.18.24")
     annotationProcessor("org.projectlombok:lombok:1.18.24")
+
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
+    testImplementation("com.github.seeseemelk:MockBukkit-v1.20:3.9.0")
+    testImplementation("net.kyori:adventure-platform-bukkit:4.3.0")
+    testImplementation("net.kyori:adventure-text-minimessage:4.14.0")
+    testImplementation("net.kyori:adventure-text-serializer-legacy:4.14.0")
+    testImplementation("me.clip:placeholderapi:2.11.2") { isTransitive = false }
+    testImplementation("org.apache.commons:commons-text:1.10.0")
+    testImplementation("cloud.commandframework:cloud-core:1.7.1")
+    testImplementation("cloud.commandframework:cloud-bukkit:1.7.1")
+    testImplementation("org.bstats:bstats-bukkit:3.0.2")
+    testCompileOnly("org.projectlombok:lombok:1.18.24")
+    testAnnotationProcessor("org.projectlombok:lombok:1.18.24")
 }
 
 java {

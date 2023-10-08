@@ -4,7 +4,7 @@ import com.github.devcyntrix.deathchest.DeathChestModel;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
 import com.github.devcyntrix.deathchest.config.HologramOptions;
 import com.github.devcyntrix.deathchest.controller.HologramController;
-import com.github.devcyntrix.deathchest.controller.PlaceHolderController;
+import com.github.devcyntrix.deathchest.controller.PlaceholderController;
 import com.github.devcyntrix.deathchest.tasks.HologramRunnable;
 import com.github.devcyntrix.deathchest.util.ChestView;
 import com.github.devcyntrix.hologram.api.Hologram;
@@ -20,9 +20,9 @@ public class HologramView implements ChestView {
     private final HologramController controller;
     private final HologramOptions options;
 
-    private final PlaceHolderController placeHolderController;
+    private final PlaceholderController placeHolderController;
 
-    public HologramView(DeathChestPlugin plugin, HologramController controller, HologramOptions options, PlaceHolderController placeHolderController) {
+    public HologramView(DeathChestPlugin plugin, HologramController controller, HologramOptions options, PlaceholderController placeHolderController) {
         this.plugin = plugin;
         this.controller = controller;
         this.options = options;

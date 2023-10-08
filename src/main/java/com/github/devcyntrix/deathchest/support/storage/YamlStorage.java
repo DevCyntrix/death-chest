@@ -3,7 +3,7 @@ package com.github.devcyntrix.deathchest.support.storage;
 import com.github.devcyntrix.deathchest.DeathChestModel;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
 import com.github.devcyntrix.deathchest.api.storage.DeathChestStorage;
-import com.github.devcyntrix.deathchest.controller.PlaceHolderController;
+import com.github.devcyntrix.deathchest.controller.PlaceholderController;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
@@ -27,11 +27,11 @@ import java.util.stream.Collectors;
  */
 public class YamlStorage implements DeathChestStorage {
 
-    private final PlaceHolderController placeHolderController;
+    private final PlaceholderController placeHolderController;
     private File chestsFolder;
     private final Multimap<World, DeathChestModel> deathChestsCache = HashMultimap.create();
 
-    public YamlStorage(PlaceHolderController placeHolderController) {
+    public YamlStorage(PlaceholderController placeHolderController) {
         this.placeHolderController = placeHolderController;
     }
 

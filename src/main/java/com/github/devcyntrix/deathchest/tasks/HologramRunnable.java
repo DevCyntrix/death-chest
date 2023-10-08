@@ -1,7 +1,7 @@
 package com.github.devcyntrix.deathchest.tasks;
 
 import com.github.devcyntrix.deathchest.DeathChestModel;
-import com.github.devcyntrix.deathchest.controller.PlaceHolderController;
+import com.github.devcyntrix.deathchest.controller.PlaceholderController;
 import com.github.devcyntrix.hologram.api.HologramTextLine;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -14,9 +14,9 @@ public class HologramRunnable extends BukkitRunnable {
     private final Plugin plugin;
     private final DeathChestModel chest;
     private final Map<String, HologramTextLine> blueprints;
-    private final PlaceHolderController controller;
+    private final PlaceholderController controller;
 
-    public HologramRunnable(Plugin plugin, DeathChestModel chest, Map<String, HologramTextLine> blueprints, PlaceHolderController controller) {
+    public HologramRunnable(Plugin plugin, DeathChestModel chest, Map<String, HologramTextLine> blueprints, PlaceholderController controller) {
         this.plugin = plugin;
         this.chest = chest;
         this.blueprints = blueprints;

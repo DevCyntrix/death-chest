@@ -16,14 +16,14 @@ import com.github.devcyntrix.deathchest.command.CommandRegistry;
 import com.github.devcyntrix.deathchest.config.*;
 import com.github.devcyntrix.deathchest.controller.DeathChestController;
 import com.github.devcyntrix.deathchest.controller.HologramController;
-import com.github.devcyntrix.deathchest.controller.PlaceHolderController;
+import com.github.devcyntrix.deathchest.controller.PlaceholderController;
 import com.github.devcyntrix.deathchest.controller.UpdateController;
 import com.github.devcyntrix.deathchest.listener.*;
 import com.github.devcyntrix.deathchest.report.GsonReportManager;
 import com.github.devcyntrix.deathchest.support.lock.LWCCompatibility;
 import com.github.devcyntrix.deathchest.support.lock.LocketteXCompatibility;
+import com.github.devcyntrix.deathchest.support.placeholder.PlaceholderAPICompatibility;
 import com.github.devcyntrix.deathchest.support.storage.YamlStorage;
-import com.github.devcyntrix.deathchest.util.LastDeathChestLocationExpansion;
 import com.github.devcyntrix.deathchest.util.WorldGuardDeathChestFlag;
 import com.github.devcyntrix.deathchest.util.adapter.DurationAdapter;
 import com.github.devcyntrix.deathchest.view.chest.*;
@@ -94,19 +94,28 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
     @Nullable
     private UpdateController updateController;
 
-    private PlaceHolderController placeHolderController;
+    private PlaceholderController placeHolderController;
 
     private HologramController hologramController;
 
     private DeathChestStorage deathChestStorage;
     private DeathChestController deathChestController;
 
-    private LastDeathChestLocationExpansion expansion;
-
     @Getter
     private BukkitAudiences audiences;
 
     private CompatibilityManager compatibilityManager;
+
+    private final boolean test;
+
+    public DeathChestPlugin(Boolean test, DeathChestConfig config) {
+        this.test = test;
+        this.deathChestConfig = config;
+    }
+
+    public DeathChestPlugin() {
+        this.test = false;
+    }
 
     /**
      * This method cleans the whole plugin up
@@ -122,7 +131,6 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
             }
         }
 
-        // Save all chests
         PluginManager pluginManager = Bukkit.getPluginManager();
         try {
             ChestProtectionOptions protectionOptions = getDeathChestConfig().chestProtectionOptions();
@@ -147,9 +155,6 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
             e.printStackTrace();
         }
 
-        if (this.expansion != null && this.expansion.unregister())
-            getLogger().info("PlaceHolder API expansion has successfully unregistered");
-
         if (this.updateController != null) {
             this.updateController.close();
             this.updateController = null;
@@ -161,7 +166,7 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
 
         if (this.hologramController != null) {
             this.hologramController.close();
-            this.updateController = null;
+            this.hologramController = null;
         }
 
         if (this.deathChestController != null) {
@@ -170,7 +175,7 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            this.deathChestConfig = null;
+            this.deathChestController = null;
         }
 
         if (this.deathChestStorage != null) {
@@ -194,6 +199,7 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            this.auditManager = null;
         }
 
         // Try to remove all holograms
@@ -227,16 +233,19 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
     @Override
     public void onEnable() {
         debug(0, "Loading configuration file...");
-        reloadConfig();
+        if (!isTest())
+            reloadConfig();
+
 
         initializeServices();
 
         debug(0, "Registering commands...");
         CommandRegistry.create(this).registerCommands(this);
 
-        debug(0, "Starting metrics...");
-        new Metrics(this, BSTATS_ID);
-
+        if (!test) {
+            debug(0, "Starting metrics...");
+            new Metrics(this, BSTATS_ID);
+        }
     }
 
     private void initializeServices() {
@@ -283,6 +292,8 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
         pluginManager.registerEvents(new ItemBlacklistListener(blacklist), this);
         pluginManager.registerEvents(new InventoryChangeSlotItemListener(), this);
         pluginManager.registerEvents(new InventoryChangeSlotItemListener(blacklist), this);
+        pluginManager.registerEvents(new PlayerNotificationListener(this), this);
+        pluginManager.registerEvents(new GlobalNotificationListener(this), this);
 
         ServicesManager servicesManager = getServer().getServicesManager();
         debug(0, "Registering death chest service...");
@@ -294,7 +305,7 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
         debug(0, "Using gson audit manager");
 
         try {
-            this.placeHolderController = new PlaceHolderController(getDeathChestConfig());
+            this.placeHolderController = new PlaceholderController(getDeathChestConfig());
 
             debug(0, "Using death chest yaml storage");
             this.deathChestStorage = new YamlStorage(this.placeHolderController);
@@ -333,17 +344,11 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
             throw new RuntimeException(e);
         }
 
-
-        if (isPlaceholderAPIEnabled()) {
-            debug(0, "Registering PlaceHolder API Expansion...");
-            this.expansion = new LastDeathChestLocationExpansion(this);
-            this.expansion.register();
-        }
-
         CompatibilityLoader loader = new CompatibilityLoader();
         this.compatibilityManager = new CompatibilityManager(this, loader);
         this.compatibilityManager.registerCompatibility(LWCCompatibility.class);
         this.compatibilityManager.registerCompatibility(LocketteXCompatibility.class);
+        this.compatibilityManager.registerCompatibility(PlaceholderAPICompatibility.class);
         this.compatibilityManager.enableCompatibilities();
 
         // Checks for updates

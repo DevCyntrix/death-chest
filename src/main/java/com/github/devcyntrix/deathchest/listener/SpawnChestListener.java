@@ -3,14 +3,14 @@ package com.github.devcyntrix.deathchest.listener;
 import com.github.devcyntrix.deathchest.DeathChestModel;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
 import com.github.devcyntrix.deathchest.api.event.DeathChestSpawnEvent;
-import com.github.devcyntrix.deathchest.config.*;
-import com.google.common.base.Preconditions;
+import com.github.devcyntrix.deathchest.config.ChangeDeathMessageOptions;
+import com.github.devcyntrix.deathchest.config.DeathChestConfig;
+import com.github.devcyntrix.deathchest.config.NoExpirationPermission;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.apache.commons.text.StringSubstitutor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -56,7 +56,6 @@ public class SpawnChestListener implements Listener {
         plugin.debug(0, "Spawning death chest...");
 
         Player player = event.getEntity();
-        Location location = player.getLocation();
         plugin.debug(1, "Checking multiple deaths at once...");
         if (set.contains(player)) {
             event.getDrops().clear();
@@ -64,28 +63,16 @@ public class SpawnChestListener implements Listener {
         }
         set.add(player);
 
-        ChangeDeathMessageOptions changeDeathMessageOptions = plugin.getDeathChestConfig().changeDeathMessageOptions();
-        if (changeDeathMessageOptions.enabled()) {
-            plugin.debug(1, "Changing death message...");
-            if (changeDeathMessageOptions.message() != null && location.getWorld() != null) {
-                StringSubstitutor substitutor = new StringSubstitutor(Map.of("x", location.getBlockX(), "y", location.getBlockY(), "z", location.getBlockZ(), "world", location.getWorld().getName(), "player_name", player.getName(), "player_display_name", player.getDisplayName()));
-                event.setDeathMessage(Arrays.stream(changeDeathMessageOptions.message()).map(substitutor::replace).map(s -> {
-                    if (DeathChestPlugin.isPlaceholderAPIEnabled()) {
-                        return PlaceholderAPI.setPlaceholders(player, s);
-                    }
-                    return s;
-                }).collect(Collectors.joining("\n")));
-            } else {
-                event.setDeathMessage(null); // Disable death message
-            }
-        }
+        DeathChestConfig config = plugin.getDeathChestConfig();
+        Location location = player.getLocation();
 
         plugin.debug(1, "Checking keep inventory...");
         if (event.getKeepInventory())
             return;
-        plugin.debug(1, "Removing air...");
+
+        plugin.debug(1, "Removing air and blacklisted items...");
         boolean removed = event.getDrops()
-                .removeIf(itemStack -> itemStack.getType() == Material.AIR || itemStack.getAmount() <= 0); // Prevent spawning an empty chest
+                .removeIf(itemStack -> itemStack == null || itemStack.getType().isAir() || itemStack.getAmount() <= 0 || !plugin.getBlacklist().isValidItem(itemStack)); // Prevent spawning an empty chest
         if (removed) {
             plugin.debug(2, "Inventory has been updated.");
         }
@@ -100,19 +87,16 @@ public class SpawnChestListener implements Listener {
             return;
         }
 
+        plugin.debug(1, "Checking world filter...");
+        if (!config.worldFilterConfig().test(player.getWorld()))
+            return;
+
         Location deathLocation = new Location(
                 player.getWorld(),
-                player.getLocation().getX(),
-                Math.round(player.getLocation().getY()),
-                player.getLocation().getZ()
+                location.getX(),
+                Math.round(location.getY()),
+                location.getZ()
         );
-
-        if (!plugin.getDeathChestConfig().worldFilterConfig().test(deathLocation.getWorld()))
-            return;
-
-        plugin.debug(1, "Checking world filter...");
-        if (!plugin.getDeathChestConfig().worldFilterConfig().test(deathLocation.getWorld()))
-            return;
 
         plugin.debug(1, "Checking world height limitations...");
         // Check Minecraft limitation of block positions
@@ -127,17 +111,16 @@ public class SpawnChestListener implements Listener {
             return;
 
         plugin.debug(1, "Getting expiration time...");
-        DeathChestConfig deathChestConfig = plugin.getDeathChestConfig();
-        Duration expiration = deathChestConfig.expiration();
+        Duration expiration = config.expiration();
         if (expiration == null)
             expiration = Duration.ofSeconds(-1);
 
         plugin.debug(1, "Checking no expiration permission...");
-        NoExpirationPermission permission = deathChestConfig.noExpirationPermission();
+        NoExpirationPermission permission = config.noExpirationPermission();
         boolean expires = permission == null || !permission.enabled() || !player.hasPermission(permission.permission());
         long createdAt = System.currentTimeMillis();
         long expireAt = !expiration.isNegative() && !expiration.isZero() && expires ? createdAt + expiration.toMillis() : -1;
-        if(expireAt <= 0) {
+        if (expireAt <= 0) {
             plugin.debug(1, "The chest will never expire");
         } else {
             plugin.debug(1, "The chest will expire at " + new Date(expireAt));
@@ -159,30 +142,31 @@ public class SpawnChestListener implements Listener {
             loc.add(x, 0, z);
         }
 
+        ChangeDeathMessageOptions changeDeathMessageOptions = config.changeDeathMessageOptions();
+        if (changeDeathMessageOptions.enabled()) {
+            plugin.debug(1, "Changing death message...");
+            if (changeDeathMessageOptions.message() != null && location.getWorld() != null) {
+                StringSubstitutor substitutor = new StringSubstitutor(Map.of("x", location.getBlockX(), "y", location.getBlockY(), "z", location.getBlockZ(), "world", location.getWorld().getName(), "player_name", player.getName(), "player_display_name", player.getDisplayName()));
+
+                event.setDeathMessage(Arrays.stream(changeDeathMessageOptions.message()).map(substitutor::replace).map(s -> {
+                    if (DeathChestPlugin.isPlaceholderAPIEnabled()) {
+                        return PlaceholderAPI.setPlaceholders(player, s);
+                    }
+                    return s;
+                }).collect(Collectors.joining("\n")));
+            } else {
+                event.setDeathMessage(null); // Disable death message
+            }
+        }
+
         try {
-            boolean protectedChest = deathChestConfig.chestProtectionOptions().enabled() && player.hasPermission(deathChestConfig.chestProtectionOptions().permission());
+            boolean protectedChest = config.chestProtectionOptions().enabled() && player.hasPermission(config.chestProtectionOptions().permission());
             plugin.debug(1, "Protected chest: %s".formatted(protectedChest));
 
-            World world = loc.getWorld();
-            Preconditions.checkNotNull(world);
+            DeathChestModel deathChest = plugin.createDeathChest(loc, createdAt, expireAt, player, protectedChest, items);
 
-            Bukkit.getScheduler().runTask(plugin, () -> {
-                DeathChestModel deathChest = null;
-                try {
-                    deathChest = plugin.createDeathChest(loc, createdAt, expireAt, player, protectedChest, items);
-                } catch (Exception e) {
-                    plugin.getLogger().severe("Items dropped because of an error while creating the death chest");
-                    for (ItemStack content : items) {
-                        world.dropItemNaturally(loc, content);
-                    }
-                    e.printStackTrace();
-                }
-
-                if (deathChest != null) {
-                    DeathChestSpawnEvent deathChestSpawnEvent = new DeathChestSpawnEvent(player, deathChest);
-                    Bukkit.getPluginManager().callEvent(deathChestSpawnEvent);
-                }
-            });
+            DeathChestSpawnEvent deathChestSpawnEvent = new DeathChestSpawnEvent(player, deathChest);
+            Bukkit.getPluginManager().callEvent(deathChestSpawnEvent);
 
             // Clears the drops
             plugin.debug(1, "Clearing drops...");
@@ -190,29 +174,6 @@ public class SpawnChestListener implements Listener {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        // Player notification
-        PlayerNotificationOptions playerNotificationOptions = deathChestConfig.playerNotificationOptions();
-        if (playerNotificationOptions.enabled() && playerNotificationOptions.messages() != null) {
-            if (deathLocation.getWorld() != null) {
-                StringSubstitutor substitutor = new StringSubstitutor(Map.of("x", deathLocation.getBlockX(), "y", deathLocation.getBlockY(), "z", deathLocation.getBlockZ(), "chest_x", loc.getBlockX(), "chest_y", loc.getBlockY(), "chest_z", loc.getBlockZ(), "world", deathLocation.getWorld().getName()));
-                playerNotificationOptions.showNotification(player, substitutor);
-            } else {
-                plugin.debug(1, "Invalid world during player notification");
-            }
-        }
-
-        // Global notification
-        GlobalNotificationOptions globalNotificationOptions = deathChestConfig.globalNotificationOptions();
-        if (globalNotificationOptions.enabled() && globalNotificationOptions.messages() != null) {
-            if (deathLocation.getWorld() != null) {
-                StringSubstitutor substitutor = new StringSubstitutor(Map.of("x", deathLocation.getBlockX(), "y", deathLocation.getBlockY(), "z", deathLocation.getBlockZ(), "chest_x", loc.getBlockX(), "chest_y", loc.getBlockY(), "chest_z", loc.getBlockZ(), "world", deathLocation.getWorld().getName(), "player_name", player.getName(), "player_display_name", player.getDisplayName()));
-                globalNotificationOptions.showNotification(player, substitutor);
-            } else {
-                plugin.debug(1, "Invalid world during player notification");
-            }
-        }
-
 
     }
 
