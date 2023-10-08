@@ -57,21 +57,23 @@ public class ChestDestroyListener implements Listener {
             lidded.close();
         }
 
-        if (inventory.isEmpty()) {
-            DestroyReason reason = DestroyReason.PLAYER;
-            if (!human.equals(model.getOwner()))
-                reason = DestroyReason.THIEF;
+        if (!inventory.isEmpty())
+            return;
 
-            this.plugin.getAuditManager().audit(new AuditItem(new Date(), AuditAction.DESTROY_CHEST, new DestroyChestInfo(model, reason, Map.of("player", human))));
+        DestroyReason reason = DestroyReason.PLAYER;
+        if (!human.equals(model.getOwner()))
+            reason = DestroyReason.THIEF;
 
-            // Remove the chest at the next server tick to prevent a stack overflow because of the inventory closing of destroyed death chests.
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    plugin.getDeathChestController().destroyChest(model);
-                }
-            }.runTask(plugin);
-        }
+        this.plugin.getAuditManager().audit(new AuditItem(new Date(), AuditAction.DESTROY_CHEST, new DestroyChestInfo(model, reason, Map.of("player", human))));
+
+        // Remove the chest at the next server tick to prevent a stack overflow because it tries to close all viewer inventories.
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                plugin.getDeathChestController().destroyChest(model);
+            }
+        }.runTask(plugin);
+
     }
 
     /**

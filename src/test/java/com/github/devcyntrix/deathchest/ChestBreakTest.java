@@ -69,7 +69,6 @@ public class ChestBreakTest {
         Location location = player.getLocation();
         Block block = location.getBlock();
 
-
         System.out.println("Breaking block...");
         BlockBreakEvent blockBreakEvent = player.simulateBlockBreak(block);
         Assertions.assertNotNull(blockBreakEvent);
