@@ -9,6 +9,8 @@ import com.github.devcyntrix.deathchest.tasks.HologramRunnable;
 import com.github.devcyntrix.deathchest.util.ChestView;
 import com.github.devcyntrix.hologram.api.Hologram;
 import com.github.devcyntrix.hologram.api.HologramTextLine;
+import org.bukkit.Chunk;
+import org.bukkit.Location;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.LinkedHashMap;
@@ -31,11 +33,17 @@ public class HologramView implements ChestView {
 
     @Override
     public void onCreate(DeathChestModel model) {
-        Hologram hologram = controller.spawnHologram(model.getLocation().clone().add(0.5, options.height(), 0.5));
+        Chunk chunk = model.getLocation().getChunk();
+        boolean loaded = chunk.isLoaded();
+        if (!loaded)
+            chunk.load();
+
+        Location holoPos = model.getLocation().clone().add(0.5, options.height(), 0.5);
+        Hologram hologram = controller.spawnHologram(holoPos);
         model.setHologram(hologram);
 
-        Map<String, HologramTextLine> blueprints = new LinkedHashMap<>(options.lines().size());
-        options.lines().forEach(line -> blueprints.put(line, hologram.appendLine(placeHolderController.replace(model, line)))); // A map of blueprints
+        Map<HologramTextLine, String> blueprints = new LinkedHashMap<>(options.lines().size());
+        options.lines().forEach(line -> blueprints.put(hologram.appendLine(placeHolderController.replace(model, line)), line)); // A map of blueprints
 
         if (blueprints.isEmpty())
             return;
@@ -43,6 +51,9 @@ public class HologramView implements ChestView {
         plugin.debug(0, "Starting hologram updater...");
         BukkitTask bukkitTask = new HologramRunnable(plugin, model, blueprints, placeHolderController).runTaskTimerAsynchronously(plugin, 20, 20);
         model.getTasks().add(bukkitTask::cancel);
+
+        if (!loaded)
+            chunk.unload();
     }
 
     @Override
@@ -50,7 +61,16 @@ public class HologramView implements ChestView {
         Hologram hologram = model.getHologram();
         if (hologram == null)
             return;
+
+        Chunk chunk = hologram.getLocation().getChunk();
+        boolean loaded = chunk.isLoaded();
+        if (!loaded)
+            chunk.load();
+
         hologram.delete();
+
+        if (!loaded)
+            chunk.unload();
         model.setHologram(null);
     }
 

@@ -9,6 +9,8 @@ public interface Hologram {
 
     @NotNull HologramService getService();
 
+    @NotNull Location getLocation();
+
     void teleport(@NotNull Location location);
 
     HologramTextLine appendLine(@NotNull String line);

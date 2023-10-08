@@ -15,8 +15,8 @@ import java.util.UUID;
 
 public class NativeHologramTextLine implements HologramTextLine {
 
-    private final Location location;
     private final UUID armorStand;
+    private Location location;
 
     public NativeHologramTextLine(@NotNull Plugin plugin, @NotNull Location location, @NotNull String text) {
         Preconditions.checkNotNull(location.getWorld());
@@ -30,27 +30,33 @@ public class NativeHologramTextLine implements HologramTextLine {
         }).getUniqueId();
     }
 
-    public @NotNull Location getLocation() {
-        return location;
-    }
-
-    public @Nullable ArmorStand getArmorStand() {
-        return (ArmorStand) Bukkit.getEntity(armorStand);
+    public void teleport(@NotNull Location location) {
+        this.location = location;
+        ArmorStand stand = getArmorStand();
+        if (stand == null || !stand.isValid()) return;
+        stand.teleport(location);
     }
 
     @Override
     public void rename(@NotNull String text) {
         ArmorStand stand = getArmorStand();
-        if (stand == null || stand.isDead())
-            return;
+        if (stand == null || !stand.isValid()) return;
         stand.setCustomName(text);
     }
 
     @Override
     public void remove() {
         ArmorStand stand = getArmorStand();
-        if (stand == null)
-            return;
+        if (stand == null || !stand.isValid()) return;
         stand.remove();
+    }
+
+
+    public @NotNull Location getLocation() {
+        return location.clone();
+    }
+
+    public @Nullable ArmorStand getArmorStand() {
+        return (ArmorStand) Bukkit.getEntity(armorStand);
     }
 }
