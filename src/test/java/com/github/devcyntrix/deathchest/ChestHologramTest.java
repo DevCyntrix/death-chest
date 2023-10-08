@@ -21,11 +21,8 @@ import java.util.List;
 @DisplayName("Hologram tests")
 public class ChestHologramTest {
 
-    private ServerMock server;
     private DeathChestPlugin plugin;
 
-    private List<ItemStack> content;
-    private PlayerMock player;
     private DeathChestModel model;
 
     @BeforeEach
@@ -40,11 +37,11 @@ public class ChestHologramTest {
             throw new RuntimeException(e);
         }
 
-        this.server = MockBukkit.getOrCreateMock();
+        ServerMock server = MockBukkit.getOrCreateMock();
         this.plugin = MockBukkit.load(DeathChestPlugin.class, true, config);
 
-        this.player = server.addPlayer();
-        this.content = new ArrayList<>(List.of(new ItemStack(Material.OAK_LOG)));
+        PlayerMock player = server.addPlayer();
+        List<ItemStack> content = new ArrayList<>(List.of(new ItemStack(Material.OAK_LOG)));
         this.model = plugin.createDeathChest(player.getLocation(), content.toArray(ItemStack[]::new));
         server.getScheduler().performOneTick();
 

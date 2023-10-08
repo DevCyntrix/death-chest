@@ -21,10 +21,7 @@ import java.util.List;
 public class ExpireChestTest {
 
     private ServerMock server;
-    private DeathChestPlugin plugin;
 
-    private List<ItemStack> content;
-    private PlayerMock player;
     private DeathChestModel model;
 
     @BeforeEach
@@ -40,10 +37,10 @@ public class ExpireChestTest {
         }
 
         this.server = MockBukkit.getOrCreateMock();
-        this.plugin = MockBukkit.load(DeathChestPlugin.class, true, config);
+        DeathChestPlugin plugin = MockBukkit.load(DeathChestPlugin.class, true, config);
 
-        this.player = server.addPlayer();
-        this.content = new ArrayList<>(List.of(new ItemStack(Material.OAK_LOG)));
+        PlayerMock player = server.addPlayer();
+        List<ItemStack> content = new ArrayList<>(List.of(new ItemStack(Material.OAK_LOG)));
 
         Duration expiration = config.expiration();
         if (expiration == null)

@@ -24,9 +24,6 @@ import java.util.List;
 public class WorldFilterTest {
 
     private ServerMock server;
-    private DeathChestPlugin plugin;
-
-    private List<ItemStack> content;
 
     private PlayerMock player;
 
@@ -43,8 +40,8 @@ public class WorldFilterTest {
         }
 
         this.server = MockBukkit.getOrCreateMock();
-        this.plugin = MockBukkit.load(DeathChestPlugin.class, true, config);
-        this.content = new ArrayList<>(List.of(new ItemStack(Material.OAK_LOG)));
+        DeathChestPlugin plugin = MockBukkit.load(DeathChestPlugin.class, true, config);
+        List<ItemStack> content = new ArrayList<>(List.of(new ItemStack(Material.OAK_LOG)));
 
         this.player = server.addPlayer();
         PlayerInventory inventory = player.getInventory();

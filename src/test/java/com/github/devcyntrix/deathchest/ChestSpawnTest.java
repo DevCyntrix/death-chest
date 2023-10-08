@@ -26,7 +26,6 @@ import java.util.List;
 public class ChestSpawnTest {
 
     private ServerMock server;
-    private DeathChestPlugin plugin;
 
     @BeforeEach
     public void setUp() {
@@ -41,8 +40,7 @@ public class ChestSpawnTest {
         }
 
         this.server = MockBukkit.getOrCreateMock();
-        this.plugin = MockBukkit.load(DeathChestPlugin.class, true, config);
-
+        MockBukkit.load(DeathChestPlugin.class, true, config);
     }
 
     @AfterEach

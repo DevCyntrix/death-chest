@@ -25,9 +25,7 @@ import java.util.List;
 public class ChestBlastProtectionTest {
 
     private ServerMock server;
-    private DeathChestPlugin plugin;
 
-    private List<ItemStack> content;
     private PlayerMock player;
     private DeathChestModel model;
 
@@ -44,10 +42,10 @@ public class ChestBlastProtectionTest {
         }
 
         this.server = MockBukkit.getOrCreateMock();
-        this.plugin = MockBukkit.load(DeathChestPlugin.class, true, config);
+        DeathChestPlugin plugin = MockBukkit.load(DeathChestPlugin.class, true, config);
 
         this.player = server.addPlayer();
-        this.content = new ArrayList<>(List.of(new ItemStack(Material.OAK_LOG)));
+        List<ItemStack> content = new ArrayList<>(List.of(new ItemStack(Material.OAK_LOG)));
         this.model = plugin.createDeathChest(player.getLocation(), content.toArray(ItemStack[]::new));
         server.getScheduler().performOneTick();
 

@@ -14,7 +14,7 @@ import pl.minecodes.plots.api.plot.PlotServiceApi;
  */
 public class MinePlotsProtection implements ProtectionService {
 
-    private PlotServiceApi api;
+    private final PlotServiceApi api;
 
     public MinePlotsProtection() {
         this.api = Bukkit.getServicesManager().load(PlotServiceApi.class);

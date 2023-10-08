@@ -8,8 +8,6 @@ public interface AuditManager extends Closeable {
 
     DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
-    void start();
-
     void audit(AuditItem item);
 
 }

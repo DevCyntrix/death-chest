@@ -13,7 +13,7 @@ public record DeathChestConfig(
         @SerializedName("update-checker") boolean updateChecker,
         @SerializedName("duration-format") @NotNull String durationFormat,
         @SerializedName("expiration") @Nullable Duration expiration,
-        @SerializedName("no-expiration-permission") @Nullable NoExpirationPermission noExpirationPermission,
+        @SerializedName("no-expiration-permission") @NotNull NoExpirationPermission noExpirationPermission,
         @SerializedName("drop-items-after-expiration") boolean dropItemsAfterExpiration,
         @SerializedName("inventory") @NotNull InventoryOptions inventoryOptions,
         @SerializedName("hologram") @NotNull HologramOptions hologramOptions,
@@ -43,7 +43,7 @@ public record DeathChestConfig(
             }
         }
 
-        NoExpirationPermission permission = null;
+        NoExpirationPermission permission = new NoExpirationPermission(false, "deathchest.stays-forever");
         if (config.isString("no-expiration-permission")) {
             permission = new NoExpirationPermission(false, config.getString("no-expiration-permission"));
         } else {

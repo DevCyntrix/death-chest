@@ -27,7 +27,6 @@ import java.util.List;
 public class ChestBreakTest {
 
     private ServerMock server;
-    private DeathChestPlugin plugin;
 
     private List<ItemStack> content;
     private PlayerMock player;
@@ -46,7 +45,7 @@ public class ChestBreakTest {
         }
 
         this.server = MockBukkit.getOrCreateMock();
-        this.plugin = MockBukkit.load(DeathChestPlugin.class, true, config);
+        DeathChestPlugin plugin = MockBukkit.load(DeathChestPlugin.class, true, config);
 
         this.player = server.addPlayer();
         this.content = new ArrayList<>(List.of(new ItemStack(Material.OAK_LOG)));
