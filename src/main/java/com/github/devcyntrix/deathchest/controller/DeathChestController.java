@@ -8,6 +8,7 @@ import com.github.devcyntrix.deathchest.api.audit.AuditManager;
 import com.github.devcyntrix.deathchest.api.audit.info.CreateChestInfo;
 import com.github.devcyntrix.deathchest.api.event.DeathChestDestroyEvent;
 import com.github.devcyntrix.deathchest.api.storage.DeathChestStorage;
+import com.github.devcyntrix.deathchest.config.ChestProtectionOptions;
 import com.github.devcyntrix.deathchest.config.DeathChestConfig;
 import com.github.devcyntrix.deathchest.config.InventoryOptions;
 import com.github.devcyntrix.deathchest.util.ChestModelStringLookup;
@@ -125,6 +126,17 @@ public class DeathChestController implements Closeable {
 
     public @NotNull Collection<DeathChestModel> getChests(World world) {
         return this.loadedChests.row(world).values();
+    }
+
+    public boolean isAccessible(@NotNull DeathChestModel model, @NotNull Player player) {
+        ChestProtectionOptions protectionOptions = plugin.getDeathChestConfig().chestProtectionOptions();
+        Long expiration = protectionOptions.expiration() == null ? null : protectionOptions.expiration().toMillis() + model.getCreatedAt() - System.currentTimeMillis();
+
+        return protectionOptions.enabled() &&
+                model.isProtected() &&
+                model.getOwner() != null && !model.getOwner().getUniqueId().equals(player.getUniqueId()) &&
+                !player.hasPermission(protectionOptions.bypassPermission()) &&
+                (expiration == null || expiration >= 0);
     }
 
     public void destroyChest(DeathChestModel model) {

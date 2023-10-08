@@ -3,6 +3,7 @@ package com.github.devcyntrix.deathchest.listener;
 import com.github.devcyntrix.deathchest.DeathChestModel;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
 import com.github.devcyntrix.deathchest.config.ChestProtectionOptions;
+import com.github.devcyntrix.deathchest.controller.DeathChestController;
 import org.bukkit.GameMode;
 import org.bukkit.block.Block;
 import org.bukkit.block.Lidded;
@@ -28,7 +29,7 @@ public class ChestModificationListener implements Listener {
      * @param event the event from the Bukkit API
      */
     @EventHandler
-    public void onOpenInventory(PlayerInteractEvent event) {
+    public void onOpenChest(PlayerInteractEvent event) {
         if (!event.hasBlock()) return;
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 
@@ -39,21 +40,17 @@ public class ChestModificationListener implements Listener {
         if (event.isBlockInHand() && player.isSneaking()) // That maintains the natural minecraft feeling
             return;
 
-        DeathChestModel model = plugin.getDeathChestController().getChest(block.getLocation());
+        DeathChestController controller = plugin.getDeathChestController();
+        DeathChestModel model = controller.getChest(block.getLocation());
         if (model == null)
             return;
 
         event.setCancelled(true);
 
-        // Chest Protection
-        ChestProtectionOptions protectionOptions = plugin.getDeathChestConfig().chestProtectionOptions();
-        Long expiration = protectionOptions.expiration() == null ? null : protectionOptions.expiration().toMillis() + model.getCreatedAt() - System.currentTimeMillis();
 
-        if (protectionOptions.enabled() &&
-                model.isProtected() &&
-                model.getOwner() != null && !model.getOwner().getUniqueId().equals(player.getUniqueId()) &&
-                !player.hasPermission(protectionOptions.bypassPermission()) &&
-                (expiration == null || expiration >= 0)) {
+        // Chest Protection
+        if (controller.isAccessible(model, player)) {
+            ChestProtectionOptions protectionOptions = plugin.getDeathChestConfig().chestProtectionOptions();
             protectionOptions.playSound(player, block.getLocation());
             protectionOptions.notify(player);
             return;
