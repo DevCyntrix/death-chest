@@ -3,6 +3,7 @@
 * [Death Chest](README.md)
 * [Documentation](documentation.md)
 * [Installation](installation.md)
+* [Permissions](permissions.md)
 
 ## Features
 
