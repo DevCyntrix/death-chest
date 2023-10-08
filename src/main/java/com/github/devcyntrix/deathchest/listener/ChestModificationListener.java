@@ -49,7 +49,7 @@ public class ChestModificationListener implements Listener {
 
 
         // Chest Protection
-        if (controller.isAccessible(model, player)) {
+        if (!controller.isAccessibleBy(model, player)) {
             ChestProtectionOptions protectionOptions = plugin.getDeathChestConfig().chestProtectionOptions();
             protectionOptions.playSound(player, block.getLocation());
             protectionOptions.notify(player);

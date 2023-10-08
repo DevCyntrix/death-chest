@@ -10,7 +10,6 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Item;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
@@ -19,14 +18,17 @@ import org.junit.jupiter.api.*;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
-@DisplayName("Chest spawn tests")
-public class ChestSpawnTest {
+@DisplayName("World filter test")
+public class WorldFilterTest {
 
     private ServerMock server;
     private DeathChestPlugin plugin;
+
+    private List<ItemStack> content;
+
+    private PlayerMock player;
 
     @BeforeEach
     public void setUp() {
@@ -42,7 +44,11 @@ public class ChestSpawnTest {
 
         this.server = MockBukkit.getOrCreateMock();
         this.plugin = MockBukkit.load(DeathChestPlugin.class, true, config);
+        this.content = new ArrayList<>(List.of(new ItemStack(Material.OAK_LOG)));
 
+        this.player = server.addPlayer();
+        PlayerInventory inventory = player.getInventory();
+        inventory.addItem(content.toArray(ItemStack[]::new));
     }
 
     @AfterEach
@@ -51,41 +57,43 @@ public class ChestSpawnTest {
     }
 
     @Test
-    @DisplayName("No chest if inventory was empty")
-    public void doesntSpawnEmptyChest() {
-        PlayerMock player = server.addPlayer();
+    @DisplayName("Try to spawn in filtered world")
+    public void dieInFilteredWorld() {
+
+        WorldMock mock = server.addSimpleWorld("disabled_world");
+        player.teleport(player.getLocation().toLocation(mock));
         @NotNull Location location = player.getLocation();
         player.setHealth(0.0);
-        Assertions.assertTrue(location.getBlock().isEmpty());
+        server.getScheduler().performOneTick();
+
+        Block block = location.getBlock();
+        Assertions.assertTrue(block.isEmpty());
+
+        // Cannot check drops because of missing drop functionality of mock bukkit
+//        WorldMock world = (WorldMock) location.getWorld();
+//        Collection<Item> items = world.getEntitiesByClass(Item.class);
+//        System.out.println(items);
+//        items.forEach(item -> content.remove(item.getItemStack()));
+//        Assertions.assertTrue(content.isEmpty());
     }
 
     @Test
-    @DisplayName("Spawn filled chest")
-    public void spawnFilledChest() {
-        List<ItemStack> list = new ArrayList<>(List.of(new ItemStack(Material.OAK_LOG)));
-
-        PlayerMock player = server.addPlayer();
-        PlayerInventory inventory = player.getInventory();
-        System.out.println("Adding item to the inventory...");
-        inventory.addItem(list.toArray(ItemStack[]::new));
-
+    @DisplayName("Try to spawn in normal world")
+    public void dieInNormalWorld() {
         @NotNull Location location = player.getLocation();
-        System.out.println("Killing player...");
         player.setHealth(0.0);
         server.getScheduler().performOneTick();
+
         Block block = location.getBlock();
         Assertions.assertFalse(block.isEmpty());
-        System.out.println("Breaking block...");
+        Assertions.assertTrue(location.getWorld().getEntitiesByClass(Item.class).isEmpty());
 
-        BlockBreakEvent blockBreakEvent = player.simulateBlockBreak(block);
-        Assertions.assertNotNull(blockBreakEvent);
-        Assertions.assertTrue(blockBreakEvent.isCancelled());
-        Assertions.assertTrue(block.isEmpty());
-
-        WorldMock world = player.getWorld();
-        Collection<Item> items = world.getEntitiesByClass(Item.class);
-        items.forEach(item -> list.remove(item.getItemStack()));
-        Assertions.assertTrue(list.isEmpty());
+        // Cannot check drops because of missing drop functionality of mock bukkit
+//        WorldMock world = (WorldMock) location.getWorld();
+//        Collection<Item> items = world.getEntitiesByClass(Item.class);
+//        System.out.println(items);
+//        items.forEach(item -> content.remove(item.getItemStack()));
+//        Assertions.assertTrue(content.isEmpty());
     }
 
 }

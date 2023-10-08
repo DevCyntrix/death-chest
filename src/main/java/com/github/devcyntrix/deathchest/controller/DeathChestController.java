@@ -84,7 +84,7 @@ public class DeathChestController implements Closeable {
         logger.info("  Of these %d have expired".formatted(this.loadedChests.row(world).values().stream().filter(model1 -> model1.getExpireAt() < time).count()));
     }
 
-    public DeathChestModel createChest(@NotNull Location location, long expireAt, @Nullable Player player, ItemStack @NotNull ... items) {
+    public @NotNull DeathChestModel createChest(@NotNull Location location, long expireAt, @Nullable Player player, ItemStack @NotNull ... items) {
         boolean protectedChest = player != null && player.hasPermission(getConfig().chestProtectionOptions().permission());
         return createChest(location, System.currentTimeMillis(), expireAt, player, protectedChest, items);
     }
@@ -128,15 +128,21 @@ public class DeathChestController implements Closeable {
         return this.loadedChests.row(world).values();
     }
 
-    public boolean isAccessible(@NotNull DeathChestModel model, @NotNull Player player) {
+    public boolean isAccessibleBy(@NotNull DeathChestModel model, @NotNull Player player) {
         ChestProtectionOptions protectionOptions = plugin.getDeathChestConfig().chestProtectionOptions();
-        Long expiration = protectionOptions.expiration() == null ? null : protectionOptions.expiration().toMillis() + model.getCreatedAt() - System.currentTimeMillis();
 
-        return protectionOptions.enabled() &&
-                model.isProtected() &&
-                model.getOwner() != null && !model.getOwner().getUniqueId().equals(player.getUniqueId()) &&
-                !player.hasPermission(protectionOptions.bypassPermission()) &&
-                (expiration == null || expiration >= 0);
+        Long remainingTime = 0L;
+        long expiration = protectionOptions.expiration().toMillis();
+        if (expiration > 0) {
+            remainingTime = expiration + model.getCreatedAt() - System.currentTimeMillis();
+        }
+
+        return !protectionOptions.enabled() ||
+                !model.isProtected() ||
+                model.getOwner() == null ||
+                model.getOwner().equals(player) ||
+                player.hasPermission(protectionOptions.bypassPermission()) ||
+                remainingTime < 0;
     }
 
     public void destroyChest(DeathChestModel model) {

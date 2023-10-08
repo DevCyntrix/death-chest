@@ -91,13 +91,9 @@ public class ChestDestroyListener implements Listener {
         Player player = event.getPlayer();
 
         event.setCancelled(true);
-        ChestProtectionOptions protectionOptions = plugin.getDeathChestConfig().chestProtectionOptions();
-        Long expiration = protectionOptions.expiration() == null ? null : protectionOptions.expiration().toMillis() + model.getCreatedAt() - System.currentTimeMillis();
-        if (protectionOptions.enabled() &&
-                model.isProtected() &&
-                model.getOwner() != null && !model.getOwner().getUniqueId().equals(player.getUniqueId()) &&
-                !player.hasPermission(protectionOptions.bypassPermission()) &&
-                (expiration == null || expiration >= 0)) {
+
+        if (!plugin.getDeathChestController().isAccessibleBy(model, player)) {
+            ChestProtectionOptions protectionOptions = plugin.getDeathChestConfig().chestProtectionOptions();
             protectionOptions.playSound(player, block.getLocation());
             protectionOptions.notify(player);
             return;
@@ -111,7 +107,6 @@ public class ChestDestroyListener implements Listener {
         model.getInventory().clear();
 
         plugin.getDeathChestController().destroyChest(model);
-
     }
 
     /**

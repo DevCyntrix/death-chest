@@ -10,10 +10,7 @@ import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.inventory.ItemStack;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -21,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+@DisplayName("Hologram tests")
 public class ChestHologramTest {
 
     private ServerMock server;
@@ -59,6 +57,7 @@ public class ChestHologramTest {
     }
 
     @Test
+    @DisplayName("Hologram spawn")
     public void spawnHologram() {
         World world = model.getWorld();
         Assertions.assertNotNull(world);
@@ -74,6 +73,7 @@ public class ChestHologramTest {
     }
 
     @Test
+    @DisplayName("Hologram remove")
     public void removeHologram() {
         World world = model.getWorld();
         Assertions.assertNotNull(world);

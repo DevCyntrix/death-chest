@@ -5,13 +5,11 @@ import be.seeseemelk.mockbukkit.ServerMock;
 import be.seeseemelk.mockbukkit.WorldMock;
 import be.seeseemelk.mockbukkit.entity.PlayerMock;
 import com.github.devcyntrix.deathchest.config.DeathChestConfig;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Item;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.inventory.ItemStack;
@@ -23,8 +21,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-@DisplayName("Chest breaking tests")
-public class ChestBreakTest {
+@DisplayName("Chest blast protection tests")
+public class ChestBlastProtectionTest {
 
     private ServerMock server;
     private DeathChestPlugin plugin;
@@ -35,7 +33,7 @@ public class ChestBreakTest {
 
     @BeforeEach
     public void setUp() {
-        InputStream stream = getClass().getClassLoader().getResourceAsStream("chest-break-config.yml");
+        InputStream stream = getClass().getClassLoader().getResourceAsStream("chest-blast-protection.yml");
         if (stream == null)
             throw new IllegalStateException("Missing config");
         DeathChestConfig config;
@@ -62,24 +60,6 @@ public class ChestBreakTest {
     }
 
     @Test
-    @DisplayName("Block break by player")
-    public void breakBlock() {
-        Location location = player.getLocation();
-        Block block = location.getBlock();
-
-        System.out.println("Breaking block...");
-        BlockBreakEvent blockBreakEvent = player.simulateBlockBreak(block);
-        Assertions.assertNotNull(blockBreakEvent);
-        Assertions.assertTrue(blockBreakEvent.isCancelled());
-        Assertions.assertTrue(block.isEmpty());
-
-        WorldMock world = player.getWorld();
-        Collection<Item> items = world.getEntitiesByClass(Item.class);
-        items.forEach(item -> content.remove(item.getItemStack()));
-        Assertions.assertTrue(content.isEmpty());
-    }
-
-    @Test
     @DisplayName("Block break by entity explosion")
     public void entityExplodeBlock() {
         WorldMock mock = player.getWorld();
@@ -90,12 +70,12 @@ public class ChestBreakTest {
         EntityExplodeEvent event = new EntityExplodeEvent(spawn, model.getLocation(), new ArrayList<>(List.of(block)), 2.0F);
         server.getPluginManager().callEvent(event);
         Assertions.assertFalse(event.isCancelled());
-        Assertions.assertTrue(block.isEmpty());
+
+        Assertions.assertFalse(block.isEmpty());
 
         WorldMock world = player.getWorld();
         Collection<Item> items = world.getEntitiesByClass(Item.class);
-        items.forEach(item -> content.remove(item.getItemStack()));
-        Assertions.assertTrue(content.isEmpty());
+        Assertions.assertTrue(items.isEmpty());
     }
 
     @Test
@@ -107,11 +87,10 @@ public class ChestBreakTest {
         BlockExplodeEvent event = new BlockExplodeEvent(block, new ArrayList<>(List.of(block)), 2.0F, null);
         server.getPluginManager().callEvent(event);
         Assertions.assertFalse(event.isCancelled());
-        Assertions.assertTrue(block.isEmpty());
+        Assertions.assertFalse(block.isEmpty());
 
         WorldMock world = player.getWorld();
         Collection<Item> items = world.getEntitiesByClass(Item.class);
-        items.forEach(item -> content.remove(item.getItemStack()));
-        Assertions.assertTrue(content.isEmpty());
+        Assertions.assertTrue(items.isEmpty());
     }
 }

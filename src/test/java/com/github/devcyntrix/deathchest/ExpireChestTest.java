@@ -9,10 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -20,6 +17,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
+@DisplayName("Chest expiration tests without drops")
 public class ExpireChestTest {
 
     private ServerMock server;
@@ -69,6 +67,7 @@ public class ExpireChestTest {
     }
 
     @Test
+    @DisplayName("Checks expiration")
     public void chestExpirationWithoutDrops() {
         long remainingSeconds = (model.getExpireAt() - model.getCreatedAt()) / 1000;
         System.out.printf("Skipping %d seconds%n", remainingSeconds);

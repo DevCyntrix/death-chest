@@ -11,7 +11,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 
-public record ChestProtectionOptions(boolean enabled, String permission, String bypassPermission, Duration expiration,
+public record ChestProtectionOptions(boolean enabled, String permission, String bypassPermission,
+                                     @NotNull Duration expiration,
                                      Sound sound, float volume, float pitch, String[] message) {
 
     public static @NotNull ChestProtectionOptions load(@Nullable ConfigurationSection section) {
@@ -21,10 +22,7 @@ public record ChestProtectionOptions(boolean enabled, String permission, String 
         String permission = section.getString("permission", "deathchest.thiefprotected");
         String bypassPermission = section.getString("bypass-permission", "deathchest.thiefprotected.bypass");
         long expirationInSeconds = section.getLong("expiration", 0);
-        Duration expiration = null;
-        if (expirationInSeconds > 0) {
-            expiration = Duration.ofSeconds(expirationInSeconds);
-        }
+        Duration expiration = Duration.ofSeconds(Math.max(expirationInSeconds, 0));
         String soundString = section.getString("sound");
         Sound sound = null;
         float volume = 1.0F;
