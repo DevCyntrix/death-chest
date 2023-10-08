@@ -39,7 +39,7 @@ public class HologramView implements ChestView {
             chunk.load();
 
         Location holoPos = model.getLocation().clone().add(0.5, options.height(), 0.5);
-        Hologram hologram = controller.spawnHologram(holoPos);
+        Hologram hologram = controller.spawnHologram(holoPos, options.lineHeight());
         model.setHologram(hologram);
 
         Map<HologramTextLine, String> blueprints = new LinkedHashMap<>(options.lines().size());

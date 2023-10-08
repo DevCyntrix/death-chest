@@ -19,12 +19,13 @@ public class NativeHologram implements Hologram {
     @NotNull
     @Getter
     private final HologramService service;
+    private final double lineHeight;
     @NotNull
     private Location location;
 
     private final List<NativeHologramTextLine> list = new ArrayList<>();
 
-    public NativeHologram(@NotNull JavaPlugin plugin, @NotNull HologramService service, @NotNull Location location) {
+    public NativeHologram(@NotNull JavaPlugin plugin, @NotNull HologramService service, @NotNull Location location, double lineHeight) {
         Preconditions.checkNotNull(plugin);
         Preconditions.checkNotNull(service);
         Preconditions.checkNotNull(location);
@@ -32,6 +33,7 @@ public class NativeHologram implements Hologram {
         this.plugin = plugin;
         this.service = service;
         this.location = location;
+        this.lineHeight = lineHeight;
     }
 
     @NotNull
@@ -54,7 +56,7 @@ public class NativeHologram implements Hologram {
     @Override
     public HologramTextLine appendLine(@NotNull String line) {
 
-        list.forEach(lineRef -> lineRef.teleport(lineRef.getLocation().add(0, 0.25, 0)));
+        list.forEach(lineRef -> lineRef.teleport(lineRef.getLocation().add(0, lineHeight, 0)));
 
         NativeHologramTextLine l = new NativeHologramTextLine(this.plugin, location.clone(), line);
         list.add(l);

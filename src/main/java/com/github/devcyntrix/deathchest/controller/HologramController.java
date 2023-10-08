@@ -21,9 +21,9 @@ public class HologramController implements HologramService, Closeable {
     }
 
     @Override
-    public @NotNull Hologram spawnHologram(@NotNull Location location) {
+    public @NotNull Hologram spawnHologram(@NotNull Location location, double lineHeight) {
         plugin.debug(0, "Creating new hologram at " + formatLocation(location) + "...");
-        NativeHologram nativeHologram = new NativeHologram(plugin, this, location);
+        NativeHologram nativeHologram = new NativeHologram(plugin, this, location, lineHeight);
         this.holograms.add(nativeHologram);
         return nativeHologram;
     }

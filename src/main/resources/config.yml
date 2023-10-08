@@ -46,7 +46,8 @@ hologram:
   enabled: true
   # If you add lines you have to increase this value. This values depends on the hologram
   # plugin and the distance between the plugin
-  height: 2.3
+  height: 1
+  line-height: 0.25
   # Support for ${player_name}: Name
   #             ${player_displayname}: Displayname
   #             ${duration}: Time left

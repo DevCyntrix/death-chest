@@ -5,6 +5,6 @@ import org.jetbrains.annotations.NotNull;
 
 public interface HologramService {
 
-    @NotNull Hologram spawnHologram(@NotNull Location location);
+    @NotNull Hologram spawnHologram(@NotNull Location location, double lineHeight);
 
 }
