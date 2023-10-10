@@ -27,6 +27,4 @@ public interface DeathChestStorage extends Closeable {
 
     void remove(DeathChestModel chest);
 
-    void save() throws IOException;
-
 }

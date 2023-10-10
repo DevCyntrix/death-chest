@@ -195,8 +195,7 @@ public class YamlStorage implements DeathChestStorage {
     }
 
     @Override
-    public void save() throws IOException {
-
+    public void close() throws IOException {
         // It is important to iterate through all bukkit worlds to avoid duplication bugs because the last death chest in the worlds cannot be overwritten
         for (World world : Bukkit.getWorlds()) {
             File worldFile = getFile(world, true);
@@ -208,9 +207,5 @@ public class YamlStorage implements DeathChestStorage {
             configuration.set("chests", collect);
             configuration.save(worldFile);
         }
-    }
-
-    @Override
-    public void close() {
     }
 }

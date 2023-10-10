@@ -6,11 +6,14 @@ import com.github.devcyntrix.deathchest.api.ChestView;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+
+import java.util.logging.Level;
 
 public class BlockView implements ChestView, Listener {
 
@@ -38,16 +41,18 @@ public class BlockView implements ChestView, Listener {
 
     @Override
     public void onDestroy(DeathChestModel model) {
+
         try {
-            if (model.getLocation() != null) {
+            World world = model.getWorld();
+            if (world != null) {
                 plugin.debug(0, "Spawning block crack particle...");
-                Block block = model.getLocation().getBlock();
+                Location location = model.getLocation();
+                Block block = location.getBlock();
                 if (!plugin.isTest())
-                    model.getWorld().spawnParticle(Particle.BLOCK_CRACK, model.getLocation().clone().add(0.5, 0.5, 0.5), 10, block.getBlockData());
+                    world.spawnParticle(Particle.BLOCK_CRACK, location.clone().add(0.5, 0.5, 0.5), 10, block.getBlockData());
             }
         } catch (Exception e) {
-            plugin.getLogger().warning("Failed to play block crack particle");
-            e.printStackTrace();
+            plugin.getLogger().log(Level.WARNING, "Failed to play block crack particle", e);
         }
 
         if (model.getPrevious() == null)

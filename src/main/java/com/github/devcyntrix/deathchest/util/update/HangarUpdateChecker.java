@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Scanner;
+import java.util.logging.Level;
 
 public class HangarUpdateChecker implements UpdateChecker {
 
@@ -40,7 +41,7 @@ public class HangarUpdateChecker implements UpdateChecker {
         try {
             return new URL("https://hangar.papermc.io/api/v1/projects/%s/versions/%s/PAPER/download".formatted(description.getName(), version)).openStream();
         } catch (IOException e) {
-            e.printStackTrace();
+            plugin.getLogger().log(Level.WARNING, "Failed to download the newest version", e);
         }
         return null;
     }

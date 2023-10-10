@@ -131,7 +131,7 @@ public class DeathChestController implements Closeable {
     public boolean isAccessibleBy(@NotNull DeathChestModel model, @NotNull Player player) {
         ChestProtectionOptions protectionOptions = plugin.getDeathChestConfig().chestProtectionOptions();
 
-        Long remainingTime = 0L;
+        long remainingTime = 0L;
         long expiration = protectionOptions.expiration().toMillis();
         if (expiration > 0) {
             remainingTime = expiration + model.getCreatedAt() - System.currentTimeMillis();
@@ -168,13 +168,11 @@ public class DeathChestController implements Closeable {
 
     @Override
     public void close() throws IOException {
-        unloadChests(true);
+        unloadChests();
     }
 
-    private void unloadChests(boolean save) {
-        if (save) {
-            saveChests();
-        }
+    private void unloadChests() {
+        saveChests();
 
         this.loadedChests.values().forEach(model -> {
             this.listeners.forEach(listener -> listener.onUnload(model));

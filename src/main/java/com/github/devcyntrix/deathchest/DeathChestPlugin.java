@@ -58,6 +58,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.logging.Level;
 import java.util.stream.Stream;
 
 import static com.github.devcyntrix.deathchest.api.report.ReportManager.DATE_FORMAT_CONFIG;
@@ -127,7 +128,7 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
             try {
                 this.blacklist.save();
             } catch (IOException e) {
-                e.printStackTrace();
+                getLogger().log(Level.SEVERE, "Failed to save the item black list", e);
             }
         }
 
@@ -151,8 +152,7 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
                 }
             }
         } catch (Exception e) {
-            getLogger().warning("Failed to remove the permission of the chest-protection");
-            e.printStackTrace();
+            getLogger().log(Level.WARNING, "Failed to remove the permission of the chest-protection", e);
         }
 
         if (this.updateController != null) {
@@ -173,22 +173,16 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
             try {
                 this.deathChestController.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                getLogger().log(Level.SEVERE, "Failed to close the death chest controller", e);
             }
             this.deathChestController = null;
         }
 
         if (this.deathChestStorage != null) {
             try {
-                this.deathChestStorage.save();
-            } catch (IOException e) {
-                getLogger().severe("Failed to save the chests");
-                e.printStackTrace();
-            }
-            try {
                 this.deathChestStorage.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                getLogger().log(Level.SEVERE, "Failed to close the death chest storage", e);
             }
             this.deathChestStorage = null;
         }
@@ -197,7 +191,7 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
             try {
                 auditManager.close();
             } catch (Exception e) {
-                e.printStackTrace();
+                getLogger().log(Level.WARNING, "Failed to close the audit manager", e);
             }
             this.auditManager = null;
         }
@@ -278,8 +272,7 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
                 }
             }
         } catch (Exception e) {
-            getLogger().warning("Failed to register the permission of the chest-protection");
-            e.printStackTrace();
+            getLogger().log(Level.WARNING, "Failed to register the permission of the chest-protection", e);
         }
         this.blacklist = new ItemBlacklist(new File(getDataFolder(), "blacklist.yml"));
 
@@ -318,7 +311,7 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
             this.deathChestController.registerAdapter(adapter);
             getServer().getPluginManager().registerEvents(adapter, this);
 
-            this.deathChestController.registerAdapter(new CloseInventoryView());
+            this.deathChestController.registerAdapter(new CloseInventoryView(this));
             this.deathChestController.registerAdapter(new ExpirationView(this));
 
 
@@ -340,7 +333,7 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
             debug(0, "Loading chests...");
             this.deathChestController.loadChests(); // Loads the chests to the cache
         } catch (IOException e) {
-            getLogger().severe("Failed to initialize the storage system. Please check your configuration file.");
+            getLogger().severe("Failed to initialize the storage. Please check your configuration file.");
             throw new RuntimeException(e);
         }
 

@@ -11,6 +11,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Date;
 import java.util.Map;
+import java.util.logging.Level;
 
 public class ExpirationRunnable extends BukkitRunnable {
 
@@ -32,8 +33,7 @@ public class ExpirationRunnable extends BukkitRunnable {
                 chest.dropItems();
             }
         } catch (Exception e) {
-            System.err.println("Failed to drop items of the expired death chest");
-            e.printStackTrace();
+            plugin.getLogger().log(Level.SEVERE, "Failed to drop items of the expired death chest", e);
         }
         if (auditManager != null)
             auditManager.audit(new AuditItem(new Date(), AuditAction.DESTROY_CHEST, new DestroyChestInfo(chest, DestroyReason.EXPIRATION, Map.of("item-drops", plugin.getDeathChestConfig().dropItemsAfterExpiration()))));

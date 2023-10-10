@@ -14,6 +14,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.logging.Level;
 
 /**
  * Checks for the newest version by using the SpigotMC API
@@ -59,7 +60,7 @@ public class UpdateController implements Closeable {
                         }
                     }
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    plugin.getLogger().log(Level.WARNING, "Failed to write the download on the disk.", e);
                 }
             }
         }, 0, 20 * 60 * 30); // Every 30 minutes
