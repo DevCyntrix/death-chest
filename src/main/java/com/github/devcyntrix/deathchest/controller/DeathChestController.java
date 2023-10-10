@@ -2,6 +2,7 @@ package com.github.devcyntrix.deathchest.controller;
 
 import com.github.devcyntrix.deathchest.DeathChestModel;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
+import com.github.devcyntrix.deathchest.api.ChestView;
 import com.github.devcyntrix.deathchest.api.audit.AuditAction;
 import com.github.devcyntrix.deathchest.api.audit.AuditItem;
 import com.github.devcyntrix.deathchest.api.audit.AuditManager;
@@ -12,7 +13,6 @@ import com.github.devcyntrix.deathchest.config.ChestProtectionOptions;
 import com.github.devcyntrix.deathchest.config.DeathChestConfig;
 import com.github.devcyntrix.deathchest.config.InventoryOptions;
 import com.github.devcyntrix.deathchest.util.ChestModelStringLookup;
-import com.github.devcyntrix.deathchest.util.ChestView;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import me.clip.placeholderapi.PlaceholderAPI;

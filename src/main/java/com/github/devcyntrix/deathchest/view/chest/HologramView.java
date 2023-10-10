@@ -2,11 +2,11 @@ package com.github.devcyntrix.deathchest.view.chest;
 
 import com.github.devcyntrix.deathchest.DeathChestModel;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
+import com.github.devcyntrix.deathchest.api.ChestView;
 import com.github.devcyntrix.deathchest.config.HologramOptions;
 import com.github.devcyntrix.deathchest.controller.HologramController;
 import com.github.devcyntrix.deathchest.controller.PlaceholderController;
 import com.github.devcyntrix.deathchest.tasks.HologramRunnable;
-import com.github.devcyntrix.deathchest.util.ChestView;
 import com.github.devcyntrix.hologram.api.Hologram;
 import com.github.devcyntrix.hologram.api.HologramTextLine;
 import org.bukkit.Chunk;

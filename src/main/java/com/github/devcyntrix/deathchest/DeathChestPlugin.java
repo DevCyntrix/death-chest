@@ -482,4 +482,10 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
     public String getPrefix() {
         return "§cᴅᴇᴀᴛʜ ᴄʜᴇꜱᴛ §8︳ §r";
     }
+
+    @NotNull
+    @Override
+    public File getFile() {
+        return super.getFile();
+    }
 }

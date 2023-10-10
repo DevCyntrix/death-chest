@@ -2,10 +2,10 @@ package com.github.devcyntrix.deathchest.view.chest;
 
 import com.github.devcyntrix.deathchest.DeathChestModel;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
+import com.github.devcyntrix.deathchest.api.ChestView;
 import com.github.devcyntrix.deathchest.api.animation.BreakAnimationService;
 import com.github.devcyntrix.deathchest.config.BreakAnimationOptions;
 import com.github.devcyntrix.deathchest.tasks.BreakAnimationRunnable;
-import com.github.devcyntrix.deathchest.util.ChestView;
 import com.github.devcyntrix.deathchest.util.EntityIdHelper;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;

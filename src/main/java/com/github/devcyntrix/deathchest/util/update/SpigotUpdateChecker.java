@@ -1,6 +1,7 @@
-package com.github.devcyntrix.deathchest.util;
+package com.github.devcyntrix.deathchest.util.update;
 
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -8,10 +9,10 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Scanner;
 
-public record UpdateChecker(JavaPlugin plugin, int resourceId) {
+public record SpigotUpdateChecker(JavaPlugin plugin, int resourceId) implements UpdateChecker {
 
     @Nullable
-    public String getPublishedVersion() {
+    public String getLatestRelease() {
         try (InputStream inputStream = new URL("https://api.spigotmc.org/legacy/update.php?resource=" + this.resourceId).openStream(); Scanner scanner = new Scanner(inputStream)) {
             if (!scanner.hasNext())
                 return null;
@@ -22,4 +23,10 @@ public record UpdateChecker(JavaPlugin plugin, int resourceId) {
         }
         return null;
     }
+
+    @Override
+    public InputStream download(@NotNull String version) {
+        return null;
+    }
+
 }

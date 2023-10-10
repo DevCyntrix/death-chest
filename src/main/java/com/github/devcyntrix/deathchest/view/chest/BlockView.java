@@ -2,7 +2,7 @@ package com.github.devcyntrix.deathchest.view.chest;
 
 import com.github.devcyntrix.deathchest.DeathChestModel;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
-import com.github.devcyntrix.deathchest.util.ChestView;
+import com.github.devcyntrix.deathchest.api.ChestView;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;

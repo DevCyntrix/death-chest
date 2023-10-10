@@ -106,6 +106,7 @@ tasks {
     }
     shadowJar {
         relocate("org.bstats", "com.github.devcyntrix.deathchest.metrics")
+        archiveFileName.set("deathchest.jar")
     }
 }
 

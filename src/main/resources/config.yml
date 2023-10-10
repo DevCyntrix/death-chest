@@ -10,6 +10,8 @@ config-version: 2
 debug: false
 # I recommend leaving this on true to receive notification if I published an update.
 update-checker: true
+auto-update: true
+
 duration-format: 'mm:ss'
 # The expiration of the chest in seconds.
 # You can deactivate the expiration by setting the value to -1

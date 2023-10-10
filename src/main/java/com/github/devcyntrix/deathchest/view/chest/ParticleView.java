@@ -2,9 +2,9 @@ package com.github.devcyntrix.deathchest.view.chest;
 
 import com.github.devcyntrix.deathchest.DeathChestModel;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
+import com.github.devcyntrix.deathchest.api.ChestView;
 import com.github.devcyntrix.deathchest.config.ParticleOptions;
 import com.github.devcyntrix.deathchest.tasks.ParticleRunnable;
-import com.github.devcyntrix.deathchest.util.ChestView;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;

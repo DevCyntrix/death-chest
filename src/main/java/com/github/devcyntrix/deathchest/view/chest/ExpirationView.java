@@ -2,8 +2,8 @@ package com.github.devcyntrix.deathchest.view.chest;
 
 import com.github.devcyntrix.deathchest.DeathChestModel;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
+import com.github.devcyntrix.deathchest.api.ChestView;
 import com.github.devcyntrix.deathchest.tasks.ExpirationRunnable;
-import com.github.devcyntrix.deathchest.util.ChestView;
 import org.bukkit.scheduler.BukkitTask;
 
 public class ExpirationView implements ChestView {

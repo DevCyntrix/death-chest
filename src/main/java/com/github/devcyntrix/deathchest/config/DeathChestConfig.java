@@ -11,6 +11,7 @@ public record DeathChestConfig(
         @SerializedName("config-version") int configVersion,
         @SerializedName("debug") boolean debug,
         @SerializedName("update-checker") boolean updateChecker,
+        @SerializedName("auto-update") boolean autoUpdate,
         @SerializedName("duration-format") @NotNull String durationFormat,
         @SerializedName("expiration") @Nullable Duration expiration,
         @SerializedName("no-expiration-permission") @NotNull NoExpirationPermission noExpirationPermission,
@@ -33,6 +34,7 @@ public record DeathChestConfig(
         int configVersion = config.getInt("config-version");
         boolean debug = config.getBoolean("debug", false);
         boolean updateCheck = config.getBoolean("update-checker", true);
+        boolean autoUpdate = config.getBoolean("auto-update", true);
         String durationFormat = config.getString("duration-format", "mm:ss");
 
         Duration expiration = null;
@@ -83,7 +85,7 @@ public record DeathChestConfig(
 
         String preferredAnimationService = config.getString("preferred-animation-service");
 
-        return new DeathChestConfig(configVersion, debug, updateCheck, durationFormat, expiration, permission, dropItemsAfterExpiration, inventoryOptions, hologramOptions, particleOptions, breakAnimationOptions, playerNotificationOptions, globalNotificationOptions, changeDeathMessageOptions, worldFilterConfig, blastProtection, chestProtectionOptions, preferredAnimationService);
+        return new DeathChestConfig(configVersion, debug, updateCheck, autoUpdate, durationFormat, expiration, permission, dropItemsAfterExpiration, inventoryOptions, hologramOptions, particleOptions, breakAnimationOptions, playerNotificationOptions, globalNotificationOptions, changeDeathMessageOptions, worldFilterConfig, blastProtection, chestProtectionOptions, preferredAnimationService);
     }
 
 }
