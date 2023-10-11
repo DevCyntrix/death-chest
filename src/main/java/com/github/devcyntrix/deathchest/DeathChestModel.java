@@ -88,10 +88,10 @@ public final class DeathChestModel {
     }
 
     public void dropItems(@NotNull Location location) {
-        Preconditions.checkNotNull(location.getWorld(), "invalid location");
+        Preconditions.checkNotNull(location.getWorld(), "invalid location because world is null");
         for (ItemStack itemStack : getInventory()) {
             if (itemStack == null) continue;
-            getWorld().dropItemNaturally(location, itemStack); // World won't be null
+            location.getWorld().dropItemNaturally(location, itemStack); // World won't be null
         }
         inventory.clear();
     }
