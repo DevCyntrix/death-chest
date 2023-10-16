@@ -1,12 +1,10 @@
 package com.github.devcyntrix.hologram;
 
-import com.github.devcyntrix.hologram.api.Hologram;
 import com.github.devcyntrix.hologram.api.HologramTextLine;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,7 +24,7 @@ public class NativeHologramTextLine implements HologramTextLine {
             stand.setInvisible(true);
             stand.setCustomName(text);
             stand.setCustomNameVisible(true);
-            stand.setMetadata(Hologram.METADATA_KEY, new FixedMetadataValue(plugin, true));
+            stand.setPersistent(false);
         }).getUniqueId();
     }
 

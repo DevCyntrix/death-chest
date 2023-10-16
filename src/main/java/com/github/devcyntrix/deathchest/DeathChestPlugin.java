@@ -30,7 +30,6 @@ import com.github.devcyntrix.deathchest.view.chest.*;
 import com.github.devcyntrix.deathchest.view.update.AdminJoinNotificationView;
 import com.github.devcyntrix.deathchest.view.update.AdminNotificationView;
 import com.github.devcyntrix.deathchest.view.update.ConsoleNotificationView;
-import com.github.devcyntrix.hologram.api.Hologram;
 import com.github.devcyntrix.hologram.api.HologramService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -42,7 +41,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
@@ -196,15 +194,6 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
             this.auditManager = null;
         }
 
-        // Try to remove all holograms
-        Bukkit.getWorlds().stream()
-                .flatMap(world -> world.getEntitiesByClass(ArmorStand.class).stream())
-                .forEach(armorStand -> {
-                    if (armorStand.hasMetadata(Hologram.METADATA_KEY)) {
-                        armorStand.remove();
-                    }
-                });
-
         if (this.compatibilityManager != null) {
             this.compatibilityManager.disableCompatibilities();
         }
@@ -307,6 +296,7 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
 
 
             this.deathChestController = new DeathChestController(this, getLogger(), this.auditManager, this.deathChestStorage);
+
             BlockView adapter = new BlockView(this);
             this.deathChestController.registerAdapter(adapter);
             getServer().getPluginManager().registerEvents(adapter, this);
