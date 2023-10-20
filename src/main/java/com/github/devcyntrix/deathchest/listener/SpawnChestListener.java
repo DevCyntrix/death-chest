@@ -8,9 +8,7 @@ import com.github.devcyntrix.deathchest.config.DeathChestConfig;
 import com.github.devcyntrix.deathchest.config.NoExpirationPermission;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.apache.commons.text.StringSubstitutor;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -65,6 +63,7 @@ public class SpawnChestListener implements Listener {
 
         DeathChestConfig config = plugin.getDeathChestConfig();
         Location location = player.getLocation();
+        World world = player.getWorld();
 
         plugin.debug(1, "Checking keep inventory...");
         if (event.getKeepInventory())
@@ -99,11 +98,17 @@ public class SpawnChestListener implements Listener {
         );
 
         plugin.debug(1, "Checking world height limitations...");
+        int highestBlockYAt = world.getHighestBlockYAt(deathLocation, HeightMap.WORLD_SURFACE);
         // Check Minecraft limitation of block positions
-        if (deathLocation.getBlockY() <= player.getWorld().getMinHeight()) // Min build height
-            return;
-        if (deathLocation.getBlockY() >= player.getWorld().getMaxHeight()) // Max build height
-            return;
+        if (deathLocation.getBlockY() <= world.getMinHeight()) { // Min build height
+            deathLocation.setY(Math.max(0, highestBlockYAt));
+        }
+        if (deathLocation.getBlockY() >= world.getMaxHeight()) { // Max build height
+            deathLocation.setY(highestBlockYAt);
+            if (deathLocation.getBlockY() >= world.getMaxHeight()) {
+                deathLocation.setY(world.getSeaLevel());
+            }
+        }
 
         plugin.debug(1, "Checking protection service...");
         boolean build = plugin.getProtectionService().canBuild(player, deathLocation, Material.CHEST);
@@ -132,7 +137,7 @@ public class SpawnChestListener implements Listener {
         long start = System.currentTimeMillis();
         while (!plugin.canPlaceChestAt(loc)) {
             if (System.currentTimeMillis() - start > 1000) {
-                loc.setY(loc.getWorld().getHighestBlockYAt(loc.getBlockX(), loc.getBlockZ()));
+                loc.setY(world.getHighestBlockYAt(loc.getBlockX(), loc.getBlockZ()));
                 plugin.debug(1, "Finding a valid location took longer than 1 second.");
                 break;
             }
