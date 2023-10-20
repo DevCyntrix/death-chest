@@ -99,7 +99,7 @@ tasks {
         }
     }
     runServer {
-        minecraftVersion("1.20.1")
+        minecraftVersion("1.20.2")
     }
     test {
         useJUnitPlatform()
@@ -150,6 +150,9 @@ hangarPublish {
                     required.set(false)
                 }
                 dependencies.url("LocketteX", "https://www.spigotmc.org/resources/lockettex-optimized-simple-chest-protection-plugin.73184/") {
+                    required.set(false)
+                }
+                dependencies.url("LWC", "https://www.spigotmc.org/resources/lwc-extended.69551/") {
                     required.set(false)
                 }
             }
