@@ -3,6 +3,7 @@ package com.github.devcyntrix.deathchest.listener;
 import com.github.devcyntrix.deathchest.DeathChestModel;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
 import com.github.devcyntrix.deathchest.api.event.DeathChestSpawnEvent;
+import com.github.devcyntrix.deathchest.api.event.PreDeathChestSpawnEvent;
 import com.github.devcyntrix.deathchest.config.ChangeDeathMessageOptions;
 import com.github.devcyntrix.deathchest.config.DeathChestConfig;
 import com.github.devcyntrix.deathchest.config.NoExpirationPermission;
@@ -122,7 +123,7 @@ public class SpawnChestListener implements Listener {
 
         plugin.debug(1, "Checking no expiration permission...");
         NoExpirationPermission permission = config.noExpirationPermission();
-        boolean expires = permission == null || !permission.enabled() || !player.hasPermission(permission.permission());
+        boolean expires = !permission.enabled() || !player.hasPermission(permission.permission());
         long createdAt = System.currentTimeMillis();
         long expireAt = !expiration.isNegative() && !expiration.isZero() && expires ? createdAt + expiration.toMillis() : -1;
         if (expireAt <= 0) {
@@ -164,9 +165,19 @@ public class SpawnChestListener implements Listener {
             }
         }
 
+
         try {
             boolean protectedChest = config.chestProtectionOptions().enabled() && player.hasPermission(config.chestProtectionOptions().permission());
             plugin.debug(1, "Protected chest: %s".formatted(protectedChest));
+
+            PreDeathChestSpawnEvent preSpawn = new PreDeathChestSpawnEvent(player, loc, protectedChest, createdAt, expireAt, items);
+            Bukkit.getPluginManager().callEvent(preSpawn);
+
+            loc = preSpawn.getLocation();
+            protectedChest = preSpawn.isProtectedChest();
+            createdAt = preSpawn.getCreatedAt();
+            expireAt = preSpawn.getExpireAt();
+            items = preSpawn.getItems();
 
             DeathChestModel deathChest = plugin.createDeathChest(loc, createdAt, expireAt, player, protectedChest, items);
 
