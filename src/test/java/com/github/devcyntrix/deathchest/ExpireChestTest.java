@@ -42,12 +42,12 @@ public class ExpireChestTest {
         PlayerMock player = server.addPlayer();
         List<ItemStack> content = new ArrayList<>(List.of(new ItemStack(Material.OAK_LOG)));
 
-        Duration expiration = config.expiration();
+        Duration expiration = config.chestOptions().expiration();
         if (expiration == null)
             expiration = Duration.ofSeconds(-1);
 
         plugin.debug(1, "Checking no expiration permission...");
-        NoExpirationPermission permission = config.noExpirationPermission();
+        NoExpirationPermission permission = config.chestOptions().noExpirationPermission();
         boolean expires = permission == null || !permission.enabled() || !player.hasPermission(permission.permission());
         long createdAt = System.currentTimeMillis();
         long expireAt = !expiration.isNegative() && !expiration.isZero() && expires ? createdAt + expiration.toMillis() : -1;

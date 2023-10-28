@@ -52,12 +52,12 @@ public class NoExpirationChestPermissionTest {
 
     private DeathChestModel createChest(Player player) {
         DeathChestConfig config = plugin.getDeathChestConfig();
-        Duration expiration = config.expiration();
+        Duration expiration = config.chestOptions().expiration();
         if (expiration == null)
             expiration = Duration.ofSeconds(-1);
 
         plugin.debug(1, "Checking no expiration permission...");
-        NoExpirationPermission permission = config.noExpirationPermission();
+        NoExpirationPermission permission = config.chestOptions().noExpirationPermission();
         boolean expires = permission == null || !permission.enabled() || !player.hasPermission(permission.permission());
         long createdAt = System.currentTimeMillis();
         long expireAt = !expiration.isNegative() && !expiration.isZero() && expires ? createdAt + expiration.toMillis() : -1;
@@ -72,7 +72,7 @@ public class NoExpirationChestPermissionTest {
     @Test
     @DisplayName("Has permission and doesn't expires")
     public void noExpirationPermissionSuccess() {
-        this.player.addAttachment(plugin, plugin.getDeathChestConfig().noExpirationPermission().permission(), true);
+        this.player.addAttachment(plugin, plugin.getDeathChestConfig().chestOptions().noExpirationPermission().permission(), true);
 
         DeathChestModel model = createChest(this.player);
 

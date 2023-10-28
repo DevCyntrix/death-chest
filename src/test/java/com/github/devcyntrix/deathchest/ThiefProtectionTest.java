@@ -28,7 +28,7 @@ import java.util.Collection;
 import java.util.List;
 
 @DisplayName("Chest protection tests")
-public class ChestProtectionTest {
+public class ThiefProtectionTest {
 
     private ServerMock server;
     private DeathChestPlugin plugin;
@@ -37,7 +37,7 @@ public class ChestProtectionTest {
 
     @BeforeEach
     public void setUp() {
-        InputStream stream = getClass().getClassLoader().getResourceAsStream("chest-protection-config.yml");
+        InputStream stream = getClass().getClassLoader().getResourceAsStream("thief-protection-config.yml");
         if (stream == null)
             throw new IllegalStateException("Missing config");
         DeathChestConfig config;
@@ -59,12 +59,12 @@ public class ChestProtectionTest {
 
     private DeathChestModel createChest(Player player) {
         DeathChestConfig config = plugin.getDeathChestConfig();
-        Duration expiration = config.expiration();
+        Duration expiration = config.chestOptions().expiration();
         if (expiration == null)
             expiration = Duration.ofSeconds(-1);
 
         plugin.debug(1, "Checking no expiration permission...");
-        NoExpirationPermission permission = config.noExpirationPermission();
+        NoExpirationPermission permission = config.chestOptions().noExpirationPermission();
         boolean expires = permission == null || !permission.enabled() || !player.hasPermission(permission.permission());
         long createdAt = System.currentTimeMillis();
         long expireAt = !expiration.isNegative() && !expiration.isZero() && expires ? createdAt + expiration.toMillis() : -1;
@@ -119,7 +119,7 @@ public class ChestProtectionTest {
     @DisplayName("Thief interacts with protected chest")
     public void thiefInteractsProtected() {
         PlayerMock diedPlayer = server.addPlayer();
-        diedPlayer.addAttachment(plugin, plugin.getDeathChestConfig().chestProtectionOptions().permission(), true);
+        diedPlayer.addAttachment(plugin, plugin.getDeathChestConfig().chestOptions().thiefProtectionOptions().permission(), true);
         PlayerMock thief = server.addPlayer();
 
         DeathChestModel chest = createChest(diedPlayer);
@@ -136,7 +136,7 @@ public class ChestProtectionTest {
     @DisplayName("Thief destroys protected chest")
     public void thiefDestroyProtected() {
         PlayerMock diedPlayer = server.addPlayer();
-        diedPlayer.addAttachment(plugin, plugin.getDeathChestConfig().chestProtectionOptions().permission(), true);
+        diedPlayer.addAttachment(plugin, plugin.getDeathChestConfig().chestOptions().thiefProtectionOptions().permission(), true);
         PlayerMock thief = server.addPlayer();
 
         DeathChestModel model = createChest(diedPlayer);
@@ -159,9 +159,9 @@ public class ChestProtectionTest {
     @DisplayName("Bypassed thief interacts with protected chest")
     public void bypassedThiefInteractsProtected() {
         PlayerMock diedPlayer = server.addPlayer();
-        diedPlayer.addAttachment(plugin, plugin.getDeathChestConfig().chestProtectionOptions().permission(), true);
+        diedPlayer.addAttachment(plugin, plugin.getDeathChestConfig().chestOptions().thiefProtectionOptions().permission(), true);
         PlayerMock thief = server.addPlayer();
-        thief.addAttachment(plugin, plugin.getDeathChestConfig().chestProtectionOptions().bypassPermission(), true);
+        thief.addAttachment(plugin, plugin.getDeathChestConfig().chestOptions().thiefProtectionOptions().bypassPermission(), true);
 
         DeathChestModel model = createChest(diedPlayer);
         Assertions.assertTrue(model.isProtected());
@@ -178,9 +178,9 @@ public class ChestProtectionTest {
     @DisplayName("Bypassed thief destroys protected chest")
     public void bypassedThiefDestroyProtected() {
         PlayerMock diedPlayer = server.addPlayer();
-        diedPlayer.addAttachment(plugin, plugin.getDeathChestConfig().chestProtectionOptions().permission(), true);
+        diedPlayer.addAttachment(plugin, plugin.getDeathChestConfig().chestOptions().thiefProtectionOptions().permission(), true);
         PlayerMock thief = server.addPlayer();
-        thief.addAttachment(plugin, plugin.getDeathChestConfig().chestProtectionOptions().bypassPermission(), true);
+        thief.addAttachment(plugin, plugin.getDeathChestConfig().chestOptions().thiefProtectionOptions().bypassPermission(), true);
 
         DeathChestModel model = createChest(diedPlayer);
         Assertions.assertTrue(model.isProtected());

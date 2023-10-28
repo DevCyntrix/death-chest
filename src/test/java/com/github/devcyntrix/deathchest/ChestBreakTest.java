@@ -34,7 +34,7 @@ public class ChestBreakTest {
 
     @BeforeEach
     public void setUp() {
-        InputStream stream = getClass().getClassLoader().getResourceAsStream("chest-break-config.yml");
+        InputStream stream = getClass().getClassLoader().getResourceAsStream("default-config.yml");
         if (stream == null)
             throw new IllegalStateException("Missing config");
         DeathChestConfig config;
