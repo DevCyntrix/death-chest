@@ -1,8 +1,8 @@
 ---
-description: This feature protects the chest agains thiefs.
+description: This feature protects the chest against thieves.
 ---
 
-# Chest Protection
+# Thief Protection
 
 If you enable this feature, all players with this permission will be protected from thieves without the bypass permission. You can also specify a time when the protection will expire if you want to protect the chest only for a certain time.
 

@@ -19,9 +19,14 @@
 * [Change death message](features/change-death-message.md)
 * [World filter](features/world-filter.md)
 * [Blast protection](features/blast-protection.md)
-* [Chest Protection](features/chest-protection.md)
+* [Thief Protection](features/chest-protection.md)
 * [PlaceHolder API](features/placeholder-api.md)
 
 ***
 
 * [❓ FAQ](faq.md)
+
+## API
+
+* [Get started](api/get-started.md)
+* [Events](api/events.md)
