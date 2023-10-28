@@ -5,6 +5,7 @@ import com.github.devcyntrix.deathchest.DeathChestModel;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +23,7 @@ public record InventoryOptions(@NotNull String title, @NotNull InventorySize siz
 
     public static InventoryOptions load(ConfigurationSection section) {
         if (section == null)
-            return null;
+            section = new MemoryConfiguration();
 
         String title = ChatColor.translateAlternateColorCodes('&', section.getString("title", "Death Chest"));
         String sizeString = section.getString("size", "flexible");

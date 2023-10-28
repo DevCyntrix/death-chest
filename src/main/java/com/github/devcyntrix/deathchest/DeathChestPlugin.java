@@ -14,10 +14,7 @@ import com.github.devcyntrix.deathchest.blacklist.ItemBlacklist;
 import com.github.devcyntrix.deathchest.blacklist.ItemBlacklistListener;
 import com.github.devcyntrix.deathchest.command.CommandRegistry;
 import com.github.devcyntrix.deathchest.config.*;
-import com.github.devcyntrix.deathchest.controller.DeathChestController;
-import com.github.devcyntrix.deathchest.controller.HologramController;
-import com.github.devcyntrix.deathchest.controller.PlaceholderController;
-import com.github.devcyntrix.deathchest.controller.UpdateController;
+import com.github.devcyntrix.deathchest.controller.*;
 import com.github.devcyntrix.deathchest.listener.*;
 import com.github.devcyntrix.deathchest.report.GsonReportManager;
 import com.github.devcyntrix.deathchest.support.lock.LWCCompatibility;
@@ -100,6 +97,8 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
     private DeathChestStorage deathChestStorage;
     private DeathChestController deathChestController;
 
+    private LastSafeLocationController lastSafeLocationController;
+
     @Getter
     private BukkitAudiences audiences;
 
@@ -132,7 +131,7 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
 
         PluginManager pluginManager = Bukkit.getPluginManager();
         try {
-            ChestProtectionOptions protectionOptions = getDeathChestConfig().chestProtectionOptions();
+            ThiefProtectionOptions protectionOptions = getDeathChestConfig().chestOptions().thiefProtectionOptions();
             if (protectionOptions.enabled()) {
                 debug(0, "Disabling chest protection...");
                 debug(1, "Removing permissions...");
@@ -247,7 +246,7 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
 
         // Registers the protection permissions if they are not registered
         try {
-            ChestProtectionOptions protectionOptions = getDeathChestConfig().chestProtectionOptions();
+            ThiefProtectionOptions protectionOptions = getDeathChestConfig().chestOptions().thiefProtectionOptions();
             if (protectionOptions.enabled()) {
                 debug(0, "Configuring chest protection...");
                 debug(1, "Registering permissions...");
@@ -265,18 +264,6 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
         }
         this.blacklist = new ItemBlacklist(new File(getDataFolder(), "blacklist.yml"));
 
-        debug(0, "Registering event listeners...");
-        pluginManager.registerEvents(new SpawnChestListener(this), this);
-        pluginManager.registerEvents(new ChestModificationListener(this), this);
-        pluginManager.registerEvents(new ChestDestroyListener(this), this);
-        pluginManager.registerEvents(new LastDeathChestListener(this), this);
-        pluginManager.registerEvents(new WorldListener(this), this);
-        pluginManager.registerEvents(new ItemBlacklistListener(blacklist), this);
-        pluginManager.registerEvents(new InventoryChangeSlotItemListener(), this);
-        pluginManager.registerEvents(new InventoryChangeSlotItemListener(blacklist), this);
-        pluginManager.registerEvents(new PlayerNotificationListener(this), this);
-        pluginManager.registerEvents(new GlobalNotificationListener(this), this);
-
         ServicesManager servicesManager = getServer().getServicesManager();
         debug(0, "Registering death chest service...");
         servicesManager.register(DeathChestService.class, this, this, ServicePriority.Normal);
@@ -286,6 +273,8 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
         this.auditManager = new GsonAuditManager(new File(getDataFolder(), "audits"));
         debug(0, "Using gson audit manager");
 
+        debug(0, "Setting up the last safe location controller...");
+        this.lastSafeLocationController = new LastSafeLocationController(this);
         try {
             this.placeHolderController = new PlaceholderController(getDeathChestConfig());
 
@@ -293,7 +282,6 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
             this.deathChestStorage = new YamlStorage(this.placeHolderController);
             debug(0, "Initializing death chest storage...");
             this.deathChestStorage.init(this, deathChestStorage.getDefaultOptions());
-
 
             this.deathChestController = new DeathChestController(this, getLogger(), this.auditManager, this.deathChestStorage);
 
@@ -333,6 +321,19 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
         this.compatibilityManager.registerCompatibility(LocketteXCompatibility.class);
         this.compatibilityManager.registerCompatibility(PlaceholderAPICompatibility.class);
         this.compatibilityManager.enableCompatibilities();
+
+        debug(0, "Registering event listeners...");
+        pluginManager.registerEvents(new SpawnChestListener(this), this);
+        pluginManager.registerEvents(new ChestModificationListener(this), this);
+        pluginManager.registerEvents(new ChestDestroyListener(this), this);
+        pluginManager.registerEvents(new LastDeathChestListener(this), this);
+        pluginManager.registerEvents(new WorldListener(this), this);
+        pluginManager.registerEvents(new ItemBlacklistListener(blacklist), this);
+        pluginManager.registerEvents(new InventoryChangeSlotItemListener(), this);
+        pluginManager.registerEvents(new InventoryChangeSlotItemListener(blacklist), this);
+        pluginManager.registerEvents(new PlayerNotificationListener(this), this);
+        pluginManager.registerEvents(new GlobalNotificationListener(this), this);
+        pluginManager.registerEvents(new LastSafeLocationListener(this), this);
 
         // Checks for updates
         if (this.deathChestConfig.updateChecker()) {
@@ -419,7 +420,10 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
      */
     @Override
     public boolean canPlaceChestAt(@NotNull Location location) {
-        return deathChestController.getChest(location) == null && !location.getBlock().getType().isSolid() && location.getBlock().getType() != Material.NETHER_PORTAL;
+        World world = location.getWorld();
+        if (world == null)
+            return false;
+        return deathChestController.getChest(location) == null && !location.getBlock().getType().isSolid() && location.getBlock().getType() != Material.NETHER_PORTAL && location.getBlockY() >= world.getMinHeight() && location.getBlockY() <= world.getMaxHeight();
     }
 
     @Override

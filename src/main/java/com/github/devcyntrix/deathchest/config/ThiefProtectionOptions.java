@@ -11,11 +11,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 
-public record ChestProtectionOptions(boolean enabled, String permission, String bypassPermission,
+public record ThiefProtectionOptions(boolean enabled, String permission, String bypassPermission,
                                      @NotNull Duration expiration,
                                      Sound sound, float volume, float pitch, String[] message) {
 
-    public static @NotNull ChestProtectionOptions load(@Nullable ConfigurationSection section) {
+    public static @NotNull ThiefProtectionOptions load(@Nullable ConfigurationSection section) {
         if (section == null) section = new MemoryConfiguration();
 
         boolean enabled = section.getBoolean("enabled", false);
@@ -41,7 +41,7 @@ public record ChestProtectionOptions(boolean enabled, String permission, String 
             messageArray = message.split(System.lineSeparator());
         }
 
-        return new ChestProtectionOptions(enabled, permission, bypassPermission, expiration, sound, volume, pitch, messageArray);
+        return new ThiefProtectionOptions(enabled, permission, bypassPermission, expiration, sound, volume, pitch, messageArray);
     }
 
     public void playSound(Player player, Location location) {

@@ -22,8 +22,9 @@ public interface DeathChestService extends Plugin {
     default void debug(int indents, Object... message) {
         if (!isDebugMode())
             return;
+        Class<?> callerClass = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).getCallerClass();
         for (Object o : message) {
-            getLogger().info("[DEBUG] " + "  ".repeat(indents) + o);
+            getLogger().info("[DEBUG] [%s] ".formatted(callerClass.getCanonicalName()) + "  ".repeat(indents) + o);
         }
     }
 

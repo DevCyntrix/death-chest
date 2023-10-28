@@ -118,7 +118,9 @@ public final class DeathChestModel {
         if (getOwner() != null)
             map.put("player", getOwner().getUniqueId().toString());
         map.put("protected", isProtected());
-        map.put("items", getInventory().getContents());
+        ItemStack[] array = Arrays.stream(getInventory().getContents()).filter(itemStack -> itemStack != null && !itemStack.getType().isAir()).toArray(ItemStack[]::new);
+        System.out.println(Arrays.toString(array));
+        map.put("items", array);
         return map;
     }
 

@@ -28,15 +28,16 @@ public class ExpirationRunnable extends BukkitRunnable {
     @Override
     public void run() {
         // Stops the scheduler when the chest expired
+        boolean dropItemsAfterExpiration = plugin.getDeathChestConfig().chestOptions().dropItemsAfterExpiration();
         try {
-            if (plugin.getDeathChestConfig().dropItemsAfterExpiration()) {
+            if (dropItemsAfterExpiration) {
                 chest.dropItems();
             }
         } catch (Exception e) {
             plugin.getLogger().log(Level.SEVERE, "Failed to drop items of the expired death chest", e);
         }
         if (auditManager != null)
-            auditManager.audit(new AuditItem(new Date(), AuditAction.DESTROY_CHEST, new DestroyChestInfo(chest, DestroyReason.EXPIRATION, Map.of("item-drops", plugin.getDeathChestConfig().dropItemsAfterExpiration()))));
+            auditManager.audit(new AuditItem(new Date(), AuditAction.DESTROY_CHEST, new DestroyChestInfo(chest, DestroyReason.EXPIRATION, Map.of("item-drops", dropItemsAfterExpiration))));
         this.plugin.getDeathChestController().destroyChest(chest);
     }
 }

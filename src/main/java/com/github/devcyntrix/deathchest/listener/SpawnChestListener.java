@@ -7,9 +7,13 @@ import com.github.devcyntrix.deathchest.api.event.PreDeathChestSpawnEvent;
 import com.github.devcyntrix.deathchest.config.ChangeDeathMessageOptions;
 import com.github.devcyntrix.deathchest.config.DeathChestConfig;
 import com.github.devcyntrix.deathchest.config.NoExpirationPermission;
+import com.github.devcyntrix.deathchest.config.ThiefProtectionOptions;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.apache.commons.text.StringSubstitutor;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -20,7 +24,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 /**
@@ -63,8 +66,6 @@ public class SpawnChestListener implements Listener {
         set.add(player);
 
         DeathChestConfig config = plugin.getDeathChestConfig();
-        Location location = player.getLocation();
-        World world = player.getWorld();
 
         plugin.debug(1, "Checking keep inventory...");
         if (event.getKeepInventory())
@@ -91,38 +92,13 @@ public class SpawnChestListener implements Listener {
         if (!config.worldFilterConfig().test(player.getWorld()))
             return;
 
-        Location deathLocation = new Location(
-                player.getWorld(),
-                location.getX(),
-                Math.round(location.getY()),
-                location.getZ()
-        );
-
-        plugin.debug(1, "Checking world height limitations...");
-        int highestBlockYAt = !plugin.isTest() ? world.getHighestBlockYAt(deathLocation, HeightMap.WORLD_SURFACE) : 60; // This is for Mock Bukkit
-        // Check Minecraft limitation of block positions
-        if (deathLocation.getBlockY() <= world.getMinHeight()) { // Min build height
-            deathLocation.setY(Math.max(0, highestBlockYAt));
-        }
-        if (deathLocation.getBlockY() >= world.getMaxHeight()) { // Max build height
-            deathLocation.setY(highestBlockYAt);
-            if (deathLocation.getBlockY() >= world.getMaxHeight()) {
-                deathLocation.setY(world.getSeaLevel());
-            }
-        }
-
-        plugin.debug(1, "Checking protection service...");
-        boolean build = plugin.getProtectionService().canBuild(player, deathLocation, Material.CHEST);
-        if (!build)
-            return;
-
         plugin.debug(1, "Getting expiration time...");
-        Duration expiration = config.expiration();
+        Duration expiration = config.chestOptions().expiration();
         if (expiration == null)
             expiration = Duration.ofSeconds(-1);
 
         plugin.debug(1, "Checking no expiration permission...");
-        NoExpirationPermission permission = config.noExpirationPermission();
+        NoExpirationPermission permission = config.chestOptions().noExpirationPermission();
         boolean expires = !permission.enabled() || !player.hasPermission(permission.permission());
         long createdAt = System.currentTimeMillis();
         long expireAt = !expiration.isNegative() && !expiration.isZero() && expires ? createdAt + expiration.toMillis() : -1;
@@ -132,27 +108,63 @@ public class SpawnChestListener implements Listener {
             plugin.debug(1, "The chest will expire at " + new Date(expireAt));
         }
 
-        Location loc = deathLocation.getBlock().getLocation();
-        ThreadLocalRandom random = ThreadLocalRandom.current();
 
-        long start = System.currentTimeMillis();
-        while (!plugin.canPlaceChestAt(loc)) {
-            if (System.currentTimeMillis() - start > 1000) {
-                loc.setY(world.getHighestBlockYAt(loc.getBlockX(), loc.getBlockZ()));
-                plugin.debug(1, "Finding a valid location took longer than 1 second.");
-                break;
-            }
+//        Location deathLocation = new Location(
+//                player.getWorld(),
+//                location.getX(),
+//                Math.round(location.getY()),
+//                location.getZ()
+//        );
 
-            int x = random.nextInt(10) - 5;
-            int z = random.nextInt(10) - 5;
-            loc.add(x, 0, z);
+
+//        plugin.debug(1, "Checking world height limitations...");
+//        int highestBlockYAt = !plugin.isTest() ? world.getHighestBlockYAt(deathLocation, HeightMap.WORLD_SURFACE) : 60; // This is for Mock Bukkit
+//        // Check Minecraft limitation of block positions
+//        if (deathLocation.getBlockY() <= world.getMinHeight()) { // Min build height
+//            deathLocation.setY(Math.max(0, highestBlockYAt));
+//        }
+//        if (deathLocation.getBlockY() >= world.getMaxHeight()) { // Max build height
+//            deathLocation.setY(highestBlockYAt);
+//            if (deathLocation.getBlockY() >= world.getMaxHeight()) {
+//                deathLocation.setY(world.getSeaLevel());
+//            }
+//        }
+//
+//        Location loc = deathLocation.getBlock().getLocation();
+//        ThreadLocalRandom random = ThreadLocalRandom.current();
+//
+//        long start = System.currentTimeMillis();
+//        while (!plugin.canPlaceChestAt(loc)) {
+//            if (System.currentTimeMillis() - start > 1000) {
+//                loc.setY(world.getHighestBlockYAt(loc.getBlockX(), loc.getBlockZ()));
+//                plugin.debug(1, "Finding a valid location took longer than 1 second.");
+//                break;
+//            }
+//
+//            int x = random.nextInt(10) - 5;
+//            int z = random.nextInt(10) - 5;
+//            loc.add(x, 0, z);
+//        }
+
+        Location blockLocation = plugin.getLastSafeLocationController().getPosition(player);
+        if (blockLocation == null) {
+            blockLocation = player.getLocation().getBlock().getLocation().clone();
+            World world = player.getWorld();
+            blockLocation.setY(Math.min(Math.max(blockLocation.getBlockY(), world.getMinHeight()), world.getMaxHeight()));
         }
+
+        Bukkit.broadcastMessage(blockLocation.toString());
+
+        plugin.debug(1, "Checking protection service...");
+        boolean build = plugin.getProtectionService().canBuild(player, blockLocation, Material.CHEST);
+        if (!build)
+            return;
 
         ChangeDeathMessageOptions changeDeathMessageOptions = config.changeDeathMessageOptions();
         if (changeDeathMessageOptions.enabled()) {
             plugin.debug(1, "Changing death message...");
-            if (changeDeathMessageOptions.message() != null && location.getWorld() != null) {
-                StringSubstitutor substitutor = new StringSubstitutor(Map.of("x", location.getBlockX(), "y", location.getBlockY(), "z", location.getBlockZ(), "world", location.getWorld().getName(), "player_name", player.getName(), "player_display_name", player.getDisplayName()));
+            if (changeDeathMessageOptions.message() != null && blockLocation.getWorld() != null) {
+                StringSubstitutor substitutor = new StringSubstitutor(Map.of("x", blockLocation.getBlockX(), "y", blockLocation.getBlockY(), "z", blockLocation.getBlockZ(), "world", blockLocation.getWorld().getName(), "player_name", player.getName(), "player_display_name", player.getDisplayName()));
 
                 event.setDeathMessage(Arrays.stream(changeDeathMessageOptions.message()).map(substitutor::replace).map(s -> {
                     if (DeathChestPlugin.isPlaceholderAPIEnabled()) {
@@ -167,19 +179,23 @@ public class SpawnChestListener implements Listener {
 
 
         try {
-            boolean protectedChest = config.chestProtectionOptions().enabled() && player.hasPermission(config.chestProtectionOptions().permission());
+            ThiefProtectionOptions thiefProtectionOptions = config.chestOptions().thiefProtectionOptions();
+            boolean protectedChest = thiefProtectionOptions.enabled() && player.hasPermission(thiefProtectionOptions.permission());
             plugin.debug(1, "Protected chest: %s".formatted(protectedChest));
 
-            PreDeathChestSpawnEvent preSpawn = new PreDeathChestSpawnEvent(player, loc, protectedChest, createdAt, expireAt, items);
+            PreDeathChestSpawnEvent preSpawn = new PreDeathChestSpawnEvent(player, blockLocation, protectedChest, createdAt, expireAt, items);
             Bukkit.getPluginManager().callEvent(preSpawn);
 
-            loc = preSpawn.getLocation();
+            if (preSpawn.isCancelled())
+                return;
+
+            blockLocation = preSpawn.getLocation();
             protectedChest = preSpawn.isProtectedChest();
             createdAt = preSpawn.getCreatedAt();
             expireAt = preSpawn.getExpireAt();
             items = preSpawn.getItems();
 
-            DeathChestModel deathChest = plugin.createDeathChest(loc, createdAt, expireAt, player, protectedChest, items);
+            DeathChestModel deathChest = plugin.createDeathChest(blockLocation, createdAt, expireAt, player, protectedChest, items);
 
             DeathChestSpawnEvent deathChestSpawnEvent = new DeathChestSpawnEvent(player, deathChest);
             Bukkit.getPluginManager().callEvent(deathChestSpawnEvent);

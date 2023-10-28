@@ -2,7 +2,7 @@ package com.github.devcyntrix.deathchest.listener;
 
 import com.github.devcyntrix.deathchest.DeathChestModel;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
-import com.github.devcyntrix.deathchest.config.ChestProtectionOptions;
+import com.github.devcyntrix.deathchest.config.ThiefProtectionOptions;
 import com.github.devcyntrix.deathchest.controller.DeathChestController;
 import org.bukkit.GameMode;
 import org.bukkit.block.Block;
@@ -50,7 +50,7 @@ public class ChestModificationListener implements Listener {
 
         // Chest Protection
         if (!controller.isAccessibleBy(model, player)) {
-            ChestProtectionOptions protectionOptions = plugin.getDeathChestConfig().chestProtectionOptions();
+            ThiefProtectionOptions protectionOptions = plugin.getDeathChestConfig().chestOptions().thiefProtectionOptions();
             protectionOptions.playSound(player, block.getLocation());
             protectionOptions.notify(player);
             return;

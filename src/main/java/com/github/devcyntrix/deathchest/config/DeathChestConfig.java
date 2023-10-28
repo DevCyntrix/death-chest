@@ -5,17 +5,13 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.time.Duration;
-
 public record DeathChestConfig(
         @SerializedName("config-version") int configVersion,
         @SerializedName("debug") boolean debug,
         @SerializedName("update-checker") boolean updateChecker,
         @SerializedName("auto-update") boolean autoUpdate,
         @SerializedName("duration-format") @NotNull String durationFormat,
-        @SerializedName("expiration") @Nullable Duration expiration,
-        @SerializedName("no-expiration-permission") @NotNull NoExpirationPermission noExpirationPermission,
-        @SerializedName("drop-items-after-expiration") boolean dropItemsAfterExpiration,
+        @SerializedName("chest") @NotNull ChestOptions chestOptions,
         @SerializedName("inventory") @NotNull InventoryOptions inventoryOptions,
         @SerializedName("hologram") @NotNull HologramOptions hologramOptions,
         @SerializedName("particle") @NotNull ParticleOptions particleOptions,
@@ -24,11 +20,9 @@ public record DeathChestConfig(
         @SerializedName("global-notification") @NotNull GlobalNotificationOptions globalNotificationOptions,
         @SerializedName("change-death-message") @NotNull ChangeDeathMessageOptions changeDeathMessageOptions,
         @SerializedName("world-filter") @NotNull WorldFilterConfig worldFilterConfig,
-        @SerializedName("blast-protection") boolean blastProtection,
-        @SerializedName("chest-protection") @NotNull ChestProtectionOptions chestProtectionOptions,
         @SerializedName("preferred-animation-service") @Nullable String preferredBlockBreakAnimationService) {
 
-    public static final int CONFIG_VERSION = 2;
+    public static final int CONFIG_VERSION = 3;
 
     public static DeathChestConfig load(FileConfiguration config) {
         int configVersion = config.getInt("config-version");
@@ -37,30 +31,10 @@ public record DeathChestConfig(
         boolean autoUpdate = config.getBoolean("auto-update", true);
         String durationFormat = config.getString("duration-format", "mm:ss");
 
-        Duration expiration = null;
-        if (config.contains("expiration")) {
-            long expirationInSeconds = config.getLong("expiration", 60 * 10);
-            if (expirationInSeconds > 0) {
-                expiration = Duration.ofSeconds(expirationInSeconds);
-            }
-        }
-
-        NoExpirationPermission permission = new NoExpirationPermission(false, "deathchest.stays-forever");
-        if (config.isString("no-expiration-permission")) {
-            permission = new NoExpirationPermission(false, config.getString("no-expiration-permission"));
-        } else {
-            if (config.contains("no-expiration-permission.enabled") && config.contains("no-expiration-permission.enabled")) {
-                permission = new NoExpirationPermission(config.getBoolean("no-expiration-permission.enabled"), config.getString("no-expiration-permission.permission"));
-            }
-        }
-
-        boolean dropItemsAfterExpiration = config.getBoolean("drop-items-after-expiration", false);
+        ChestOptions chestOptions = ChestOptions.load(config.getConfigurationSection("chest"));
 
         // Inventory
         InventoryOptions inventoryOptions = InventoryOptions.load(config.getConfigurationSection("inventory"));
-        if (inventoryOptions == null) {
-            throw new IllegalArgumentException("Missing inventory section in configuration file");
-        }
 
         // Hologram
         HologramOptions hologramOptions = HologramOptions.load(config.getConfigurationSection("hologram"));
@@ -79,13 +53,9 @@ public record DeathChestConfig(
 
         WorldFilterConfig worldFilterConfig = WorldFilterConfig.load(config.getConfigurationSection("world-filter"));
 
-        boolean blastProtection = config.getBoolean("blast-protection", false);
-
-        ChestProtectionOptions chestProtectionOptions = ChestProtectionOptions.load(config.getConfigurationSection("chest-protection"));
-
         String preferredAnimationService = config.getString("preferred-animation-service");
 
-        return new DeathChestConfig(configVersion, debug, updateCheck, autoUpdate, durationFormat, expiration, permission, dropItemsAfterExpiration, inventoryOptions, hologramOptions, particleOptions, breakAnimationOptions, playerNotificationOptions, globalNotificationOptions, changeDeathMessageOptions, worldFilterConfig, blastProtection, chestProtectionOptions, preferredAnimationService);
+        return new DeathChestConfig(configVersion, debug, updateCheck, autoUpdate, durationFormat, chestOptions, inventoryOptions, hologramOptions, particleOptions, breakAnimationOptions, playerNotificationOptions, globalNotificationOptions, changeDeathMessageOptions, worldFilterConfig, preferredAnimationService);
     }
 
 }

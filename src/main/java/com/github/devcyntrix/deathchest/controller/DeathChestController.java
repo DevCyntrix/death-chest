@@ -9,9 +9,9 @@ import com.github.devcyntrix.deathchest.api.audit.AuditManager;
 import com.github.devcyntrix.deathchest.api.audit.info.CreateChestInfo;
 import com.github.devcyntrix.deathchest.api.event.DeathChestDestroyEvent;
 import com.github.devcyntrix.deathchest.api.storage.DeathChestStorage;
-import com.github.devcyntrix.deathchest.config.ChestProtectionOptions;
 import com.github.devcyntrix.deathchest.config.DeathChestConfig;
 import com.github.devcyntrix.deathchest.config.InventoryOptions;
+import com.github.devcyntrix.deathchest.config.ThiefProtectionOptions;
 import com.github.devcyntrix.deathchest.util.ChestModelStringLookup;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
@@ -85,7 +85,7 @@ public class DeathChestController implements Closeable {
     }
 
     public @NotNull DeathChestModel createChest(@NotNull Location location, long expireAt, @Nullable Player player, ItemStack @NotNull ... items) {
-        boolean protectedChest = player != null && player.hasPermission(getConfig().chestProtectionOptions().permission());
+        boolean protectedChest = player != null && player.hasPermission(getConfig().chestOptions().thiefProtectionOptions().permission());
         return createChest(location, System.currentTimeMillis(), expireAt, player, protectedChest, items);
     }
 
@@ -129,7 +129,7 @@ public class DeathChestController implements Closeable {
     }
 
     public boolean isAccessibleBy(@NotNull DeathChestModel model, @NotNull Player player) {
-        ChestProtectionOptions protectionOptions = plugin.getDeathChestConfig().chestProtectionOptions();
+        ThiefProtectionOptions protectionOptions = plugin.getDeathChestConfig().chestOptions().thiefProtectionOptions();
 
         long remainingTime = 0L;
         long expiration = protectionOptions.expiration().toMillis();

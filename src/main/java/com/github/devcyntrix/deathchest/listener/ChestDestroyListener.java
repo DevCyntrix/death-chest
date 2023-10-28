@@ -7,7 +7,7 @@ import com.github.devcyntrix.deathchest.api.audit.AuditAction;
 import com.github.devcyntrix.deathchest.api.audit.AuditItem;
 import com.github.devcyntrix.deathchest.api.audit.info.DestroyChestInfo;
 import com.github.devcyntrix.deathchest.api.audit.info.DestroyReason;
-import com.github.devcyntrix.deathchest.config.ChestProtectionOptions;
+import com.github.devcyntrix.deathchest.config.ThiefProtectionOptions;
 import org.bukkit.GameMode;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -93,7 +93,7 @@ public class ChestDestroyListener implements Listener {
         event.setCancelled(true);
 
         if (!plugin.getDeathChestController().isAccessibleBy(model, player)) {
-            ChestProtectionOptions protectionOptions = plugin.getDeathChestConfig().chestProtectionOptions();
+            ThiefProtectionOptions protectionOptions = plugin.getDeathChestConfig().chestOptions().thiefProtectionOptions();
             protectionOptions.playSound(player, block.getLocation());
             protectionOptions.notify(player);
             return;
@@ -124,7 +124,7 @@ public class ChestDestroyListener implements Listener {
             DeathChestModel model = this.plugin.getDeathChestController().getChest(next.getLocation());
             if (model == null)
                 continue;
-            if (plugin.getDeathChestConfig().blastProtection()) {
+            if (plugin.getDeathChestConfig().chestOptions().blastProtection()) {
                 iterator.remove();
                 continue;
             }
@@ -158,7 +158,7 @@ public class ChestDestroyListener implements Listener {
             DeathChestModel model = this.plugin.getDeathChestController().getChest(next.getLocation());
             if (model == null)
                 continue;
-            if (this.plugin.getDeathChestConfig().blastProtection()) {
+            if (this.plugin.getDeathChestConfig().chestOptions().blastProtection()) {
                 iterator.remove();
                 continue;
             }
