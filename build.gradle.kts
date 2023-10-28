@@ -1,4 +1,5 @@
 import io.papermc.hangarpublishplugin.model.Platforms
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
     `java-library`
@@ -8,7 +9,7 @@ plugins {
 }
 
 group = "com.github.devcyntrix"
-version = "2.0.3"
+version = "2.1.0"
 
 repositories {
     mavenCentral()
@@ -63,8 +64,11 @@ dependencies {
     compileOnly("org.projectlombok:lombok:1.18.24")
     annotationProcessor("org.projectlombok:lombok:1.18.24")
 
+
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
-    testImplementation("com.github.seeseemelk:MockBukkit-v1.20:3.9.0")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    testImplementation("com.github.seeseemelk:MockBukkit-v1.20:3.42.0")
     testImplementation("net.kyori:adventure-platform-bukkit:4.3.0")
     testImplementation("net.kyori:adventure-text-minimessage:4.14.0")
     testImplementation("net.kyori:adventure-text-serializer-legacy:4.14.0")
@@ -98,17 +102,24 @@ tasks {
             expand(Pair("projectVersion", project.version))
         }
     }
-    runServer {
-        minecraftVersion("1.20.2")
-    }
     test {
         useJUnitPlatform()
+
+        testLogging {
+            events("passed", "skipped", "failed")
+            showStackTraces = true
+            exceptionFormat = TestExceptionFormat.FULL
+        }
+    }
+    runServer {
+        minecraftVersion("1.20.2")
     }
     shadowJar {
         relocate("org.bstats", "com.github.devcyntrix.deathchest.metrics")
         archiveFileName.set("deathchest.jar")
     }
 }
+
 
 hangarPublish {
     publications.register("DeathChest") {

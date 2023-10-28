@@ -40,7 +40,7 @@ public class WorldFilterTest {
         }
 
         this.server = MockBukkit.getOrCreateMock();
-        DeathChestPlugin plugin = MockBukkit.load(DeathChestPlugin.class, true, config);
+        MockBukkit.load(DeathChestPlugin.class, true, config);
         List<ItemStack> content = new ArrayList<>(List.of(new ItemStack(Material.OAK_LOG)));
 
         this.player = server.addPlayer();
@@ -77,11 +77,14 @@ public class WorldFilterTest {
     @Test
     @DisplayName("Try to spawn in normal world")
     public void dieInNormalWorld() {
-        @NotNull Location location = player.getLocation();
+        System.out.println("Killing player...");
         player.setHealth(0.0);
+        System.out.println("Perform tick");
         server.getScheduler().performOneTick();
 
+        @NotNull Location location = player.getLocation();
         Block block = location.getBlock();
+        System.out.println("Checking block...");
         Assertions.assertFalse(block.isEmpty());
         Assertions.assertTrue(location.getWorld().getEntitiesByClass(Item.class).isEmpty());
 

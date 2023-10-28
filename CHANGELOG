@@ -1,3 +1,12 @@
+2.1.0:
++ Auto plugin updater
++ Calculate another location if someone dies in void
++ Added LWC and Lockette compatibility
++ Added a line height to the config
++ Add a PreDeathChestSpawnEvent
+* Update Apache commons text dependency
+* Move the hologram anchor
+
 2.0.0:
 * Restructured the whole project
 * Now you can reload more options of the config.yml with the /deathchest reload command

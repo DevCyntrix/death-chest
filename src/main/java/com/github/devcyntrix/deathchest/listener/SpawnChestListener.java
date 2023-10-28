@@ -99,7 +99,7 @@ public class SpawnChestListener implements Listener {
         );
 
         plugin.debug(1, "Checking world height limitations...");
-        int highestBlockYAt = world.getHighestBlockYAt(deathLocation, HeightMap.WORLD_SURFACE);
+        int highestBlockYAt = !plugin.isTest() ? world.getHighestBlockYAt(deathLocation, HeightMap.WORLD_SURFACE) : 60; // This is for Mock Bukkit
         // Check Minecraft limitation of block positions
         if (deathLocation.getBlockY() <= world.getMinHeight()) { // Min build height
             deathLocation.setY(Math.max(0, highestBlockYAt));

@@ -20,6 +20,8 @@ public class ParticleView implements ChestView {
 
     @Override
     public void onCreate(DeathChestModel model) {
+        if (plugin.isTest())
+            return;
         World world = model.getWorld();
         if (world == null)
             return;
