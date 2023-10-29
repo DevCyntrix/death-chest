@@ -22,6 +22,10 @@ public class LastSafeLocationListener implements Listener {
         if (!hasBlockChanged(event))
             return;
         Player player = event.getPlayer();
+        Block block1 = player.getLocation().getBlock();
+        if (!block1.isEmpty() && !block1.isLiquid())
+            return;
+
         Location location = player.getLocation().clone().subtract(0, 0.2, 0);
         Block block = location.getBlock();
         if (block.isEmpty())
