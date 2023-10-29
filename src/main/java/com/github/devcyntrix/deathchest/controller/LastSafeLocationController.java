@@ -3,6 +3,7 @@ package com.github.devcyntrix.deathchest.controller;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
 import com.github.devcyntrix.deathchest.util.LastLocationMetadata;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.MetadataValue;
 
@@ -20,6 +21,11 @@ public class LastSafeLocationController {
     }
 
     public void updatePosition(Player player) {
+        Location location = player.getLocation().clone().subtract(0, 0.2, 0);
+        Block block = location.getBlock();
+        if (block.isEmpty())
+            return;
+
         Location blockLoc = player.getLocation().getBlock().getLocation();
         if (!plugin.canPlaceChestAt(blockLoc))
             return;

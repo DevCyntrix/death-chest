@@ -3,7 +3,6 @@ package com.github.devcyntrix.deathchest.listener;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
 import com.github.devcyntrix.deathchest.controller.LastSafeLocationController;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -22,14 +21,6 @@ public class LastSafeLocationListener implements Listener {
         if (!hasBlockChanged(event))
             return;
         Player player = event.getPlayer();
-        Block block1 = player.getLocation().getBlock();
-        if (!block1.isEmpty() && !block1.isLiquid())
-            return;
-
-        Location location = player.getLocation().clone().subtract(0, 0.2, 0);
-        Block block = location.getBlock();
-        if (block.isEmpty())
-            return;
         LastSafeLocationController controller = plugin.getLastSafeLocationController();
         controller.updatePosition(player);
     }

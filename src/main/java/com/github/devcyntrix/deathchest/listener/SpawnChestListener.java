@@ -8,6 +8,7 @@ import com.github.devcyntrix.deathchest.config.ChangeDeathMessageOptions;
 import com.github.devcyntrix.deathchest.config.DeathChestConfig;
 import com.github.devcyntrix.deathchest.config.NoExpirationPermission;
 import com.github.devcyntrix.deathchest.config.ThiefProtectionOptions;
+import com.github.devcyntrix.deathchest.controller.LastSafeLocationController;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.apache.commons.text.StringSubstitutor;
 import org.bukkit.Bukkit;
@@ -146,14 +147,15 @@ public class SpawnChestListener implements Listener {
 //            loc.add(x, 0, z);
 //        }
 
-        Location blockLocation = plugin.getLastSafeLocationController().getPosition(player);
+
+        LastSafeLocationController controller = plugin.getLastSafeLocationController();
+        controller.updatePosition(player);
+        Location blockLocation = controller.getPosition(player);
         if (blockLocation == null) {
             blockLocation = player.getLocation().getBlock().getLocation().clone();
             World world = player.getWorld();
             blockLocation.setY(Math.min(Math.max(blockLocation.getBlockY(), world.getMinHeight()), world.getMaxHeight()));
         }
-
-        Bukkit.broadcastMessage(blockLocation.toString());
 
         plugin.debug(1, "Checking protection service...");
         boolean build = plugin.getProtectionService().canBuild(player, blockLocation, Material.CHEST);
