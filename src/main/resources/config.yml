@@ -113,6 +113,7 @@ global-notification:
 # ${player_name} : shows the player name
 # ${player_displayname} : shows the player display name (Maybe with prefix)
 # ${x}, ${y}, ${z}, ${world} : shows the coordinates of the death location
+# ${world_alias} : shows the alias of the world (see world-alias section)
 # (coordinates of the chest isn't available for here)
 # To disable the death message change "enabled" to true and remove the message option.
 change-death-message:
@@ -128,6 +129,10 @@ world-filter:
   worlds:
     - disabled_world
 
+world-alias:
+  world: "World"
+  world_nether: "Nether"
+  world_the_end: "The End"
 
 # Do not touch this!
 config-version: 3
