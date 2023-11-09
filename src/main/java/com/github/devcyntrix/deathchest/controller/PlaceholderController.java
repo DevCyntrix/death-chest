@@ -12,9 +12,11 @@ import java.util.function.Function;
 
 public class PlaceholderController {
 
+    private final DeathChestConfig config;
     private final Function<Long, String> duration;
 
     public PlaceholderController(DeathChestConfig config) {
+        this.config = config;
         this.duration = expiresAt -> {
             long duration = expiresAt - System.currentTimeMillis();
             if (duration <= 0) duration = 0;
@@ -23,7 +25,7 @@ public class PlaceholderController {
     }
 
     public String replace(DeathChestModel model, String base) {
-        StringSubstitutor substitutor = new StringSubstitutor(new ChestModelStringLookup(model, duration));
+        StringSubstitutor substitutor = new StringSubstitutor(new ChestModelStringLookup(config, model, duration));
         base = substitutor.replace(base);
         if (DeathChestPlugin.isPlaceholderAPIEnabled()) base = PlaceholderAPI.setPlaceholders(model.getOwner(), base);
         return base;

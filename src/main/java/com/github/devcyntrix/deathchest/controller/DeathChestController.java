@@ -91,7 +91,7 @@ public class DeathChestController implements Closeable {
 
     public @NotNull DeathChestModel createChest(@NotNull Location location, long createdAt, long expireAt, @Nullable Player player, boolean isProtected, ItemStack @NotNull ... items) {
         DeathChestModel model = new DeathChestModel(location, createdAt, expireAt, player, isProtected);
-        StringSubstitutor substitutor = new StringSubstitutor(new ChestModelStringLookup(model, durationFormat));
+        StringSubstitutor substitutor = new StringSubstitutor(new ChestModelStringLookup(plugin.getDeathChestConfig(), model, durationFormat));
 
         // Creates inventory
         InventoryOptions inventoryOptions = getConfig().inventoryOptions();
