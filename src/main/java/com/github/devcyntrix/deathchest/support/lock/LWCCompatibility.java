@@ -13,9 +13,7 @@ public class LWCCompatibility extends Compatibility {
 
     @Override
     public boolean isValid(Server server) {
-        boolean lwc = server.getPluginManager().isPluginEnabled("LWC");
-        System.out.println("VALID " + lwc);
-        return lwc;
+        return server.getPluginManager().isPluginEnabled("LWC");
     }
 
     @Override
@@ -23,7 +21,7 @@ public class LWCCompatibility extends Compatibility {
         try {
             Class.forName("com.griefcraft.lwc.LWC");
             LWC.getInstance().getModuleLoader().registerModule(plugin, new LWCModule(plugin));
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException ignored) {
         }
     }
 
@@ -32,7 +30,7 @@ public class LWCCompatibility extends Compatibility {
         try {
             Class.forName("com.griefcraft.lwc.LWC");
             LWC.getInstance().getModuleLoader().removeModules(plugin);
-        } catch (ClassNotFoundException e) {
+        } catch (ClassNotFoundException ignored) {
         }
     }
 
