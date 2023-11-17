@@ -148,7 +148,7 @@ public class YamlStorage implements DeathChestStorage {
                 migrateChests(plugin, file, plugin.getLogger());
             }
         } else {
-            System.out.println("No saved file found");
+            plugin.getLogger().info("No save file found");
         }
 
         // Load all chests of loaded worlds
