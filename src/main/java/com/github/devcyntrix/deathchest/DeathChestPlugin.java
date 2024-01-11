@@ -324,7 +324,7 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
 
         debug(0, "Registering event listeners...");
         pluginManager.registerEvents(new SpawnChestListener(this), this);
-        pluginManager.registerEvents(new ChestModificationListener(this), this);
+        pluginManager.registerEvents(new ChestInteractionListener(this), this);
         pluginManager.registerEvents(new ChestDestroyListener(this), this);
         pluginManager.registerEvents(new LastDeathChestListener(this), this);
         pluginManager.registerEvents(new WorldListener(this), this);

@@ -13,11 +13,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-public class ChestModificationListener implements Listener {
+public class ChestInteractionListener implements Listener {
 
     private final DeathChestPlugin plugin;
 
-    public ChestModificationListener(DeathChestPlugin plugin) {
+    public ChestInteractionListener(DeathChestPlugin plugin) {
         this.plugin = plugin;
     }
 
