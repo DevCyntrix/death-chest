@@ -20,6 +20,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -40,6 +41,11 @@ public class SpawnChestListener implements Listener {
     }
 
     private final Set<Player> set = Collections.newSetFromMap(new WeakHashMap<>());
+
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        set.remove(event.getPlayer());
+    }
 
     @EventHandler
     public void onRespawn(PlayerRespawnEvent event) {
@@ -166,9 +172,9 @@ public class SpawnChestListener implements Listener {
         if (changeDeathMessageOptions.enabled()) {
             plugin.debug(1, "Changing death message...");
             if (changeDeathMessageOptions.message() != null && blockLocation.getWorld() != null) {
-                StringSubstitutor substitutor = new StringSubstitutor(Map.of("x", blockLocation.getBlockX(), "y", blockLocation.getBlockY(), "z", blockLocation.getBlockZ(), "world", blockLocation.getWorld().getName(), "player_name", player.getName(), "player_display_name", player.getDisplayName()));
+                StringSubstitutor substitution = new StringSubstitutor(Map.of("x", blockLocation.getBlockX(), "y", blockLocation.getBlockY(), "z", blockLocation.getBlockZ(), "world", blockLocation.getWorld().getName(), "player_name", player.getName(), "player_display_name", player.getDisplayName()));
 
-                event.setDeathMessage(Arrays.stream(changeDeathMessageOptions.message()).map(substitutor::replace).map(s -> {
+                event.setDeathMessage(Arrays.stream(changeDeathMessageOptions.message()).map(substitution::replace).map(s -> {
                     if (DeathChestPlugin.isPlaceholderAPIEnabled()) {
                         return PlaceholderAPI.setPlaceholders(player, s);
                     }
