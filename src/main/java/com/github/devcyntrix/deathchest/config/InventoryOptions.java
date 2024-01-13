@@ -1,6 +1,5 @@
 package com.github.devcyntrix.deathchest.config;
 
-import com.github.devcyntrix.deathchest.DeathChestHolder;
 import com.github.devcyntrix.deathchest.DeathChestModel;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -16,7 +15,7 @@ public record InventoryOptions(@NotNull String title, @NotNull InventorySize siz
 
     public Inventory createInventory(DeathChestModel model, Function<String, String> placeholder, ItemStack... stacks) {
         String title = placeholder.apply(title());
-        var inventory = Bukkit.createInventory(new DeathChestHolder(model), size().getSize(stacks.length), title);
+        var inventory = Bukkit.createInventory(model, size().getSize(stacks.length), title);
         inventory.setContents(stacks);
         return inventory;
     }

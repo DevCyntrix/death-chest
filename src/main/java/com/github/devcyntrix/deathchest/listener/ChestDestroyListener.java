@@ -1,6 +1,5 @@
 package com.github.devcyntrix.deathchest.listener;
 
-import com.github.devcyntrix.deathchest.DeathChestHolder;
 import com.github.devcyntrix.deathchest.DeathChestModel;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
 import com.github.devcyntrix.deathchest.api.audit.AuditAction;
@@ -45,10 +44,9 @@ public class ChestDestroyListener implements Listener {
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
         Inventory inventory = event.getInventory();
-        if (!(inventory.getHolder() instanceof DeathChestHolder holder))
+        if (!(inventory.getHolder() instanceof DeathChestModel model))
             return;
 
-        DeathChestModel model = holder.getModel();
         BlockState state = model.getLocation().getBlock().getState();
 
         HumanEntity human = event.getPlayer();
