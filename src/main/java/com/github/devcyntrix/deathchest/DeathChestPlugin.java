@@ -20,6 +20,7 @@ import com.github.devcyntrix.deathchest.report.GsonReportManager;
 import com.github.devcyntrix.deathchest.support.lock.LWCCompatibility;
 import com.github.devcyntrix.deathchest.support.lock.LocketteXCompatibility;
 import com.github.devcyntrix.deathchest.support.placeholder.PlaceholderAPICompatibility;
+import com.github.devcyntrix.deathchest.support.storage.MemoryStorage;
 import com.github.devcyntrix.deathchest.support.storage.YamlStorage;
 import com.github.devcyntrix.deathchest.util.WorldGuardDeathChestFlag;
 import com.github.devcyntrix.deathchest.util.adapter.DurationAdapter;
@@ -279,7 +280,11 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
             this.placeHolderController = new PlaceholderController(getDeathChestConfig());
 
             debug(0, "Using death chest yaml storage");
-            this.deathChestStorage = new YamlStorage(this.placeHolderController);
+            if (!test) {
+                this.deathChestStorage = new YamlStorage(this.placeHolderController);
+            } else {
+                this.deathChestStorage = new MemoryStorage(this.placeHolderController);
+            }
             debug(0, "Initializing death chest storage...");
             this.deathChestStorage.init(this, deathChestStorage.getDefaultOptions());
 
@@ -443,7 +448,7 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
 
     @Override
     public @NotNull DeathChestModel createDeathChest(@NotNull Location location, long createdAt, long expireAt, @Nullable Player player, boolean isProtected, ItemStack @NotNull ... items) {
-        return this.deathChestController.createChest(location, expireAt, player, items);
+        return this.deathChestController.createChest(location, createdAt, expireAt, player, isProtected, items);
     }
 
     @Override
