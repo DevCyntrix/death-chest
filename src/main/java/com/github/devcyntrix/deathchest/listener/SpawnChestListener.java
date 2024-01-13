@@ -188,7 +188,7 @@ public class SpawnChestListener implements Listener {
 
         try {
             ThiefProtectionOptions thiefProtectionOptions = config.chestOptions().thiefProtectionOptions();
-            boolean protectedChest = thiefProtectionOptions.enabled() && player.hasPermission(thiefProtectionOptions.permission());
+            boolean protectedChest = thiefProtectionOptions.enabled() && player.hasPermission(thiefProtectionOptions.permission()) && config.worldChestProtectionFilter().test(blockLocation.getWorld());
             plugin.debug(1, "Protected chest: %s".formatted(protectedChest));
 
             PreDeathChestSpawnEvent preSpawn = new PreDeathChestSpawnEvent(player, blockLocation, protectedChest, createdAt, expireAt, items);
