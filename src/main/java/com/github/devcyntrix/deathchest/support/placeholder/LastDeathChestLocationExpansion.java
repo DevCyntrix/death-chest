@@ -1,4 +1,4 @@
-package com.github.devcyntrix.deathchest.util;
+package com.github.devcyntrix.deathchest.support.placeholder;
 
 import com.github.devcyntrix.deathchest.DeathChestModel;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
