@@ -18,7 +18,7 @@ public class GlobalNotificationListener implements Listener {
         DeathChestConfig deathChestConfig = plugin.getDeathChestConfig();
 
         GlobalNotificationOptions globalNotificationOptions = deathChestConfig.globalNotificationOptions();
-        if (globalNotificationOptions.enabled() && globalNotificationOptions.messages() != null) {
+        if (globalNotificationOptions.enabled() && globalNotificationOptions.message() != null) {
             globalNotificationOptions.showNotification(event.getDeathChest(), plugin.getPlaceHolderController());
         }
     }

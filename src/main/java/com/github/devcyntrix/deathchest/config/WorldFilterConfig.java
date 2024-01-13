@@ -3,6 +3,7 @@ package com.github.devcyntrix.deathchest.config;
 import com.github.devcyntrix.deathchest.util.FilterType;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,9 +15,12 @@ import java.util.function.Predicate;
 
 public record WorldFilterConfig(FilterType filterType, Set<String> worlds) implements Predicate<World> {
 
+    public static final FilterType DEFAULT_TYPE = FilterType.BLACKLIST;
+
+    @Contract("null -> new")
     public static @NotNull WorldFilterConfig load(@Nullable ConfigurationSection section) {
         if (section == null)
-            return new WorldFilterConfig(FilterType.BLACKLIST, Collections.emptySet());
+            return new WorldFilterConfig(DEFAULT_TYPE, Collections.emptySet());
 
         String filterString = section.getString("filter");
         if (filterString != null) {
@@ -29,7 +33,7 @@ public record WorldFilterConfig(FilterType filterType, Set<String> worlds) imple
                 e.printStackTrace();
             }
         }
-        return new WorldFilterConfig(FilterType.BLACKLIST, Collections.emptySet());
+        return new WorldFilterConfig(DEFAULT_TYPE, Collections.emptySet());
     }
 
 

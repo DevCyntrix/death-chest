@@ -28,7 +28,7 @@ public class PlayerNotificationListener implements Listener {
 
         // Player notification
         PlayerNotificationOptions playerNotificationOptions = deathChestConfig.playerNotificationOptions();
-        if (playerNotificationOptions.enabled() && playerNotificationOptions.messages() != null) {
+        if (playerNotificationOptions.enabled() && playerNotificationOptions.message() != null) {
             playerNotificationOptions.showNotification(audience, deathChest, controller);
         }
     }

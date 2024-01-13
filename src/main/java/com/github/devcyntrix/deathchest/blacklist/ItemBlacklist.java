@@ -1,5 +1,6 @@
 package com.github.devcyntrix.deathchest.blacklist;
 
+import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@Singleton
 public class ItemBlacklist implements InventoryHolder {
 
     public static final ItemStack ADD_ITEM = new ItemStack(Material.EMERALD_BLOCK);

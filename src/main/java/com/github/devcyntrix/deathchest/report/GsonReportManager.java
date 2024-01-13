@@ -38,7 +38,9 @@ public class GsonReportManager implements ReportManager {
 
     public GsonReportManager(File folder) {
         this.folder = folder;
-        this.folder.mkdirs();
+        if (!this.folder.isDirectory() && !this.folder.mkdirs())
+            throw new RuntimeException("Failed to create report directory");
+
     }
 
 

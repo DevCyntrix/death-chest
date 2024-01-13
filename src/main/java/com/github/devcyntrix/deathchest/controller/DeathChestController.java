@@ -15,6 +15,7 @@ import com.github.devcyntrix.deathchest.config.ThiefProtectionOptions;
 import com.github.devcyntrix.deathchest.util.ChestModelStringLookup;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+import com.google.inject.Singleton;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.text.StringSubstitutor;
@@ -35,6 +36,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.logging.Logger;
 
+@Singleton
 public class DeathChestController implements Closeable {
 
     private final DeathChestPlugin plugin;
@@ -45,7 +47,6 @@ public class DeathChestController implements Closeable {
     private final Set<ChestView> listeners = new HashSet<>();
 
     protected final Table<World, Location, DeathChestModel> loadedChests = HashBasedTable.create();
-    //protected final Set<DeathChestModel> loadedChests = new CopyOnWriteArraySet<>();
 
     private final Function<Long, String> durationFormat;
 
@@ -91,13 +92,13 @@ public class DeathChestController implements Closeable {
 
     public @NotNull DeathChestModel createChest(@NotNull Location location, long createdAt, long expireAt, @Nullable Player player, boolean isProtected, ItemStack @NotNull ... items) {
         DeathChestModel model = new DeathChestModel(location, createdAt, expireAt, player, isProtected);
-        StringSubstitutor substitutor = new StringSubstitutor(new ChestModelStringLookup(plugin.getDeathChestConfig(), model, durationFormat));
+        StringSubstitutor substitution = new StringSubstitutor(new ChestModelStringLookup(plugin.getDeathChestConfig(), model, durationFormat));
 
         // Creates inventory
         InventoryOptions inventoryOptions = getConfig().inventoryOptions();
 
         model.setInventory(inventoryOptions.createInventory(model, title -> {
-            title = substitutor.replace(title);
+            title = substitution.replace(title);
             if (DeathChestPlugin.isPlaceholderAPIEnabled()) {
                 title = PlaceholderAPI.setPlaceholders(player, title);
             }

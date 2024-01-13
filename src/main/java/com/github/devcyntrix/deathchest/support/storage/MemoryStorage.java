@@ -3,7 +3,6 @@ package com.github.devcyntrix.deathchest.support.storage;
 import com.github.devcyntrix.deathchest.DeathChestModel;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
 import com.github.devcyntrix.deathchest.api.storage.DeathChestStorage;
-import com.github.devcyntrix.deathchest.controller.PlaceholderController;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import org.bukkit.World;
@@ -18,12 +17,7 @@ import java.util.Set;
 
 public class MemoryStorage implements DeathChestStorage {
 
-    private final PlaceholderController placeHolderController;
     private final Multimap<World, DeathChestModel> deathChestsCache = HashMultimap.create();
-
-    public MemoryStorage(PlaceholderController placeHolderController) {
-        this.placeHolderController = placeHolderController;
-    }
 
     @Override
     public ConfigurationSection getDefaultOptions() {

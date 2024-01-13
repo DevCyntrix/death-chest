@@ -4,6 +4,7 @@ import com.github.devcyntrix.deathchest.DeathChestPlugin;
 import com.github.devcyntrix.hologram.NativeHologram;
 import com.github.devcyntrix.hologram.api.Hologram;
 import com.github.devcyntrix.hologram.api.HologramService;
+import com.google.inject.Singleton;
 import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
 
@@ -11,6 +12,7 @@ import java.io.Closeable;
 import java.util.HashSet;
 import java.util.Set;
 
+@Singleton
 public class HologramController implements HologramService, Closeable {
 
     private final DeathChestPlugin plugin;

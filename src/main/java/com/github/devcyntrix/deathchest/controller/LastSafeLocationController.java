@@ -2,6 +2,7 @@ package com.github.devcyntrix.deathchest.controller;
 
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
 import com.github.devcyntrix.deathchest.util.LastLocationMetadata;
+import com.google.inject.Singleton;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -10,6 +11,7 @@ import org.bukkit.metadata.MetadataValue;
 import javax.annotation.Nullable;
 import java.util.List;
 
+@Singleton
 public class LastSafeLocationController {
 
     private static final String lastSafePosition = "last-safe-position";

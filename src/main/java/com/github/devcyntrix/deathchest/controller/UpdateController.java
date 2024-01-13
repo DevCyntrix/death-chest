@@ -5,6 +5,7 @@ import com.github.devcyntrix.deathchest.config.DeathChestConfig;
 import com.github.devcyntrix.deathchest.util.update.HangarUpdateChecker;
 import com.github.devcyntrix.deathchest.util.update.UpdateChecker;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
@@ -20,6 +21,7 @@ import java.util.logging.Level;
  * Checks for the newest version by using the SpigotMC API
  */
 @Getter
+@Singleton
 public class UpdateController implements Closeable {
 
     private String newestVersion;
@@ -30,7 +32,6 @@ public class UpdateController implements Closeable {
     @Inject
     public UpdateController(DeathChestPlugin plugin) {
         UpdateChecker checker = new HangarUpdateChecker(plugin);
-        // new SpigotUpdateChecker(plugin, DeathChestPlugin.RESOURCE_ID);
         updateScheduler = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
             String version = checker.getLatestRelease();
             if (version == null)

@@ -4,12 +4,14 @@ import com.github.devcyntrix.deathchest.DeathChestModel;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
 import com.github.devcyntrix.deathchest.config.DeathChestConfig;
 import com.github.devcyntrix.deathchest.util.ChestModelStringLookup;
+import com.google.inject.Singleton;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.text.StringSubstitutor;
 
 import java.util.function.Function;
 
+@Singleton
 public class PlaceholderController {
 
     private final DeathChestConfig config;

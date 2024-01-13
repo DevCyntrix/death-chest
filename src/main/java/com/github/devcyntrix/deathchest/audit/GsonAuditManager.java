@@ -2,6 +2,7 @@ package com.github.devcyntrix.deathchest.audit;
 
 import com.github.devcyntrix.deathchest.api.audit.AuditItem;
 import com.github.devcyntrix.deathchest.api.audit.AuditManager;
+import com.google.inject.Singleton;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -9,6 +10,7 @@ import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+@Singleton
 public class GsonAuditManager extends Thread implements AuditManager {
 
     private static final String format = "audit-%s.csv";

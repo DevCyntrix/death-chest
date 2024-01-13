@@ -3,6 +3,7 @@ package com.github.devcyntrix.deathchest.config;
 import com.google.gson.annotations.SerializedName;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,13 +17,14 @@ public record ChestOptions(
         @SerializedName("thief-protection") @NotNull ThiefProtectionOptions thiefProtectionOptions
 ) {
 
+    @Contract("null -> new")
     public static @NotNull ChestOptions load(@Nullable ConfigurationSection section) {
         if (section == null)
             section = new MemoryConfiguration();
 
         Duration expiration = null;
         if (section.contains("expiration")) {
-            long expirationInSeconds = section.getLong("expiration", 600);
+            long expirationInSeconds = section.getLong("expiration");
             if (expirationInSeconds > 0) {
                 expiration = Duration.ofSeconds(expirationInSeconds);
             }

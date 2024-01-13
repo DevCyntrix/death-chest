@@ -31,6 +31,7 @@ import com.github.devcyntrix.deathchest.view.update.ConsoleNotificationView;
 import com.github.devcyntrix.hologram.api.HologramService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.inject.Singleton;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
@@ -65,6 +66,7 @@ import static com.github.devcyntrix.deathchest.api.report.ReportManager.DATE_FOR
  * You are welcome to contribute to this plugin!
  */
 @Getter
+@Singleton
 public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
 
     public static final int RESOURCE_ID = 101066;
@@ -284,7 +286,7 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
             if (!test) {
                 this.deathChestStorage = new YamlStorage(this.placeHolderController);
             } else {
-                this.deathChestStorage = new MemoryStorage(this.placeHolderController);
+                this.deathChestStorage = new MemoryStorage();
             }
             debug(0, "Initializing death chest storage...");
             this.deathChestStorage.init(this, deathChestStorage.getDefaultOptions());
