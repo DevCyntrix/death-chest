@@ -1,5 +1,4 @@
 import io.papermc.hangarpublishplugin.model.Platforms
-import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
     `java-library`
@@ -65,10 +64,10 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:1.18.24")
 
 
-    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.7.1")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-    testImplementation("com.github.seeseemelk:MockBukkit-v1.20:3.42.0")
+    testImplementation("com.github.seeseemelk:MockBukkit-v1.20:3.65.0")
     testImplementation("net.kyori:adventure-platform-bukkit:4.3.0")
     testImplementation("net.kyori:adventure-text-minimessage:4.14.0")
     testImplementation("net.kyori:adventure-text-serializer-legacy:4.14.0")
@@ -77,6 +76,8 @@ dependencies {
     testImplementation("cloud.commandframework:cloud-core:1.7.1")
     testImplementation("cloud.commandframework:cloud-bukkit:1.7.1")
     testImplementation("org.bstats:bstats-bukkit:3.0.2")
+    testImplementation("ch.qos.logback:logback-classic:1.4.14")
+
     testCompileOnly("org.projectlombok:lombok:1.18.24")
     testAnnotationProcessor("org.projectlombok:lombok:1.18.24")
 }
@@ -107,8 +108,8 @@ tasks {
 
         testLogging {
             events("passed", "skipped", "failed")
-            showStackTraces = true
-            exceptionFormat = TestExceptionFormat.FULL
+            showCauses = true
+            showExceptions = true
         }
     }
     runServer {
