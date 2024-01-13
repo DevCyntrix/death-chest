@@ -1,7 +1,6 @@
 package com.github.devcyntrix.deathchest.support.protection;
 
 import com.github.devcyntrix.deathchest.api.protection.ProtectionService;
-import com.github.devcyntrix.deathchest.util.WorldGuardDeathChestFlag;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;

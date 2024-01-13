@@ -1,4 +1,4 @@
-package com.github.devcyntrix.deathchest.util;
+package com.github.devcyntrix.deathchest.support.protection;
 
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
 import com.sk89q.worldguard.WorldGuard;
