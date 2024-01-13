@@ -210,6 +210,10 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
             debug(0, "Registering death chest flag to WorldGuard...");
             WorldGuardDeathChestFlag.register();
         }
+
+        ServicesManager servicesManager = getServer().getServicesManager();
+        debug(0, "Registering death chest service...");
+        servicesManager.register(DeathChestService.class, this, this, ServicePriority.Normal);
     }
 
     @SneakyThrows
@@ -265,9 +269,6 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
         }
         this.blacklist = new ItemBlacklist(new File(getDataFolder(), "blacklist.yml"));
 
-        ServicesManager servicesManager = getServer().getServicesManager();
-        debug(0, "Registering death chest service...");
-        servicesManager.register(DeathChestService.class, this, this, ServicePriority.Normal);
 
         this.reportManager = new GsonReportManager(new File(getDataFolder(), "reports"));
         debug(0, "Using gson report manager");
