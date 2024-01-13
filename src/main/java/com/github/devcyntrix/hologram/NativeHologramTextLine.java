@@ -19,13 +19,13 @@ public class NativeHologramTextLine implements HologramTextLine {
     public NativeHologramTextLine(@NotNull Plugin plugin, @NotNull Location location, @NotNull String text) {
         Preconditions.checkNotNull(location.getWorld());
         this.location = location;
-        this.armorStand = location.getWorld().spawn(location, ArmorStand.class, stand -> {
-            stand.setMarker(true);
-            stand.setInvisible(true);
-            stand.setCustomName(text);
-            stand.setCustomNameVisible(true);
-            stand.setPersistent(false);
-        }).getUniqueId();
+        ArmorStand stand = location.getWorld().spawn(location, ArmorStand.class);
+        stand.setMarker(true);
+        stand.setInvisible(true);
+        stand.setCustomName(text);
+        stand.setCustomNameVisible(true);
+        stand.setPersistent(false);
+        this.armorStand = stand.getUniqueId();
     }
 
     public void teleport(@NotNull Location location) {
