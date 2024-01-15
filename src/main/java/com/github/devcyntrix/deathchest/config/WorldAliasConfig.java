@@ -20,7 +20,7 @@ public record WorldAliasConfig(Map<String, Object> aliases) {
         return new WorldAliasConfig(Map.copyOf(aliases));
     }
 
-    public @NotNull String getAlias(String worldName) {
+    public @NotNull String getAlias(@NotNull String worldName) {
         return (String) aliases.getOrDefault(worldName, worldName);
     }
 }
