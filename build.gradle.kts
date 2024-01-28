@@ -113,7 +113,7 @@ tasks {
         }
     }
     runServer {
-        minecraftVersion("1.20.2")
+        minecraftVersion("1.20.4")
     }
     shadowJar {
         relocate("org.bstats", "com.github.devcyntrix.deathchest.metrics")
