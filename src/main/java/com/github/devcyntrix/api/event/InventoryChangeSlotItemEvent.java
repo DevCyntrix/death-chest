@@ -1,5 +1,7 @@
 package com.github.devcyntrix.api.event;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -14,10 +16,14 @@ public class InventoryChangeSlotItemEvent extends Event implements Cancellable {
 
     private final HumanEntity entity;
 
+    @Getter
     private final Inventory inventory;
 
+    @Getter
     private final int slot;
 
+    @Setter
+    @Getter
     private ItemStack from, to;
 
     private boolean cancelled;
@@ -27,30 +33,6 @@ public class InventoryChangeSlotItemEvent extends Event implements Cancellable {
         this.inventory = inventory;
         this.slot = slot;
         this.from = from;
-        this.to = to;
-    }
-
-    public Inventory getInventory() {
-        return inventory;
-    }
-
-    public int getSlot() {
-        return slot;
-    }
-
-    public ItemStack getFrom() {
-        return from;
-    }
-
-    public void setFrom(ItemStack from) {
-        this.from = from;
-    }
-
-    public ItemStack getTo() {
-        return to;
-    }
-
-    public void setTo(ItemStack to) {
         this.to = to;
     }
 

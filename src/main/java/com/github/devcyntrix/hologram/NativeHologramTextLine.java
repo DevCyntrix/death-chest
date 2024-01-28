@@ -14,6 +14,8 @@ import java.util.UUID;
 public class NativeHologramTextLine implements HologramTextLine {
 
     private final UUID armorStand;
+
+    @NotNull
     private Location location;
 
     public NativeHologramTextLine(@NotNull Plugin plugin, @NotNull Location location, @NotNull String text) {
