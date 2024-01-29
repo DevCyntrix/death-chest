@@ -1,3 +1,8 @@
+2.2.0:
++ world-aliases and ${world_alias} placeholder added
++ A world chest protection filter added
+* move the chest storage files to the corresponding world folders
+
 2.1.0:
 + Auto plugin updater
 + Calculate another location if someone dies in void
