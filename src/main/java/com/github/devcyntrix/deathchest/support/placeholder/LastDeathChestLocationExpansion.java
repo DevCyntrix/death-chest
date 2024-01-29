@@ -6,6 +6,7 @@ import com.github.devcyntrix.deathchest.config.DeathChestConfig;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -42,6 +43,15 @@ public class LastDeathChestLocationExpansion extends PlaceholderExpansion {
     @Override
     public @NotNull List<String> getPlaceholders() {
         return Collections.singletonList("last_location");
+    }
+
+    @Nullable
+    public String onRequest(final OfflinePlayer player, @NotNull final String params) {
+        if (player != null && player.isOnline()) {
+            return onPlaceholderRequest(player.getPlayer(), params);
+        }
+
+        return onPlaceholderRequest(null, params);
     }
 
     @Override
