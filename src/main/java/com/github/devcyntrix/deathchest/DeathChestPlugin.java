@@ -431,7 +431,12 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
         World world = location.getWorld();
         if (world == null)
             return false;
-        return deathChestController.getChest(location) == null && !location.getBlock().getType().isSolid() && location.getBlock().getType() != Material.NETHER_PORTAL && location.getBlockY() >= world.getMinHeight() && location.getBlockY() <= world.getMaxHeight();
+        if (location.getY() < world.getMinHeight())
+            return false;
+        if (location.getY() >= world.getMaxHeight())
+            return false;
+
+        return deathChestController.getChest(location) == null && !location.getBlock().getType().isSolid() && location.getBlock().getType() != Material.NETHER_PORTAL;
     }
 
     @Override

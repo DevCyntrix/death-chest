@@ -160,7 +160,7 @@ public class SpawnChestListener implements Listener {
         if (blockLocation == null) {
             blockLocation = player.getLocation().getBlock().getLocation().clone();
             World world = player.getWorld();
-            blockLocation.setY(Math.min(Math.max(blockLocation.getBlockY(), world.getMinHeight()), world.getMaxHeight()));
+            blockLocation.setY(Math.min(Math.max(blockLocation.getBlockY(), world.getMinHeight()), world.getMaxHeight() - 1)); // -1 because the max height is exclusive
         }
 
         plugin.debug(1, "Checking protection service...");
