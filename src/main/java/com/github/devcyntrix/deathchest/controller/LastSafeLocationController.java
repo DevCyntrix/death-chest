@@ -25,7 +25,7 @@ public class LastSafeLocationController {
     public void updatePosition(Player player) {
         Location location = player.getLocation().clone().subtract(0, 0.2, 0);
         Block block = location.getBlock();
-        if (block.isEmpty())
+        if (block.isEmpty()) // Check if the player is in air
             return;
 
         Location blockLoc = player.getLocation().getBlock().getLocation();

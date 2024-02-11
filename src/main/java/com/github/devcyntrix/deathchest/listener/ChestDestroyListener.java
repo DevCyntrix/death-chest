@@ -47,9 +47,8 @@ public class ChestDestroyListener implements Listener {
         if (!(inventory.getHolder() instanceof DeathChestModel model))
             return;
 
-        BlockState state = model.getLocation().getBlock().getState();
-
         HumanEntity human = event.getPlayer();
+        BlockState state = model.getLocation().getBlock().getState();
 
         if (state instanceof Lidded lidded && human.getGameMode() != GameMode.SPECTATOR) {
             lidded.close();

@@ -72,6 +72,7 @@ public class SpawnChestListener implements Listener {
         }
         set.add(player);
 
+        World world = player.getWorld();
         DeathChestConfig config = plugin.getDeathChestConfig();
 
         plugin.debug(1, "Checking keep inventory...");
@@ -156,23 +157,29 @@ public class SpawnChestListener implements Listener {
 
         LastSafeLocationController controller = plugin.getLastSafeLocationController();
         controller.updatePosition(player);
-        Location blockLocation = controller.getPosition(player);
-        if (blockLocation == null) {
-            blockLocation = player.getLocation().getBlock().getLocation().clone();
-            World world = player.getWorld();
-            blockLocation.setY(Math.min(Math.max(blockLocation.getBlockY(), world.getMinHeight()), world.getMaxHeight() - 1)); // -1 because the max height is exclusive
+        Location lastSafePos = controller.getPosition(player);
+
+        if (lastSafePos == null) {
+            lastSafePos = player.getLocation().getBlock().getLocation().clone();
+        } else if (player.getLocation().distanceSquared(lastSafePos) >= 20 * 20) {
+            // Spawn the chest near to the player death location if the safe position distance is higher than 20 Blocks
+            lastSafePos = player.getLocation().getBlock().getLocation().clone();
+            lastSafePos.setY(world.getHighestBlockYAt(lastSafePos.getBlockX(), lastSafePos.getBlockZ()) + 1); // Spawn the chest on top of the highest block
         }
 
+        // Clip the chest spawn to the world heights
+        lastSafePos.setY(Math.min(Math.max(lastSafePos.getBlockY(), world.getMinHeight()), world.getMaxHeight() - 1)); // -1 because the max height is exclusive
+
         plugin.debug(1, "Checking protection service...");
-        boolean build = plugin.getProtectionService().canBuild(player, blockLocation, Material.CHEST);
+        boolean build = plugin.getProtectionService().canBuild(player, lastSafePos, Material.CHEST);
         if (!build)
             return;
 
         ChangeDeathMessageOptions changeDeathMessageOptions = config.changeDeathMessageOptions();
         if (changeDeathMessageOptions.enabled()) {
             plugin.debug(1, "Changing death message...");
-            if (changeDeathMessageOptions.message() != null && blockLocation.getWorld() != null) {
-                StringSubstitutor substitution = new StringSubstitutor(Map.of("x", blockLocation.getBlockX(), "y", blockLocation.getBlockY(), "z", blockLocation.getBlockZ(), "world", blockLocation.getWorld().getName(), "player_name", player.getName(), "player_display_name", player.getDisplayName()));
+            if (changeDeathMessageOptions.message() != null && lastSafePos.getWorld() != null) {
+                StringSubstitutor substitution = new StringSubstitutor(Map.of("x", lastSafePos.getBlockX(), "y", lastSafePos.getBlockY(), "z", lastSafePos.getBlockZ(), "world", lastSafePos.getWorld().getName(), "player_name", player.getName(), "player_display_name", player.getDisplayName()));
 
                 event.setDeathMessage(Arrays.stream(changeDeathMessageOptions.message()).map(substitution::replace).map(s -> {
                     if (DeathChestPlugin.isPlaceholderAPIEnabled()) {
@@ -188,22 +195,22 @@ public class SpawnChestListener implements Listener {
 
         try {
             ThiefProtectionOptions thiefProtectionOptions = config.chestOptions().thiefProtectionOptions();
-            boolean protectedChest = thiefProtectionOptions.enabled() && player.hasPermission(thiefProtectionOptions.permission()) && config.worldChestProtectionFilter().test(blockLocation.getWorld());
+            boolean protectedChest = thiefProtectionOptions.enabled() && player.hasPermission(thiefProtectionOptions.permission()) && config.worldChestProtectionFilter().test(lastSafePos.getWorld());
             plugin.debug(1, "Protected chest: %s".formatted(protectedChest));
 
-            PreDeathChestSpawnEvent preSpawn = new PreDeathChestSpawnEvent(player, blockLocation, protectedChest, createdAt, expireAt, items);
+            PreDeathChestSpawnEvent preSpawn = new PreDeathChestSpawnEvent(player, lastSafePos, protectedChest, createdAt, expireAt, items);
             Bukkit.getPluginManager().callEvent(preSpawn);
 
             if (preSpawn.isCancelled())
                 return;
 
-            blockLocation = preSpawn.getLocation();
+            lastSafePos = preSpawn.getLocation();
             protectedChest = preSpawn.isProtectedChest();
             createdAt = preSpawn.getCreatedAt();
             expireAt = preSpawn.getExpireAt();
             items = preSpawn.getItems();
 
-            DeathChestModel deathChest = plugin.createDeathChest(blockLocation, createdAt, expireAt, player, protectedChest, items);
+            DeathChestModel deathChest = plugin.createDeathChest(lastSafePos, createdAt, expireAt, player, protectedChest, items);
 
             DeathChestSpawnEvent deathChestSpawnEvent = new DeathChestSpawnEvent(player, deathChest);
             Bukkit.getPluginManager().callEvent(deathChestSpawnEvent);
