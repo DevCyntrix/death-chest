@@ -1,3 +1,6 @@
+2.2.2:
+* Fix that the chests spawns on the top of the nether if the player dies without safe position in the nether.
+
 2.2.1:
 * Fix that the chests spawn far away when you crash into the wall with an Elytra
 
