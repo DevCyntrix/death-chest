@@ -67,7 +67,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.7.1")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-    testImplementation("com.github.seeseemelk:MockBukkit-v1.20:3.65.0")
+    testImplementation("com.github.seeseemelk:MockBukkit-v1.20:3.71.0")
     testImplementation("net.kyori:adventure-platform-bukkit:4.3.0")
     testImplementation("net.kyori:adventure-text-minimessage:4.14.0")
     testImplementation("net.kyori:adventure-text-serializer-legacy:4.14.0")
