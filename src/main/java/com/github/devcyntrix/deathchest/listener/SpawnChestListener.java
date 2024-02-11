@@ -164,7 +164,13 @@ public class SpawnChestListener implements Listener {
         } else if (player.getLocation().distanceSquared(lastSafePos) >= 20 * 20) {
             // Spawn the chest near to the player death location if the safe position distance is higher than 20 Blocks
             lastSafePos = player.getLocation().getBlock().getLocation().clone();
-            lastSafePos.setY(world.getHighestBlockYAt(lastSafePos.getBlockX(), lastSafePos.getBlockZ()) + 1); // Spawn the chest on top of the highest block
+            int it = 0;
+            while (lastSafePos.getBlock().isEmpty() && lastSafePos.getBlockY() >= world.getMinHeight() && it <= 20) {
+                lastSafePos = lastSafePos.subtract(0, 1, 0);
+                it++;
+            }
+            if (!lastSafePos.getBlock().isEmpty())
+                lastSafePos.add(0, 1, 0); // Spawn the chest on top of the highest block
         }
 
         // Clip the chest spawn to the world heights
