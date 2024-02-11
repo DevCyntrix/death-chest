@@ -139,7 +139,7 @@ hangarPublish {
         platforms {
             register(Platforms.PAPER) {
                 jar.set(tasks.shadowJar.flatMap { it.archiveFile })
-                platformVersions.set(listOf("1.17-1.20.2"))
+                platformVersions.set(listOf("1.17-1.20.4"))
                 dependencies.url("ProtocolLib", "https://www.spigotmc.org/resources/protocollib.1997/") {
                     required.set(false)
                 }
