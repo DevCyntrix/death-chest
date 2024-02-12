@@ -20,5 +20,7 @@ jobs:
           distribution: 'temurin'
       - name: Publish with Gradle to Hangar
         uses: gradle/actions/setup-gradle@v3
+        with:
+          cache-disabled: true
       - name: Build and publish
         run: ./gradlew clean publishAllPublicationsToHangar
