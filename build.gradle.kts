@@ -2,9 +2,9 @@ import io.papermc.hangarpublishplugin.model.Platforms
 
 plugins {
     `java-library`
-    id("xyz.jpenilla.run-paper") version "2.1.0"
+    id("xyz.jpenilla.run-paper") version "2.2.3"
     id("com.github.johnrengelman.shadow") version "8.1.1"
-    id("io.papermc.hangar-publish-plugin") version "0.0.5"
+    id("io.papermc.hangar-publish-plugin") version "0.1.2"
 }
 
 group = "com.github.devcyntrix"
@@ -125,7 +125,7 @@ tasks {
 hangarPublish {
     publications.register("DeathChest") {
         version.set(project.version as String)
-        namespace("CyntrixAlgorithm", "DeathChest")
+        id = "DeathChest"
         changelog.set("https://github.com/DevCyntrix/death-chest/blob/main/CHANGELOG")
 
         apiKey.set(System.getenv("API_KEY"))
