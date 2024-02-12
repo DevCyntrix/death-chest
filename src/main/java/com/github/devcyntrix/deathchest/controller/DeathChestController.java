@@ -141,7 +141,7 @@ public class DeathChestController implements Closeable {
         return !protectionOptions.enabled() ||
                 !model.isProtected() ||
                 model.getOwner() == null ||
-                model.getOwner().equals(player) ||
+                model.getOwner().getUniqueId().equals(player.getUniqueId()) ||
                 player.hasPermission(protectionOptions.bypassPermission()) ||
                 remainingTime < 0;
     }
