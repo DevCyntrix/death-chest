@@ -41,6 +41,7 @@ public final class SupportServices {
 
     public static @NotNull ProtectionService getProtectionService(@NotNull DeathChestPlugin plugin) {
         List<ProtectionService> services = new ArrayList<>();
+        services.add(new MinecraftProtection());
         for (Map.Entry<String, Function<Plugin, ProtectionService>> entry : protectionServiceMap.entrySet()) {
             if (!Bukkit.getPluginManager().isPluginEnabled(entry.getKey()))
                 continue;
