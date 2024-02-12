@@ -40,6 +40,7 @@ public class WorldFilterTest {
         }
 
         this.server = MockBukkit.getOrCreateMock();
+        this.server.setSpawnRadius(0);
         MockBukkit.load(DeathChestPlugin.class, true, config);
         List<ItemStack> content = new ArrayList<>(List.of(new ItemStack(Material.OAK_LOG)));
 
