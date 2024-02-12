@@ -1,3 +1,7 @@
+2.2.3:
+* Fix the bug that the player cannot open the chest after rejoining (If chest protection is enabled)
+* Fix the bug that the player cannot open the chest if he dies in the world spawn region and has no operator
+
 2.2.2:
 * Fix that the chests spawns on the top of the nether if the player dies without safe position in the nether.
 
