@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "com.github.devcyntrix"
-version = "2.2.3"
+version = "2.2.4-rc1"
 
 repositories {
     mavenCentral()
