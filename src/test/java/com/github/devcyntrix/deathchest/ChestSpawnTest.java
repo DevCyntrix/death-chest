@@ -40,6 +40,7 @@ public class ChestSpawnTest {
         }
 
         this.server = MockBukkit.getOrCreateMock();
+        this.server.setSpawnRadius(0);
         MockBukkit.load(DeathChestPlugin.class, true, config);
     }
 

@@ -50,6 +50,7 @@ public class ThiefProtectionTest {
         }
 
         this.server = MockBukkit.getOrCreateMock();
+        this.server.setSpawnRadius(0);
         this.plugin = MockBukkit.load(DeathChestPlugin.class, true, config);
         this.content = new ArrayList<>(List.of(new ItemStack(Material.OAK_LOG)));
     }
