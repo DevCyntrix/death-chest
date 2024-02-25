@@ -140,6 +140,12 @@ world-alias:
   world_nether: "Nether"
   world_the_end: "The End"
 
+# Drops the items if any of the conditions becomes the true when activated.
+drop-conditions:
+  lava-death: false
+  fire-death: false
+  void-death: false
+
 # Do not touch this!
 config-version: 3
 # Prints debug messages if property is set to true

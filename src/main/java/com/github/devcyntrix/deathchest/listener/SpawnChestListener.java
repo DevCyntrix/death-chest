@@ -100,6 +100,9 @@ public class SpawnChestListener implements Listener {
         if (!config.worldFilterConfig().test(player.getWorld()))
             return;
 
+        if (config.dropCondition().shouldDrop(player.getLocation()))
+            return;
+
         plugin.debug(1, "Getting expiration time...");
         Duration expiration = config.chestOptions().expiration();
         if (expiration == null)
