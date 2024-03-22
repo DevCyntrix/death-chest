@@ -23,6 +23,7 @@ import com.github.devcyntrix.deathchest.support.placeholder.PlaceholderAPICompat
 import com.github.devcyntrix.deathchest.support.protection.WorldGuardDeathChestFlag;
 import com.github.devcyntrix.deathchest.support.storage.MemoryStorage;
 import com.github.devcyntrix.deathchest.support.storage.YamlStorage;
+import com.github.devcyntrix.deathchest.util.LocationUtil;
 import com.github.devcyntrix.deathchest.util.adapter.DurationAdapter;
 import com.github.devcyntrix.deathchest.view.chest.*;
 import com.github.devcyntrix.deathchest.view.update.AdminJoinNotificationView;
@@ -58,7 +59,7 @@ import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 
-import static com.github.devcyntrix.deathchest.api.report.ReportManager.DATE_FORMAT_CONFIG;
+import static com.github.devcyntrix.deathchest.Constants.DATE_FORMAT_CONFIG;
 
 /**
  * This plugin creates chests if a player dies and will destroy them after a specific time.
@@ -200,8 +201,7 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
             this.compatibilityManager.disableCompatibilities();
         }
 
-        if (this.audiences != null)
-            this.audiences.close();
+        if (this.audiences != null) this.audiences.close();
     }
 
     @Override
@@ -222,22 +222,21 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
     @Override
     public void onEnable() {
         debug(0, "Loading configuration file...");
-        if (!isTest())
-            reloadConfig();
+        if (!isTest()) reloadConfig();
 
 
-        initializeServices();
+        loadServices();
 
         debug(0, "Registering commands...");
         CommandRegistry.create(this).registerCommands(this);
 
-        if (!test) {
+        if (!isTest()) {
             debug(0, "Starting metrics...");
             new Metrics(this, BSTATS_ID);
         }
     }
 
-    private void initializeServices() {
+    private void loadServices() {
         placeholderAPIEnabled = Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI");
         this.audiences = BukkitAudiences.create(this);
 
@@ -283,7 +282,7 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
             this.placeHolderController = new PlaceholderController(getDeathChestConfig());
 
             debug(0, "Using death chest yaml storage");
-            if (!test) {
+            if (!isTest()) {
                 this.deathChestStorage = new YamlStorage(this.placeHolderController);
             } else {
                 this.deathChestStorage = new MemoryStorage();
@@ -399,7 +398,7 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
     public void reload() {
         onDisable();
         reloadConfig();
-        initializeServices();
+        loadServices();
     }
 
     @Override
@@ -411,11 +410,7 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
         debug(1, "Parsing configuration file...");
         this.deathChestConfig = DeathChestConfig.load(getConfig());
         if (isDebugMode()) {
-            Gson gson = new GsonBuilder()
-                    .setPrettyPrinting()
-                    .setDateFormat(DATE_FORMAT_CONFIG, DATE_FORMAT_CONFIG)
-                    .registerTypeAdapter(Duration.class, new DurationAdapter())
-                    .create();
+            Gson gson = new GsonBuilder().setPrettyPrinting().setDateFormat(DATE_FORMAT_CONFIG, DATE_FORMAT_CONFIG).registerTypeAdapter(Duration.class, new DurationAdapter()).create();
             debug(1, "Configuration: " + gson.toJson(this.deathChestConfig));
         }
     }
@@ -428,15 +423,10 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
      */
     @Override
     public boolean canPlaceChestAt(@NotNull Location location) {
-        World world = location.getWorld();
-        if (world == null)
-            return false;
-        if (location.getY() < world.getMinHeight())
-            return false;
-        if (location.getY() >= world.getMaxHeight())
-            return false;
-
-        return deathChestController.getChest(location) == null && !location.getBlock().getType().isSolid() && location.getBlock().getType() != Material.NETHER_PORTAL;
+        return LocationUtil.isValidBlock(location) &&
+                deathChestController.getChest(location) == null &&
+                !location.getBlock().getType().isSolid() &&
+                location.getBlock().getType() != Material.NETHER_PORTAL; // To avoid a nether portal bug
     }
 
     @Override

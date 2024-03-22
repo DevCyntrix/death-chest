@@ -1,5 +1,6 @@
 package com.github.devcyntrix.deathchest.config;
 
+import com.github.devcyntrix.deathchest.util.LocationUtil;
 import com.google.gson.annotations.SerializedName;
 import lombok.Getter;
 import org.bukkit.Location;
@@ -34,10 +35,10 @@ public class DropConditionConfig {
             return location.getBlockY() < location.getWorld().getMinHeight();
         });
         if (lavaDeath) appliedConditions.add(location -> {
-            return location.getBlock().getType() == Material.LAVA;
+            return LocationUtil.isValidBlock(location) && location.getBlock().getType() == Material.LAVA;
         });
         if (fireDeath) appliedConditions.add(location -> {
-            return location.getBlock().getType() == Material.FIRE;
+            return LocationUtil.isValidBlock(location) && location.getBlock().getType() == Material.FIRE;
         });
     }
 

@@ -40,6 +40,7 @@ public class ChestSpawnTest {
         }
 
         this.server = MockBukkit.getOrCreateMock();
+        Assertions.assertNotNull(this.server);
         this.server.setSpawnRadius(0);
         MockBukkit.load(DeathChestPlugin.class, true, config);
     }
@@ -54,33 +55,46 @@ public class ChestSpawnTest {
     public void doesntSpawnEmptyChest() {
         PlayerMock player = server.addPlayer();
         @NotNull Location location = player.getLocation();
+
+        // Kills the player
         player.setHealth(0.0);
-        Assertions.assertTrue(location.getBlock().isEmpty());
+        // Wait one tick that the chest can spawn
+        server.getScheduler().performOneTick();
+
+        Assertions.assertEquals(Material.AIR, location.getBlock().getType());
     }
 
+    /**
+     * Checks the spawn of a chest if a player dies and that the items drops in the world if the player breaks
+     * the chest.
+     */
     @Test
-    @DisplayName("Spawn filled chest")
+    @DisplayName("Spawn filled chest and drop items")
     public void spawnFilledChest() {
         List<ItemStack> list = new ArrayList<>(List.of(new ItemStack(Material.OAK_LOG)));
 
         PlayerMock player = server.addPlayer();
+        @NotNull Location location = player.getLocation();
+
+        // Give items
         PlayerInventory inventory = player.getInventory();
-        System.out.println("Adding item to the inventory...");
         inventory.addItem(list.toArray(ItemStack[]::new));
 
-        @NotNull Location location = player.getLocation();
-        System.out.println("Killing player...");
+        // Kills the player
         player.setHealth(0.0);
+        // Wait one tick that the chest can spawn
         server.getScheduler().performOneTick();
-        Block block = location.getBlock();
-        Assertions.assertFalse(block.isEmpty());
-        System.out.println("Breaking block...");
 
+        Block block = location.getBlock();
+        Assertions.assertEquals(Material.CHEST, block.getType());
+
+        // Simulate the block break
         BlockBreakEvent blockBreakEvent = player.simulateBlockBreak(block);
         Assertions.assertNotNull(blockBreakEvent);
         Assertions.assertTrue(blockBreakEvent.isCancelled());
-        Assertions.assertTrue(block.isEmpty());
+        Assertions.assertEquals(Material.AIR, block.getType());
 
+        // Check that the items drops
         WorldMock world = player.getWorld();
         Collection<Item> items = world.getEntitiesByClass(Item.class);
         items.forEach(item -> list.remove(item.getItemStack()));

@@ -2,6 +2,7 @@ package com.github.devcyntrix.deathchest.controller;
 
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
 import com.github.devcyntrix.deathchest.util.LastLocationMetadata;
+import com.github.devcyntrix.deathchest.util.LocationUtil;
 import com.google.inject.Singleton;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -24,6 +25,10 @@ public class LastSafeLocationController {
 
     public void updatePosition(Player player) {
         Location location = player.getLocation().clone().subtract(0, 0.2, 0);
+
+        if (!LocationUtil.isValidBlock(location))
+            return;
+
         Block block = location.getBlock();
         if (block.isEmpty()) // Check if the player is in air
             return;

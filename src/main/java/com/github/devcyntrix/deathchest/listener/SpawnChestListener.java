@@ -163,7 +163,7 @@ public class SpawnChestListener implements Listener {
         Location lastSafePos = controller.getPosition(player);
 
         if (lastSafePos == null) {
-            lastSafePos = player.getLocation().getBlock().getLocation().clone();
+            lastSafePos = player.getLocation().clone();
         } else if (player.getLocation().distanceSquared(lastSafePos) >= 20 * 20) {
             // Spawn the chest near to the player death location if the safe position distance is higher than 20 Blocks
             lastSafePos = player.getLocation().getBlock().getLocation().clone();

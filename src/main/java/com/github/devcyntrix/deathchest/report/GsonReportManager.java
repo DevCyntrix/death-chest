@@ -23,6 +23,8 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.github.devcyntrix.deathchest.Constants.DATE_FORMAT_CONFIG;
+
 public class GsonReportManager implements ReportManager {
 
     private static final Logger LOG = Logger.getLogger(GsonReportManager.class.getName());
