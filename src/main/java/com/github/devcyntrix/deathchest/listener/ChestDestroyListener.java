@@ -51,7 +51,10 @@ public class ChestDestroyListener implements Listener {
         BlockState state = model.getLocation().getBlock().getState();
 
         if (state instanceof Lidded lidded && human.getGameMode() != GameMode.SPECTATOR) {
-            lidded.close();
+            try {
+                lidded.close();
+            } catch (Exception ignored) {
+            }
         }
 
         if (!inventory.isEmpty())

@@ -61,7 +61,10 @@ public class ChestInteractionListener implements Listener {
         }
 
         if (block.getState() instanceof Lidded lidded && player.getGameMode() != GameMode.SPECTATOR) {
-            lidded.open();
+            try {
+                lidded.open();
+            } catch (Exception ignored) {
+            }
         }
 
         player.openInventory(model.getInventory());
