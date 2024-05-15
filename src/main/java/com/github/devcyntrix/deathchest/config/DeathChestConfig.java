@@ -19,12 +19,13 @@ public record DeathChestConfig(
         @SerializedName("player-notification") @NotNull PlayerNotificationOptions playerNotificationOptions,
         @SerializedName("global-notification") @NotNull GlobalNotificationOptions globalNotificationOptions,
         @SerializedName("change-death-message") @NotNull ChangeDeathMessageOptions changeDeathMessageOptions,
+        @SerializedName("teleport") @NotNull TeleportOptions teleportOptions,
         @SerializedName("world-filter") @NotNull WorldFilterConfig worldFilterConfig,
         @SerializedName("world-chest-protection-filter") @NotNull WorldFilterConfig worldChestProtectionFilter,
         @SerializedName("world-alias") @NotNull WorldAliasConfig worldAlias,
         @SerializedName("preferred-animation-service") @Nullable String preferredBlockBreakAnimationService) {
 
-    public static final int CONFIG_VERSION = 3;
+    public static final int CONFIG_VERSION = 4;
 
     public static DeathChestConfig load(FileConfiguration config) {
         int configVersion = config.getInt("config-version");
@@ -53,13 +54,15 @@ public record DeathChestConfig(
 
         ChangeDeathMessageOptions changeDeathMessageOptions = ChangeDeathMessageOptions.load(config.getConfigurationSection("change-death-message"));
 
+        TeleportOptions teleportOptions = TeleportOptions.load(config.getConfigurationSection("teleport"));
+
         WorldFilterConfig worldFilterConfig = WorldFilterConfig.load(config.getConfigurationSection("world-filter"));
         WorldFilterConfig worldChestProtectionFilterConfig = WorldFilterConfig.load(config.getConfigurationSection("world-chest-protection-filter"));
         WorldAliasConfig worldAliasConfig = WorldAliasConfig.load(config.getConfigurationSection("world-alias"));
 
         String preferredAnimationService = config.getString("preferred-animation-service");
 
-        return new DeathChestConfig(configVersion, debug, updateCheck, autoUpdate, durationFormat, chestOptions, inventoryOptions, hologramOptions, particleOptions, breakAnimationOptions, playerNotificationOptions, globalNotificationOptions, changeDeathMessageOptions, worldFilterConfig, worldChestProtectionFilterConfig, worldAliasConfig, preferredAnimationService);
+        return new DeathChestConfig(configVersion, debug, updateCheck, autoUpdate, durationFormat, chestOptions, inventoryOptions, hologramOptions, particleOptions, breakAnimationOptions, playerNotificationOptions, globalNotificationOptions, changeDeathMessageOptions, teleportOptions, worldFilterConfig, worldChestProtectionFilterConfig, worldAliasConfig, preferredAnimationService);
     }
 
 }

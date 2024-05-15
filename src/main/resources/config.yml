@@ -123,6 +123,14 @@ change-death-message:
   message: |-
     &7${player_name} died at ${x} ${y} ${z} in ${world}
 
+# This section configures the teleport functionality, allowing players to teleport to their
+# chest if they die.
+teleport:
+  enabled: false
+  message: |-
+    &8&oClick here to teleport
+  not-found: '&cCould not find last death chest'
+
 # This section configures the activation of this plugin for specific worlds.
 world-filter:
   # Possible values: blacklist, whitelist

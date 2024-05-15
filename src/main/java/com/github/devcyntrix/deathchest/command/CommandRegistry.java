@@ -9,6 +9,7 @@ import com.github.devcyntrix.deathchest.command.admin.BlacklistCommandProvider;
 import com.github.devcyntrix.deathchest.command.admin.DeleteinworldCommandProvider;
 import com.github.devcyntrix.deathchest.command.admin.ReloadCommandProvider;
 import com.github.devcyntrix.deathchest.command.admin.report.*;
+import com.github.devcyntrix.deathchest.command.user.TeleportCommandProvider;
 import org.bukkit.command.CommandSender;
 
 import java.util.function.Function;
@@ -48,6 +49,11 @@ public class CommandRegistry {
         commandManager.command(
                 new BlacklistCommandProvider(plugin)
                         .provide(rootCommand.literal("blacklist"))
+        );
+
+        commandManager.command(
+                new TeleportCommandProvider(plugin)
+                        .provide(rootCommand.literal("teleport"))
         );
 
         Command.Builder<CommandSender> reportCommandBuilder = new ReportCommandProvider().provide(
