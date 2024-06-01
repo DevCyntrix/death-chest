@@ -21,6 +21,7 @@
 * [Blast protection](features/blast-protection.md)
 * [Thief Protection](features/chest-protection.md)
 * [PlaceHolder API](features/placeholder-api.md)
+* [Duration Format](features/duration-format.md)
 
 ***
 
