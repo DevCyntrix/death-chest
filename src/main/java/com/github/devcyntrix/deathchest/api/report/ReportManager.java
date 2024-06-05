@@ -4,7 +4,6 @@ import com.google.gson.internal.bind.util.ISO8601Utils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.util.Date;
@@ -12,9 +11,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 public interface ReportManager {
-
-
-    int DATE_FORMAT_CONFIG = DateFormat.DEFAULT;
 
     default void createReport() {
         addReport(Report.create());

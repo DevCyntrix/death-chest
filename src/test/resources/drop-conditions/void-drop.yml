@@ -90,7 +90,7 @@ break-effect:
 # This section is for handling the notification function in this plugin. You can remove this section to disable the feature,
 # or you set the 'enabled' option to false.
 # This feature sends a message to the dead player. Here you can inform the player about the chest and their expiration.
-# You can send the death coordination by using the placeholders: ${x} ${y}, ${z}, ${world} and ${world_alias}
+# You can send the death coordination by using the placeholders: ${x} ${y}, ${z} and ${world}
 # Also you can send the chest coordination by using the placeholders: ${chest_x}, ${chest_y} and ${chest_z}
 player-notification:
   # Set the value to 'false' if you want to deactivate this feature
@@ -102,7 +102,6 @@ player-notification:
 # ${player_name} : shows the player name
 # ${player_displayname} : shows the player display name (Maybe with prefix)
 # ${x}, ${y}, ${z}, ${world} : shows the coordinates of the death location
-# ${world_alias} : shows the alias of the world (see world-alias section)
 # ${chest_x}, ${chest_y}, ${chest_z} : shows the coordinates of the chest
 global-notification:
   # Set the value to 'true' if you want to activate this feature
@@ -114,7 +113,6 @@ global-notification:
 # ${player_name} : shows the player name
 # ${player_displayname} : shows the player display name (Maybe with prefix)
 # ${x}, ${y}, ${z}, ${world} : shows the coordinates of the death location
-# ${world_alias} : shows the alias of the world (see world-alias section)
 # (coordinates of the chest isn't available for here)
 # To disable the death message change "enabled" to true and remove the message option.
 change-death-message:
@@ -130,21 +128,11 @@ world-filter:
   worlds:
     - disabled_world
 
-world-chest-protection-filter:
-  filter: blacklist
-  worlds:
-    - disabled_world
-
-world-alias:
-  world: "World"
-  world_nether: "Nether"
-  world_the_end: "The End"
-
 # Drops the items if any of the conditions becomes the true when activated.
 drop-conditions:
   lava-death: false
   fire-death: false
-  void-death: false
+  void-death: true
 
 # Do not touch this!
 config-version: 3

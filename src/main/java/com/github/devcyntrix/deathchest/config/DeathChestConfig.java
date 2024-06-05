@@ -22,6 +22,7 @@ public record DeathChestConfig(
         @SerializedName("world-filter") @NotNull WorldFilterConfig worldFilterConfig,
         @SerializedName("world-chest-protection-filter") @NotNull WorldFilterConfig worldChestProtectionFilter,
         @SerializedName("world-alias") @NotNull WorldAliasConfig worldAlias,
+        @SerializedName("drop-conditions") @NotNull DropConditionConfig dropCondition,
         @SerializedName("preferred-animation-service") @Nullable String preferredBlockBreakAnimationService) {
 
     public static final int CONFIG_VERSION = 3;
@@ -57,9 +58,11 @@ public record DeathChestConfig(
         WorldFilterConfig worldChestProtectionFilterConfig = WorldFilterConfig.load(config.getConfigurationSection("world-chest-protection-filter"));
         WorldAliasConfig worldAliasConfig = WorldAliasConfig.load(config.getConfigurationSection("world-alias"));
 
+        DropConditionConfig dropConditions = DropConditionConfig.load(config.getConfigurationSection("drop-conditions"));
+
         String preferredAnimationService = config.getString("preferred-animation-service");
 
-        return new DeathChestConfig(configVersion, debug, updateCheck, autoUpdate, durationFormat, chestOptions, inventoryOptions, hologramOptions, particleOptions, breakAnimationOptions, playerNotificationOptions, globalNotificationOptions, changeDeathMessageOptions, worldFilterConfig, worldChestProtectionFilterConfig, worldAliasConfig, preferredAnimationService);
+        return new DeathChestConfig(configVersion, debug, updateCheck, autoUpdate, durationFormat, chestOptions, inventoryOptions, hologramOptions, particleOptions, breakAnimationOptions, playerNotificationOptions, globalNotificationOptions, changeDeathMessageOptions, worldFilterConfig, worldChestProtectionFilterConfig, worldAliasConfig, dropConditions, preferredAnimationService);
     }
 
 }
