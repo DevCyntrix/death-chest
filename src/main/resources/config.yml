@@ -7,6 +7,8 @@
 update-checker: true
 auto-update: true
 
+# Uses the Duration Format Utils class from the Apache lang dependency
+# https://commons.apache.org/proper/commons-lang/apidocs/org/apache/commons/lang3/time/DurationFormatUtils.html
 duration-format: 'mm:ss'
 
 chest:
