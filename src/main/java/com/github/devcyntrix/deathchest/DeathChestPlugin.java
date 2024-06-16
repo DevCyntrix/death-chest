@@ -225,7 +225,6 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
         if (!isTest())
             reloadConfig();
 
-
         initializeServices();
 
         debug(0, "Registering commands...");

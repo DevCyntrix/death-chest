@@ -80,21 +80,20 @@ public class SpawnChestListener implements Listener {
             return;
 
         plugin.debug(1, "Removing air and blacklisted items...");
-        boolean removed = event.getDrops()
+        List<ItemStack> drops = event.getDrops();
+        boolean removed = drops
                 .removeIf(itemStack -> itemStack == null || itemStack.getType().isAir() || itemStack.getAmount() <= 0 || !plugin.getBlacklist().isValidItem(itemStack)); // Prevent spawning an empty chest
         if (removed) {
             plugin.debug(2, "Inventory has been updated.");
         }
-        ItemStack[] items = event.getDrops().stream()
-                .filter(Objects::nonNull)
-                .filter(stack -> plugin.getBlacklist().isValidItem(stack))
-                .toArray(ItemStack[]::new);
 
-        if (items.length == 0) {
+        if (drops.isEmpty()) {
             plugin.debug(1, "Clearing drops because the inventory was empty after removing blacklisted items");
-            event.getDrops().clear();
             return;
         }
+
+        ItemStack[] items = event.getDrops().toArray(ItemStack[]::new);
+
 
         plugin.debug(1, "Checking world filter...");
         if (!config.worldFilterConfig().test(player.getWorld()))
@@ -115,45 +114,6 @@ public class SpawnChestListener implements Listener {
         } else {
             plugin.debug(1, "The chest will expire at " + new Date(expireAt));
         }
-
-
-//        Location deathLocation = new Location(
-//                player.getWorld(),
-//                location.getX(),
-//                Math.round(location.getY()),
-//                location.getZ()
-//        );
-
-
-//        plugin.debug(1, "Checking world height limitations...");
-//        int highestBlockYAt = !plugin.isTest() ? world.getHighestBlockYAt(deathLocation, HeightMap.WORLD_SURFACE) : 60; // This is for Mock Bukkit
-//        // Check Minecraft limitation of block positions
-//        if (deathLocation.getBlockY() <= world.getMinHeight()) { // Min build height
-//            deathLocation.setY(Math.max(0, highestBlockYAt));
-//        }
-//        if (deathLocation.getBlockY() >= world.getMaxHeight()) { // Max build height
-//            deathLocation.setY(highestBlockYAt);
-//            if (deathLocation.getBlockY() >= world.getMaxHeight()) {
-//                deathLocation.setY(world.getSeaLevel());
-//            }
-//        }
-//
-//        Location loc = deathLocation.getBlock().getLocation();
-//        ThreadLocalRandom random = ThreadLocalRandom.current();
-//
-//        long start = System.currentTimeMillis();
-//        while (!plugin.canPlaceChestAt(loc)) {
-//            if (System.currentTimeMillis() - start > 1000) {
-//                loc.setY(world.getHighestBlockYAt(loc.getBlockX(), loc.getBlockZ()));
-//                plugin.debug(1, "Finding a valid location took longer than 1 second.");
-//                break;
-//            }
-//
-//            int x = random.nextInt(10) - 5;
-//            int z = random.nextInt(10) - 5;
-//            loc.add(x, 0, z);
-//        }
-
 
         LastSafeLocationController controller = plugin.getLastSafeLocationController();
         controller.updatePosition(player);

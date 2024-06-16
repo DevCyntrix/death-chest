@@ -1,8 +1,8 @@
 import io.papermc.hangarpublishplugin.model.Platforms
 
 plugins {
-    `java-library`
-    id("xyz.jpenilla.run-paper") version "2.2.3"
+    java
+    id("xyz.jpenilla.run-paper") version "2.3.0"
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("io.papermc.hangar-publish-plugin") version "0.1.2"
 }
@@ -60,9 +60,9 @@ dependencies {
     compileOnly("org.apache.commons:commons-text:1.10.0")
     compileOnly("org.jetbrains:annotations:23.0.0")
 
-    compileOnly("org.projectlombok:lombok:1.18.24")
-    annotationProcessor("org.projectlombok:lombok:1.18.24")
 
+    compileOnly("org.projectlombok:lombok:1.18.32")
+    annotationProcessor("org.projectlombok:lombok:1.18.32")
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.7.1")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
@@ -78,12 +78,12 @@ dependencies {
     testImplementation("org.bstats:bstats-bukkit:3.0.2")
     testImplementation("ch.qos.logback:logback-classic:1.4.14")
 
-    testCompileOnly("org.projectlombok:lombok:1.18.24")
-    testAnnotationProcessor("org.projectlombok:lombok:1.18.24")
+    testCompileOnly("org.projectlombok:lombok:1.18.32")
+    testAnnotationProcessor("org.projectlombok:lombok:1.18.32")
 }
 
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
     targetCompatibility = JavaVersion.VERSION_17
     sourceCompatibility = JavaVersion.VERSION_17
 }
@@ -113,7 +113,8 @@ tasks {
         }
     }
     runServer {
-        minecraftVersion("1.20.4")
+        minecraftVersion("1.20.6")
+
     }
     shadowJar {
         relocate("org.bstats", "com.github.devcyntrix.deathchest.metrics")
