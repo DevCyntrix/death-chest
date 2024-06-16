@@ -13,11 +13,11 @@ import com.github.devcyntrix.deathchest.config.DeathChestConfig;
 import com.github.devcyntrix.deathchest.config.InventoryOptions;
 import com.github.devcyntrix.deathchest.config.ThiefProtectionOptions;
 import com.github.devcyntrix.deathchest.util.ChestModelStringLookup;
+import com.github.devcyntrix.deathchest.util.DurationFormatter;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import com.google.inject.Singleton;
 import me.clip.placeholderapi.PlaceholderAPI;
-import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.text.StringSubstitutor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -33,7 +33,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.logging.Logger;
 
 @Singleton
@@ -48,7 +47,7 @@ public class DeathChestController implements Closeable {
 
     protected final Table<World, Location, DeathChestModel> loadedChests = HashBasedTable.create();
 
-    private final Function<Long, String> durationFormat;
+    private final DurationFormatter durationFormatter;
 
     public DeathChestController(DeathChestPlugin plugin, Logger logger, AuditManager auditManager, DeathChestStorage storage) {
         this.plugin = plugin;
@@ -56,11 +55,7 @@ public class DeathChestController implements Closeable {
         this.auditManager = auditManager;
         this.storage = storage;
 
-        this.durationFormat = (expireAt) -> {
-            long duration = expireAt - System.currentTimeMillis();
-            if (duration <= 0) duration = 0;
-            return DurationFormatUtils.formatDuration(duration, getConfig().durationFormat());
-        };
+        this.durationFormatter = new DurationFormatter(getConfig().durationFormat());
     }
 
     public void registerAdapter(ChestView adapter) {
@@ -92,7 +87,7 @@ public class DeathChestController implements Closeable {
 
     public @NotNull DeathChestModel createChest(@NotNull Location location, long createdAt, long expireAt, @Nullable Player player, boolean isProtected, ItemStack @NotNull ... items) {
         DeathChestModel model = new DeathChestModel(location, createdAt, expireAt, player, isProtected);
-        StringSubstitutor substitution = new StringSubstitutor(new ChestModelStringLookup(plugin.getDeathChestConfig(), model, durationFormat));
+        StringSubstitutor substitution = new StringSubstitutor(new ChestModelStringLookup(this, plugin.getDeathChestConfig(), model, durationFormatter));
 
         // Creates inventory
         InventoryOptions inventoryOptions = getConfig().inventoryOptions();
@@ -129,17 +124,38 @@ public class DeathChestController implements Closeable {
         return this.loadedChests.row(world).values();
     }
 
-    public boolean isAccessibleBy(@NotNull DeathChestModel model, @NotNull Player player) {
+    public long getProtectionExpiresAt(@NotNull DeathChestModel model) {
         ThiefProtectionOptions protectionOptions = plugin.getDeathChestConfig().chestOptions().thiefProtectionOptions();
+        if (!protectionOptions.enabled()) {
+            return -1;
+        }
 
         long remainingTime = 0L;
         long expiration = protectionOptions.expiration().toMillis();
         if (expiration > 0) {
-            remainingTime = expiration + model.getCreatedAt() - System.currentTimeMillis();
+            remainingTime = expiration + model.getCreatedAt();
         }
 
-        return !protectionOptions.enabled() ||
-                !model.isProtected() ||
+        return remainingTime;
+    }
+
+    /**
+     * Calculates the remaining protection time.
+     *
+     * @param model the chest
+     * @return the remaining protection time if enabled otherwise -1
+     */
+    public long getRemainingProtection(@NotNull DeathChestModel model) {
+        long protectionExpiresAt = getProtectionExpiresAt(model);
+        return protectionExpiresAt < 0 ? -1 : protectionExpiresAt - System.currentTimeMillis();
+    }
+
+    public boolean isAccessibleBy(@NotNull DeathChestModel model, @NotNull Player player) {
+        ThiefProtectionOptions protectionOptions = plugin.getDeathChestConfig().chestOptions().thiefProtectionOptions();
+
+        long remainingTime = getRemainingProtection(model);
+
+        return !model.isProtected() ||
                 model.getOwner() == null ||
                 model.getOwner().getUniqueId().equals(player.getUniqueId()) ||
                 player.hasPermission(protectionOptions.bypassPermission()) ||

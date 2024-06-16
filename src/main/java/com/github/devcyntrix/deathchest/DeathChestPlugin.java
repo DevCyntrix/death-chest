@@ -279,18 +279,20 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
         debug(0, "Setting up the last safe location controller...");
         this.lastSafeLocationController = new LastSafeLocationController(this);
         try {
-            this.placeHolderController = new PlaceholderController(getDeathChestConfig());
-
             debug(0, "Using death chest yaml storage");
             if (!test) {
-                this.deathChestStorage = new YamlStorage(this.placeHolderController);
+                this.deathChestStorage = new YamlStorage();
             } else {
                 this.deathChestStorage = new MemoryStorage();
             }
+
+            this.deathChestController = new DeathChestController(this, getLogger(), this.auditManager, this.deathChestStorage);
+            this.placeHolderController = new PlaceholderController(getDeathChestConfig(), this.deathChestController);
+
             debug(0, "Initializing death chest storage...");
             this.deathChestStorage.init(this, deathChestStorage.getDefaultOptions());
 
-            this.deathChestController = new DeathChestController(this, getLogger(), this.auditManager, this.deathChestStorage);
+            // Register adapters...
 
             BlockView adapter = new BlockView(this);
             this.deathChestController.registerAdapter(adapter);
@@ -298,7 +300,6 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
 
             this.deathChestController.registerAdapter(new CloseInventoryView(this));
             this.deathChestController.registerAdapter(new ExpirationView(this));
-
 
             HologramOptions hologramOptions = getDeathChestConfig().hologramOptions();
             if (hologramOptions.enabled()) {

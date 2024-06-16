@@ -3,7 +3,6 @@ package com.github.devcyntrix.deathchest.support.storage;
 import com.github.devcyntrix.deathchest.DeathChestModel;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
 import com.github.devcyntrix.deathchest.api.storage.DeathChestStorage;
-import com.github.devcyntrix.deathchest.controller.PlaceholderController;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
@@ -26,12 +25,7 @@ import java.util.stream.Collectors;
  */
 public class YamlStorage implements DeathChestStorage {
 
-    private final PlaceholderController placeHolderController;
     private final Multimap<World, DeathChestModel> deathChestsCache = HashMultimap.create();
-
-    public YamlStorage(PlaceholderController placeHolderController) {
-        this.placeHolderController = placeHolderController;
-    }
 
     @Override
     public ConfigurationSection getDefaultOptions() {
@@ -100,7 +94,7 @@ public class YamlStorage implements DeathChestStorage {
             YamlConfiguration configuration = YamlConfiguration.loadConfiguration(worldFile);
             List<Map<String, Object>> chests = (List<Map<String, Object>>) configuration.getList("chests", Collections.emptyList());
             Set<DeathChestModel> list = chests.stream()
-                    .map(map -> DeathChestModel.deserialize(map, plugin.getDeathChestConfig().inventoryOptions(), this.placeHolderController))
+                    .map(map -> DeathChestModel.deserialize(map, plugin.getDeathChestConfig().inventoryOptions(), plugin.getPlaceHolderController()))
                     .filter(Objects::nonNull)
                     .collect(Collectors.toSet());
             this.deathChestsCache.putAll(world, list);

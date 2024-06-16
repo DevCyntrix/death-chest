@@ -1,36 +1,37 @@
 package com.github.devcyntrix.deathchest.util;
 
 import com.github.devcyntrix.deathchest.DeathChestModel;
-import com.github.devcyntrix.deathchest.DeathChestPlugin;
 import com.github.devcyntrix.deathchest.config.DeathChestConfig;
-import com.github.devcyntrix.deathchest.config.WorldAliasConfig;
+import com.github.devcyntrix.deathchest.controller.DeathChestController;
 import org.apache.commons.text.lookup.StringLookup;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.function.Function;
-
 public class ChestModelStringLookup implements StringLookup {
 
+    private final DeathChestController controller;
     private final DeathChestConfig config;
     @NotNull
     private final DeathChestModel model;
     @NotNull
-    private final Function<Long, String> duration;
+    private final DurationFormatter durationFormatter;
 
-    public ChestModelStringLookup(@NotNull DeathChestConfig config, @NotNull DeathChestModel model, @NotNull Function<Long, String> duration) {
+    public ChestModelStringLookup(@NotNull DeathChestController controller, @NotNull DeathChestConfig config, @NotNull DeathChestModel model, @NotNull DurationFormatter durationFormatter) {
+        this.controller = controller;
         this.config = config;
         this.model = model;
-        this.duration = duration;
+        this.durationFormatter = durationFormatter;
     }
 
     @Override
     public String lookup(String key) {
 
         if ("duration".equals(key))
-            return duration.apply(model.getExpireAt());
+            return durationFormatter.apply(model.getExpireAt() - System.currentTimeMillis());
+        if ("thief_duration".equals(key))
+            return durationFormatter.apply(controller.getRemainingProtection(model));
         if ("player_name".equals(key)) {
             if (model.getOwner() == null)
                 return "Unknown";
