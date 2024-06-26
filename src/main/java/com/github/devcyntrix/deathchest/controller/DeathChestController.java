@@ -126,9 +126,6 @@ public class DeathChestController implements Closeable {
 
     public long getProtectionExpiresAt(@NotNull DeathChestModel model) {
         ThiefProtectionOptions protectionOptions = plugin.getDeathChestConfig().chestOptions().thiefProtectionOptions();
-        if (!protectionOptions.enabled()) {
-            return -1;
-        }
 
         long remainingTime = 0L;
         long expiration = protectionOptions.expiration().toMillis();
@@ -143,17 +140,23 @@ public class DeathChestController implements Closeable {
      * Calculates the remaining protection time.
      *
      * @param model the chest
-     * @return the remaining protection time if enabled otherwise -1
+     * @return the remaining protection time
      */
     public long getRemainingProtection(@NotNull DeathChestModel model) {
         long protectionExpiresAt = getProtectionExpiresAt(model);
-        return protectionExpiresAt < 0 ? -1 : protectionExpiresAt - System.currentTimeMillis();
+
+        // Because it is zero if there is no expiration
+        if (protectionExpiresAt <= 0)
+            return 0;
+
+        return protectionExpiresAt - System.currentTimeMillis();
     }
 
     public boolean isAccessibleBy(@NotNull DeathChestModel model, @NotNull Player player) {
         ThiefProtectionOptions protectionOptions = plugin.getDeathChestConfig().chestOptions().thiefProtectionOptions();
 
         long remainingTime = getRemainingProtection(model);
+        System.out.println(remainingTime);
 
         return !model.isProtected() ||
                 model.getOwner() == null ||
