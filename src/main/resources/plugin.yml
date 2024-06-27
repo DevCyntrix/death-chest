@@ -39,4 +39,4 @@ permissions:
       - 'deathchest.command.deathchest'
       - 'deathchest.command.report'
       - 'deathchest.command.deleteInWorld'
-      - 'eathchest.command.reload'
+      - 'deathchest.command.reload'
