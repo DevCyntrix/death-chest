@@ -142,7 +142,7 @@ hangarPublish {
                 jar = tasks.shadowJar.flatMap { it.archiveFile }
                 println(jar.get().asFile)
                 println(version)
-                platformVersions.set(listOf("1.17-1.20.4"))
+                platformVersions.set(listOf("1.17-1.21"))
                 dependencies.url("ProtocolLib", "https://www.spigotmc.org/resources/protocollib.1997/") {
                     required.set(false)
                 }
