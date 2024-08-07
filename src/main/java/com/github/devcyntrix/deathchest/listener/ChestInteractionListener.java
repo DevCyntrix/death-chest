@@ -47,7 +47,6 @@ public class ChestInteractionListener implements Listener {
 
         event.setCancelled(true);
 
-
         // Chest Protection
         if (!controller.isAccessibleBy(model, player)) {
             ThiefProtectionOptions protectionOptions = plugin.getDeathChestConfig().chestOptions().thiefProtectionOptions();

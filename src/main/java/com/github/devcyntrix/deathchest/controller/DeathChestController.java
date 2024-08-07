@@ -156,7 +156,6 @@ public class DeathChestController implements Closeable {
         ThiefProtectionOptions protectionOptions = plugin.getDeathChestConfig().chestOptions().thiefProtectionOptions();
 
         long remainingTime = getRemainingProtection(model);
-        System.out.println(remainingTime);
 
         return !model.isProtected() ||
                 model.getOwner() == null ||
