@@ -41,6 +41,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
@@ -202,6 +203,8 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
 
         if (this.audiences != null)
             this.audiences.close();
+
+        HandlerList.unregisterAll(this);
     }
 
     @Override
