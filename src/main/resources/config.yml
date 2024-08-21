@@ -109,6 +109,7 @@ player-notification:
 global-notification:
   # Set the value to 'true' if you want to activate this feature
   enabled: false
+  exclude-died-player: false
   message: |-
     &7${player_name} died at ${x} ${y} ${z} in ${world}
 
