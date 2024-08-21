@@ -19,6 +19,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
@@ -173,5 +174,22 @@ public class ChestDestroyListener implements Listener {
             this.plugin.getAuditManager().audit(new AuditItem(new Date(), AuditAction.DESTROY_CHEST, new DestroyChestInfo(model, DestroyReason.ENTITY_EXPLOSION, Map.of("entity", entity))));
             this.plugin.getDeathChestController().destroyChest(model);
         }
+    }
+
+    /**
+     * Cancel if an entity tries to change the death chest.
+     *
+     * @param event the event from the Bukkit API
+     */
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
+    public void onEntityChange(EntityChangeBlockEvent event) {
+
+        Block next = event.getBlock();
+
+        DeathChestModel model = this.plugin.getDeathChestController().getChest(next.getLocation());
+        if (model == null)
+            return;
+
+        event.setCancelled(true);
     }
 }
