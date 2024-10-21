@@ -11,7 +11,6 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.stream.Stream;
 
 public class ProtocolLibBreakAnimation implements BreakAnimationService {
@@ -28,11 +27,7 @@ public class ProtocolLibBreakAnimation implements BreakAnimationService {
         packet.getIntegers().write(1, state);
 
         players.forEach(player -> {
-            try {
-                manager.sendServerPacket(player, packet);
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            }
+            manager.sendServerPacket(player, packet);
         });
     }
 

@@ -49,10 +49,10 @@ dependencies {
     compileOnly("pl.minecodes.plots:plugin-api:4.0.0")
 
     // Animation Support
-    compileOnly("com.comphenix.protocol:ProtocolLib:4.7.0") { isTransitive = false }
+    compileOnly("com.comphenix.protocol:ProtocolLib:5.3.0") { isTransitive = false }
 
     // Placeholder API
-    compileOnly("me.clip:placeholderapi:2.11.2") { isTransitive = false }
+    compileOnly("me.clip:placeholderapi:2.11.6") { isTransitive = false }
 
     // Lock
     compileOnly("com.griefcraft:lwc:2.3.2-dev")
@@ -71,7 +71,7 @@ dependencies {
     testImplementation("net.kyori:adventure-platform-bukkit:4.3.0")
     testImplementation("net.kyori:adventure-text-minimessage:4.14.0")
     testImplementation("net.kyori:adventure-text-serializer-legacy:4.14.0")
-    testImplementation("me.clip:placeholderapi:2.11.2") { isTransitive = false }
+    testImplementation("me.clip:placeholderapi:2.11.6") { isTransitive = false }
     testImplementation("org.apache.commons:commons-text:1.10.0")
     testImplementation("cloud.commandframework:cloud-core:1.7.1")
     testImplementation("cloud.commandframework:cloud-bukkit:1.7.1")
@@ -113,7 +113,7 @@ tasks {
         }
     }
     runServer {
-        minecraftVersion("1.20.6")
+        minecraftVersion("1.21.1")
 
     }
     shadowJar {
