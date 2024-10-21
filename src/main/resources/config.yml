@@ -28,7 +28,9 @@ chest:
   thief-protection:
     # Set the value to 'true' if you want to activate this feature
     enabled: false
+    # To enable the thief protection the player needs this permission
     permission: 'deathchest.thiefprotected'
+    # To let the admin bypass the protection he needs this permission
     bypass-permission: 'deathchest.thiefprotected.bypass'
     # To enable the expiration set the number to number greater than 0. The unit of this variable is seconds.
     expiration: 0
