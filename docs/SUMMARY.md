@@ -31,3 +31,7 @@
 
 * [Get started](api/get-started.md)
 * [Events](api/events.md)
+
+## Control Flow
+
+* [Spawn chest control flow](control-flow/spawn-chest-control-flow.md)
