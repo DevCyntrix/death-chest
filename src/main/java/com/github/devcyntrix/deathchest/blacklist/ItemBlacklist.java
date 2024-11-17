@@ -40,7 +40,6 @@ public class ItemBlacklist implements InventoryHolder {
         itemMeta.setLore(Arrays.asList("§7This will remove all items from the blacklist which falls into the scheme."));
         FORCE_ADD_ITEM.setItemMeta(itemMeta);
 
-
         itemMeta = DENY_ITEM.getItemMeta();
         itemMeta.setDisplayName("§cItem not found");
         DENY_ITEM.setItemMeta(itemMeta);

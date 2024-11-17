@@ -125,14 +125,17 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
     @Override
     public void onDisable() {
 
+        // Saves the blacklist
         if (this.blacklist != null) {
             try {
                 this.blacklist.save();
             } catch (IOException e) {
                 getLogger().log(Level.SEVERE, "Failed to save the item black list", e);
             }
+            this.blacklist = null;
         }
 
+        // Unregisters the thief protection and the bypass permission
         PluginManager pluginManager = Bukkit.getPluginManager();
         try {
             ThiefProtectionOptions protectionOptions = getDeathChestConfig().chestOptions().thiefProtectionOptions();
@@ -156,29 +159,34 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
             getLogger().log(Level.WARNING, "Failed to remove the permission of the chest-protection", e);
         }
 
+        // Disables the update controller/routine
         if (this.updateController != null) {
             this.updateController.close();
             this.updateController = null;
         }
 
+        // Unregisters the death chest service
         ServicesManager servicesManager = getServer().getServicesManager();
         debug(0, "Removing death chest service...");
         servicesManager.unregisterAll(this);
 
+        // Disables the hologram controller
         if (this.hologramController != null) {
             this.hologramController.close();
             this.hologramController = null;
         }
 
+        // Unloads all death chests
         if (this.deathChestController != null) {
             try {
                 this.deathChestController.close();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 getLogger().log(Level.SEVERE, "Failed to close the death chest controller", e);
             }
             this.deathChestController = null;
         }
 
+        // Saves the death chest in the storage
         if (this.deathChestStorage != null) {
             try {
                 this.deathChestStorage.close();
@@ -188,6 +196,7 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
             this.deathChestStorage = null;
         }
 
+        // Disable the audit system
         if (this.auditManager != null) {
             try {
                 auditManager.close();
@@ -197,6 +206,7 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
             this.auditManager = null;
         }
 
+        // Disable all compatibilities
         if (this.compatibilityManager != null) {
             this.compatibilityManager.disableCompatibilities();
         }
@@ -204,6 +214,7 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
         if (this.audiences != null)
             this.audiences.close();
 
+        // Unregister all listeners
         HandlerList.unregisterAll(this);
     }
 

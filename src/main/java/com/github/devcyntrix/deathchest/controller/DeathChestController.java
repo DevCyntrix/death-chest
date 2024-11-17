@@ -28,7 +28,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Closeable;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -185,8 +184,11 @@ public class DeathChestController implements Closeable {
     }
 
 
+    /**
+     * Unloads the death chests in all worlds.
+     */
     @Override
-    public void close() throws IOException {
+    public void close() {
         unloadChests();
     }
 

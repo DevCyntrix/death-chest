@@ -40,6 +40,9 @@ public class SpawnChestListener implements Listener {
         this.plugin = plugin;
     }
 
+    /**
+     * Necessary for detecting multi dying at once.
+     */
     private final Set<Player> set = Collections.newSetFromMap(new WeakHashMap<>());
 
     @EventHandler
@@ -93,7 +96,6 @@ public class SpawnChestListener implements Listener {
         }
 
         ItemStack[] items = event.getDrops().toArray(ItemStack[]::new);
-
 
         plugin.debug(1, "Checking world filter...");
         if (!config.worldFilterConfig().test(player.getWorld()))
