@@ -1,0 +1,21 @@
+flowchart TD
+    die(["Player dies"]) --> multiDieCheck["Check multiple dying"]
+    multiDieCheck --> keepInv["Check keep inventory"]
+    keepInv --> removeBlacklistedItems["Remove null, air and blacklisted Items"]
+    removeBlacklistedItems --> checkEmptyDrops["Check empty drops"]
+    checkEmptyDrops --> checkWorldFilter["Check world filter"]
+    checkWorldFilter --> calculateExpirationDate["Calculate the expiration date"]
+    calculateExpirationDate --> updateLastSafePos["Update the last safe position"]
+    updateLastSafePos --> hasSafePos["Has safe position"]
+    hasSafePos -->|yes| getLastSafePos["Provide the last safe position"]
+    hasSafePos -->|no| findNearPos["Find near position"]
+    getLastSafePos --> clipWorld["Clip the y min and max height"]
+    findNearPos --> clipWorld
+    clipWorld --> canBuild["Can the player place a chest at the position"]
+    canBuild --> changeDeathMessage["Change death message"]
+    changeDeathMessage --> checkThiefProtection["Check the chest thief protection"]
+    checkThiefProtection --> callPreChestSpawn["Call the PreDeathChestSpawnEvent"]
+    callPreChestSpawn --> createChest["Create Chest"]
+    createChest --> callChestSpawnEvent["Call the DeathChestSpawnEvent"]
+    callChestSpawnEvent --> clearDrops["Clear the drops"]
+    clearDrops --> playerDied(["Player died"])
