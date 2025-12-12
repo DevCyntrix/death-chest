@@ -6,7 +6,6 @@ import com.github.devcyntrix.deathchest.api.audit.AuditItem;
 import com.github.devcyntrix.deathchest.api.audit.info.DestroyChestInfo;
 import com.github.devcyntrix.deathchest.api.audit.info.DestroyReason;
 import com.github.devcyntrix.deathchest.config.ThiefProtectionOptions;
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;

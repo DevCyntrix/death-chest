@@ -1,8 +1,8 @@
 package com.github.devcyntrix.deathchest.feature.placeholder;
 
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
-import com.github.devcyntrix.deathchest.feature.lastchest.LastDeathChestLocationExpansion;
 import com.github.devcyntrix.deathchest.api.compatibility.Compatibility;
+import com.github.devcyntrix.deathchest.feature.lastchest.LastDeathChestLocationExpansion;
 import org.bukkit.Server;
 
 public class PlaceholderAPICompatibility extends Compatibility {

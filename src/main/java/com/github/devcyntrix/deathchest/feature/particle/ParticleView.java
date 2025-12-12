@@ -7,7 +7,6 @@ import com.github.devcyntrix.deathchest.feature.chest.DeathChestModel;
 import com.github.devcyntrix.deathchest.util.ParticleUtils;
 import org.bukkit.*;
 import org.bukkit.scheduler.BukkitTask;
-import org.jetbrains.annotations.NotNull;
 
 public class ParticleView implements ChestView {
 
