@@ -35,7 +35,6 @@ public class LastSafeLocationService {
         List<MetadataValue> metadata = player.getMetadata(lastSafePosition);
         if (metadata.isEmpty()) {
             player.setMetadata(lastSafePosition, new LastLocationMetadata(plugin, blockLoc.clone()));
-            player.sendMessage("Updated position");
         } else {
             MetadataValue metadataValue = metadata.get(0);
             if (!(metadataValue instanceof LastLocationMetadata meta))
@@ -44,7 +43,6 @@ public class LastSafeLocationService {
                 return;
 
             meta.setLocation(blockLoc.clone());
-            player.sendMessage("Updated position");
         }
     }
 
