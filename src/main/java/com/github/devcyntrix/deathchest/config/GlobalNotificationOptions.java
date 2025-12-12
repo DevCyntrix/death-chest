@@ -1,8 +1,8 @@
 package com.github.devcyntrix.deathchest.config;
 
-import com.github.devcyntrix.deathchest.DeathChestModel;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
-import com.github.devcyntrix.deathchest.controller.PlaceholderController;
+import com.github.devcyntrix.deathchest.feature.chest.DeathChestModel;
+import com.github.devcyntrix.deathchest.feature.placeholder.PlaceholderService;
 import com.google.gson.annotations.SerializedName;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
@@ -41,7 +41,7 @@ public record GlobalNotificationOptions(
         return new GlobalNotificationOptions(enabled, excludeDiedPlayer, coloredMessage);
     }
 
-    public void showNotification(DeathChestModel model, Player diedPlayer, PlaceholderController controller) {
+    public void showNotification(DeathChestModel model, Player diedPlayer, PlaceholderService controller) {
 
         for (String message : message()) {
             message = controller.replace(model, message);

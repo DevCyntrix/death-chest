@@ -1,8 +1,8 @@
 package com.github.devcyntrix.deathchest.api;
 
-import com.github.devcyntrix.deathchest.DeathChestModel;
-import com.github.devcyntrix.deathchest.api.animation.BreakAnimationService;
-import com.github.devcyntrix.deathchest.api.protection.ProtectionService;
+import com.github.devcyntrix.deathchest.feature.animation.AnimationService;
+import com.github.devcyntrix.deathchest.feature.chest.DeathChestModel;
+import com.github.devcyntrix.deathchest.feature.protection.ProtectionService;
 import com.github.devcyntrix.hologram.api.HologramService;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -57,10 +57,10 @@ public interface DeathChestService extends Plugin {
     @Nullable HologramService getHologramService();
 
     default boolean hasBreakAnimation() {
-        return getBreakAnimationService() != null;
+        return getAnimationService() != null;
     }
 
-    @Nullable BreakAnimationService getBreakAnimationService();
+    @Nullable AnimationService getAnimationService();
 
     @NotNull ProtectionService getProtectionService();
 }

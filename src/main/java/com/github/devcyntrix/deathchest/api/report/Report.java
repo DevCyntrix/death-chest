@@ -21,18 +21,6 @@ public record Report(
         Map<String, Object> extra
 ) {
 
-    /**
-     * Creates a new report object
-     *
-     * @return the new report object
-     */
-    public static Report create() {
-        PluginManager pluginManager = Bukkit.getPluginManager();
-        Set<PluginInfo> collect = Arrays.stream(pluginManager.getPlugins()).map(PluginInfo::of).collect(Collectors.toSet());
-        DeathChestPlugin plugin = JavaPlugin.getPlugin(DeathChestPlugin.class);
-        return new Report(new Date(), collect, plugin.getDeathChestConfig(), new HashMap<>());
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

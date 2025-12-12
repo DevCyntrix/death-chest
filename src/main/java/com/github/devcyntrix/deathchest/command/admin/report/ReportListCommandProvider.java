@@ -23,7 +23,7 @@ public class ReportListCommandProvider implements CommandProvider {
     public Command.Builder<CommandSender> provide(Command.Builder<CommandSender> builder) {
         return builder
                 .handler(commandContext -> {
-                    Set<@NotNull Report> reports = plugin.getReportManager().getReports();
+                    Set<@NotNull Report> reports = plugin.getReportService().getReports();
                     commandContext.getSender().sendMessage(
                             plugin.getPrefix() + "§7" + reports.stream()
                                     .map(Report::date)

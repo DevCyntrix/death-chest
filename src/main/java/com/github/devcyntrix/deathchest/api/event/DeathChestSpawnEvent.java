@@ -1,6 +1,6 @@
 package com.github.devcyntrix.deathchest.api.event;
 
-import com.github.devcyntrix.deathchest.DeathChestModel;
+import com.github.devcyntrix.deathchest.feature.chest.DeathChestModel;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;

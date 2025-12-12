@@ -2,33 +2,44 @@ package com.github.devcyntrix.deathchest;
 
 import com.github.devcyntrix.api.event.InventoryChangeSlotItemListener;
 import com.github.devcyntrix.deathchest.api.DeathChestService;
-import com.github.devcyntrix.deathchest.api.animation.BreakAnimationService;
-import com.github.devcyntrix.deathchest.api.audit.AuditManager;
 import com.github.devcyntrix.deathchest.api.compatibility.CompatibilityLoader;
 import com.github.devcyntrix.deathchest.api.compatibility.CompatibilityManager;
-import com.github.devcyntrix.deathchest.api.protection.ProtectionService;
-import com.github.devcyntrix.deathchest.api.report.ReportManager;
 import com.github.devcyntrix.deathchest.api.storage.DeathChestStorage;
-import com.github.devcyntrix.deathchest.audit.GsonAuditManager;
-import com.github.devcyntrix.deathchest.blacklist.ItemBlacklist;
-import com.github.devcyntrix.deathchest.blacklist.ItemBlacklistListener;
 import com.github.devcyntrix.deathchest.command.CommandRegistry;
 import com.github.devcyntrix.deathchest.config.*;
-import com.github.devcyntrix.deathchest.controller.*;
-import com.github.devcyntrix.deathchest.listener.*;
-import com.github.devcyntrix.deathchest.report.GsonReportManager;
-import com.github.devcyntrix.deathchest.support.lock.LWCCompatibility;
-import com.github.devcyntrix.deathchest.support.lock.LocketteXCompatibility;
-import com.github.devcyntrix.deathchest.support.placeholder.PlaceholderAPICompatibility;
-import com.github.devcyntrix.deathchest.support.protection.WorldGuardDeathChestFlag;
-import com.github.devcyntrix.deathchest.support.storage.MemoryStorage;
-import com.github.devcyntrix.deathchest.support.storage.YamlStorage;
+import com.github.devcyntrix.deathchest.feature.animation.AnimationService;
+import com.github.devcyntrix.deathchest.feature.animation.BreakAnimationView;
+import com.github.devcyntrix.deathchest.feature.audit.AuditService;
+import com.github.devcyntrix.deathchest.feature.audit.GsonAuditStore;
+import com.github.devcyntrix.deathchest.feature.blacklist.ItemBlacklist;
+import com.github.devcyntrix.deathchest.feature.blacklist.ItemBlacklistListener;
+import com.github.devcyntrix.deathchest.feature.blacklist.ItemBlacklistService;
+import com.github.devcyntrix.deathchest.feature.blacklist.ItemBlacklistStore;
+import com.github.devcyntrix.deathchest.feature.chest.*;
+import com.github.devcyntrix.deathchest.feature.chest.views.BlockView;
+import com.github.devcyntrix.deathchest.feature.chest.views.CloseInventoryView;
+import com.github.devcyntrix.deathchest.feature.expiration.ExpirationView;
+import com.github.devcyntrix.deathchest.feature.hologram.HologramService;
+import com.github.devcyntrix.deathchest.feature.hologram.HologramView;
+import com.github.devcyntrix.deathchest.feature.lastchest.LastDeathChestService;
+import com.github.devcyntrix.deathchest.feature.lastchest.LastDeathChestListener;
+import com.github.devcyntrix.deathchest.feature.lastsafelocation.LastSafeLocationService;
+import com.github.devcyntrix.deathchest.feature.lastsafelocation.LastSafeLocationListener;
+import com.github.devcyntrix.deathchest.feature.lock.LWCCompatibility;
+import com.github.devcyntrix.deathchest.feature.lock.LocketteXCompatibility;
+import com.github.devcyntrix.deathchest.feature.notification.GlobalNotificationListener;
+import com.github.devcyntrix.deathchest.feature.notification.PlayerNotificationListener;
+import com.github.devcyntrix.deathchest.feature.particle.ParticleView;
+import com.github.devcyntrix.deathchest.feature.placeholder.PlaceholderAPICompatibility;
+import com.github.devcyntrix.deathchest.feature.placeholder.PlaceholderService;
+import com.github.devcyntrix.deathchest.feature.protection.ProtectionService;
+import com.github.devcyntrix.deathchest.feature.report.GsonReportStore;
+import com.github.devcyntrix.deathchest.feature.report.ReportService;
+import com.github.devcyntrix.deathchest.feature.update.UpdateService;
+import com.github.devcyntrix.deathchest.feature.update.views.AdminJoinNotificationView;
+import com.github.devcyntrix.deathchest.feature.update.views.AdminNotificationView;
+import com.github.devcyntrix.deathchest.feature.update.views.ConsoleNotificationView;
 import com.github.devcyntrix.deathchest.util.adapter.DurationAdapter;
-import com.github.devcyntrix.deathchest.view.chest.*;
-import com.github.devcyntrix.deathchest.view.update.AdminJoinNotificationView;
-import com.github.devcyntrix.deathchest.view.update.AdminNotificationView;
-import com.github.devcyntrix.deathchest.view.update.ConsoleNotificationView;
-import com.github.devcyntrix.hologram.api.HologramService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.inject.Singleton;
@@ -54,12 +65,10 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
-import java.util.Map;
-import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 
-import static com.github.devcyntrix.deathchest.api.report.ReportManager.DATE_FORMAT_CONFIG;
+import static com.github.devcyntrix.deathchest.api.report.ReportStore.DATE_FORMAT_CONFIG;
 
 /**
  * This plugin creates chests if a player dies and will destroy them after a specific time.
@@ -70,38 +79,38 @@ import static com.github.devcyntrix.deathchest.api.report.ReportManager.DATE_FOR
 @Singleton
 public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
 
-    public static final int RESOURCE_ID = 101066;
-    public static final int BSTATS_ID = 14866;
-
-
-    private DeathChestConfig deathChestConfig;
-
-    private BreakAnimationService breakAnimationService;
-    private ProtectionService protectionService;
-
     @Getter
     private static boolean placeholderAPIEnabled;
 
-    private ReportManager reportManager;
+    private DeathChestConfig deathChestConfig;
 
-    private AuditManager auditManager;
+    private AnimationService animationService;
+    private ProtectionService protectionService;
 
+    private ReportService reportService;
+
+    private AuditService auditService;
+
+    private ItemBlacklistStore blacklistStore;
+    private ItemBlacklistService blacklistService;
     private ItemBlacklist blacklist;
 
     @Getter
-    private final Map<Player, DeathChestModel> lastDeathChests = new WeakHashMap<>();
+    private LastDeathChestService lastDeathChestService;
 
     @Nullable
-    private UpdateController updateController;
+    private UpdateService updateService;
 
-    private PlaceholderController placeHolderController;
+    @Getter
+    private PlaceholderService placeHolderService;
 
-    private HologramController hologramController;
+    @Getter
+    private HologramService hologramService;
 
     private DeathChestStorage deathChestStorage;
     private DeathChestController deathChestController;
 
-    private LastSafeLocationController lastSafeLocationController;
+    private LastSafeLocationService lastSafeLocationService;
 
     @Getter
     private BukkitAudiences audiences;
@@ -126,13 +135,13 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
     public void onDisable() {
 
         // Saves the blacklist
-        if (this.blacklist != null) {
+        if (this.blacklistService != null) {
             try {
-                this.blacklist.save();
+                this.blacklistService.close();
             } catch (IOException e) {
                 getLogger().log(Level.SEVERE, "Failed to save the item black list", e);
             }
-            this.blacklist = null;
+            this.blacklistService = null;
         }
 
         // Unregisters the thief protection and the bypass permission
@@ -160,9 +169,9 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
         }
 
         // Disables the update controller/routine
-        if (this.updateController != null) {
-            this.updateController.close();
-            this.updateController = null;
+        if (this.updateService != null) {
+            this.updateService.close();
+            this.updateService = null;
         }
 
         // Unregisters the death chest service
@@ -171,9 +180,9 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
         servicesManager.unregisterAll(this);
 
         // Disables the hologram controller
-        if (this.hologramController != null) {
-            this.hologramController.close();
-            this.hologramController = null;
+        if (this.hologramService != null) {
+            this.hologramService.close();
+            this.hologramService = null;
         }
 
         // Unloads all death chests
@@ -197,13 +206,13 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
         }
 
         // Disable the audit system
-        if (this.auditManager != null) {
+        if (this.auditService != null) {
             try {
-                auditManager.close();
+                auditService.close();
             } catch (Exception e) {
                 getLogger().log(Level.WARNING, "Failed to close the audit manager", e);
             }
-            this.auditManager = null;
+            this.auditService = null;
         }
 
         // Disable all compatibilities
@@ -255,12 +264,12 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
         this.audiences = BukkitAudiences.create(this);
 
         debug(0, "Creating hologram controller...");
-        this.hologramController = new HologramController(this);
+        this.hologramService = new HologramService(this);
 
         debug(0, "Selecting animation service...");
-        this.breakAnimationService = SupportServices.getBlockBreakAnimationService(this, this.deathChestConfig.preferredBlockBreakAnimationService());
+        this.animationService = new AnimationService(this, this.deathChestConfig.preferredBlockBreakAnimationService());
         debug(0, "Selecting protection services...");
-        this.protectionService = SupportServices.getProtectionService(this);
+        this.protectionService = new ProtectionService(this);
 
         PluginManager pluginManager = getServer().getPluginManager();
 
@@ -282,16 +291,21 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
         } catch (Exception e) {
             getLogger().log(Level.WARNING, "Failed to register the permission of the chest-protection", e);
         }
-        this.blacklist = new ItemBlacklist(new File(getDataFolder(), "blacklist.yml"));
 
+        this.blacklistStore = new ItemBlacklistStore(new File(getDataFolder(), "blacklist.yml"));
+        this.blacklistService = new ItemBlacklistService(this.blacklistStore);
+        this.blacklist = new ItemBlacklist(this.blacklistService);
 
-        this.reportManager = new GsonReportManager(new File(getDataFolder(), "reports"));
+        this.reportService = new ReportService(new GsonReportStore(new File(getDataFolder(), "reports")));
         debug(0, "Using gson report manager");
-        this.auditManager = new GsonAuditManager(new File(getDataFolder(), "audits"));
+
+        this.auditService = new AuditService(new GsonAuditStore(new File(getDataFolder(), "audits")));
         debug(0, "Using gson audit manager");
 
         debug(0, "Setting up the last safe location controller...");
-        this.lastSafeLocationController = new LastSafeLocationController(this);
+        this.lastSafeLocationService = new LastSafeLocationService(this);
+        this.lastDeathChestService = new LastDeathChestService();
+
         try {
             debug(0, "Using death chest yaml storage");
             if (!test) {
@@ -300,8 +314,8 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
                 this.deathChestStorage = new MemoryStorage();
             }
 
-            this.deathChestController = new DeathChestController(this, getLogger(), this.auditManager, this.deathChestStorage);
-            this.placeHolderController = new PlaceholderController(getDeathChestConfig(), this.deathChestController);
+            this.deathChestController = new DeathChestController(this, getLogger(), this.auditService, this.deathChestStorage);
+            this.placeHolderService = new PlaceholderService(getDeathChestConfig(), this.deathChestController);
 
             debug(0, "Initializing death chest storage...");
             this.deathChestStorage.init(this, deathChestStorage.getDefaultOptions());
@@ -317,12 +331,12 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
 
             HologramOptions hologramOptions = getDeathChestConfig().hologramOptions();
             if (hologramOptions.enabled()) {
-                this.deathChestController.registerAdapter(new HologramView(this, hologramController, hologramOptions, placeHolderController));
+                this.deathChestController.registerAdapter(new HologramView(this, hologramService, hologramOptions, placeHolderService));
             }
 
             BreakAnimationOptions breakAnimationOptions = getDeathChestConfig().breakAnimationOptions();
             if (breakAnimationOptions.enabled()) {
-                this.deathChestController.registerAdapter(new BreakAnimationView(this, breakAnimationService, breakAnimationOptions));
+                this.deathChestController.registerAdapter(new BreakAnimationView(this, getAnimationService(), breakAnimationOptions));
             }
 
             ParticleOptions particleOptions = getDeathChestConfig().particleOptions();
@@ -350,7 +364,7 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
         pluginManager.registerEvents(new ChestDestroyListener(this), this);
         pluginManager.registerEvents(new LastDeathChestListener(this), this);
         pluginManager.registerEvents(new WorldListener(this), this);
-        pluginManager.registerEvents(new ItemBlacklistListener(blacklist), this);
+        pluginManager.registerEvents(new ItemBlacklistListener(this.blacklistService, blacklist), this);
         pluginManager.registerEvents(new InventoryChangeSlotItemListener(), this);
         pluginManager.registerEvents(new InventoryChangeSlotItemListener(blacklist), this);
         pluginManager.registerEvents(new PlayerNotificationListener(this), this);
@@ -360,10 +374,10 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
         // Checks for updates
         if (this.deathChestConfig.updateChecker()) {
             debug(0, "Starting update checker...");
-            this.updateController = new UpdateController(this);
-            this.updateController.subscribe(new ConsoleNotificationView(this, getLogger()));
-            this.updateController.subscribe(new AdminNotificationView(this));
-            getServer().getPluginManager().registerEvents(new AdminJoinNotificationView(this, updateController), this);
+            this.updateService = new UpdateService(this);
+            this.updateService.subscribe(new ConsoleNotificationView(this, getLogger()));
+            this.updateService.subscribe(new AdminNotificationView(this));
+            getServer().getPluginManager().registerEvents(new AdminJoinNotificationView(this, updateService), this);
         }
     }
 
@@ -396,7 +410,7 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
 
     @Override
     public @Nullable DeathChestModel getLastChest(@NotNull Player player) {
-        return this.lastDeathChests.get(player);
+        return this.lastDeathChestService.getLastDeathChest(player);
     }
 
     /**
@@ -483,16 +497,6 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
         return this.deathChestController.getChests(world).stream();
     }
 
-    @Override
-    public HologramService getHologramService() {
-        return hologramController;
-    }
-
-    @Override
-    public @NotNull ProtectionService getProtectionService() {
-        return protectionService;
-    }
-
     public String getPrefix() {
         return "§cᴅᴇᴀᴛʜ ᴄʜᴇꜱᴛ §8︳ §r";
     }
@@ -502,4 +506,9 @@ public class DeathChestPlugin extends JavaPlugin implements DeathChestService {
     public File getFile() {
         return super.getFile();
     }
+
+    // DO NOT TOUCH THIS
+    public static final int RESOURCE_ID = 101066;
+    public static final int BSTATS_ID = 14866;
+
 }

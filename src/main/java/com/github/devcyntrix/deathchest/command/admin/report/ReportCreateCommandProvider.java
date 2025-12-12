@@ -17,7 +17,7 @@ public class ReportCreateCommandProvider implements CommandProvider {
     public Command.Builder<CommandSender> provide(Command.Builder<CommandSender> builder) {
         return builder
                 .handler(commandContext -> {
-                    plugin.getReportManager().createReport();
+                    plugin.getReportService().createReport();
                     commandContext.getSender().sendMessage(
                             plugin.getPrefix() + "§7A new report was created successfully."
                     );

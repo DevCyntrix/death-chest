@@ -104,7 +104,7 @@ public class DateArgument<C> extends CommandArgument<C, Date> {
         public @NonNull List<@NonNull String> suggestions(@NonNull CommandContext<C> commandContext, @NonNull String input) {
             return StringUtil.copyPartialMatches(
                     input,
-                    deathChestPlugin.getReportManager().getReportDates().stream().map(ISO8601Utils::format).toList(),
+                    deathChestPlugin.getReportService().getReportDates().stream().map(ISO8601Utils::format).toList(),
                     new ArrayList<>()
             );
         }

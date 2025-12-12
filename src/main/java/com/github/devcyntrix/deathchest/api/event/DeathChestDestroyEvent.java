@@ -1,6 +1,6 @@
 package com.github.devcyntrix.deathchest.api.event;
 
-import com.github.devcyntrix.deathchest.DeathChestModel;
+import com.github.devcyntrix.deathchest.feature.chest.DeathChestModel;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;

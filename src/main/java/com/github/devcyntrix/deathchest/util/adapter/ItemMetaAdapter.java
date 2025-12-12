@@ -1,9 +1,7 @@
 package com.github.devcyntrix.deathchest.util.adapter;
 
 import com.google.gson.*;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.lang.reflect.Type;

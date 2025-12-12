@@ -1,7 +1,7 @@
 package com.github.devcyntrix.deathchest.api.storage;
 
-import com.github.devcyntrix.deathchest.DeathChestModel;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
+import com.github.devcyntrix.deathchest.feature.chest.DeathChestModel;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;

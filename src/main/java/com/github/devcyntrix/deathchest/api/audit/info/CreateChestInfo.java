@@ -1,7 +1,7 @@
 package com.github.devcyntrix.deathchest.api.audit.info;
 
-import com.github.devcyntrix.deathchest.DeathChestModel;
 import com.github.devcyntrix.deathchest.api.audit.AuditInfo;
+import com.github.devcyntrix.deathchest.feature.chest.DeathChestModel;
 import com.google.gson.annotations.Expose;
 
 public class CreateChestInfo extends AuditInfo {

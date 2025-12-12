@@ -3,7 +3,7 @@ package com.github.devcyntrix.deathchest.command.admin.report;
 import cloud.commandframework.Command;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
 import com.github.devcyntrix.deathchest.api.report.Report;
-import com.github.devcyntrix.deathchest.api.report.ReportManager;
+import com.github.devcyntrix.deathchest.api.report.ReportStore;
 import com.github.devcyntrix.deathchest.command.CommandProvider;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -27,7 +27,7 @@ public class ReportLatestCommandProvider implements CommandProvider {
     public Command.Builder<CommandSender> provide(Command.Builder<CommandSender> builder) {
         return builder
                 .handler(commandContext -> {
-                    Report latestReport = plugin.getReportManager().getLatestReport();
+                    Report latestReport = plugin.getReportService().getLatestReport();
                     if (latestReport == null) {
                         commandContext.getSender().sendMessage(plugin.getPrefix() + "§cNo report found");
                     }
@@ -46,7 +46,7 @@ public class ReportLatestCommandProvider implements CommandProvider {
                     copy.setUnderlined(true);
                     copy.setClickEvent(
                             new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD,
-                                    ReportManager.formatISO(latestReport.date()))
+                                    ReportStore.formatISO(latestReport.date()))
                     );
                     copy.setHoverEvent(
                             new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("§7Click to copy the file name"))

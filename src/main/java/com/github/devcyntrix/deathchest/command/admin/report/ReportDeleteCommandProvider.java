@@ -23,7 +23,7 @@ public class ReportDeleteCommandProvider implements CommandProvider {
                 .handler(commandContext -> {
                     Date date = commandContext.get("date");
 
-                    boolean success = plugin.getReportManager().deleteReport(date);
+                    boolean success = plugin.getReportService().deleteReport(date);
                     if (success) {
                         commandContext.getSender().sendMessage(
                                 plugin.getPrefix() + "§7You deleted the report successfully"

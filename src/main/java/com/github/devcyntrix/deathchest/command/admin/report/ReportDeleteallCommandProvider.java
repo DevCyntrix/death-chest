@@ -17,7 +17,7 @@ public class ReportDeleteallCommandProvider implements CommandProvider {
     public Command.Builder<CommandSender> provide(Command.Builder<CommandSender> builder) {
         return builder
                 .handler(commandContext -> {
-                    plugin.getReportManager().deleteReports();
+                    plugin.getReportService().deleteReports();
                     commandContext.getSender().sendMessage(
                             plugin.getPrefix() + "§7You deleted all reports successfully"
                     );

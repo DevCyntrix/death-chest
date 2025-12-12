@@ -2,8 +2,8 @@ package com.github.devcyntrix.deathchest.command.admin;
 
 import cloud.commandframework.Command;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
-import com.github.devcyntrix.deathchest.blacklist.ItemBlacklist;
 import com.github.devcyntrix.deathchest.command.CommandProvider;
+import com.github.devcyntrix.deathchest.feature.blacklist.ItemBlacklist;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;

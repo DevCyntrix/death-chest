@@ -1,8 +1,8 @@
 package com.github.devcyntrix.deathchest.util;
 
-import com.github.devcyntrix.deathchest.DeathChestModel;
 import com.github.devcyntrix.deathchest.config.DeathChestConfig;
-import com.github.devcyntrix.deathchest.controller.DeathChestController;
+import com.github.devcyntrix.deathchest.feature.chest.DeathChestController;
+import com.github.devcyntrix.deathchest.feature.chest.DeathChestModel;
 import org.apache.commons.text.lookup.StringLookup;
 import org.bukkit.Location;
 import org.bukkit.World;

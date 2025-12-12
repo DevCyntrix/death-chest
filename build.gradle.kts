@@ -28,7 +28,7 @@ repositories {
 
 dependencies {
     compileOnly("com.google.inject:guice:7.0.0")
-    compileOnly("org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.20-R0.1-SNAPSHOT")
     compileOnly("net.kyori:adventure-platform-bukkit:4.3.0")
     compileOnly("net.kyori:adventure-text-minimessage:4.14.0")
     compileOnly("net.kyori:adventure-text-serializer-legacy:4.14.0")
@@ -119,7 +119,7 @@ tasks {
         }
     }
     runServer {
-        minecraftVersion("1.21.4")
+        minecraftVersion("1.21.8")
 
     }
     shadowJar {
