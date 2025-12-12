@@ -3,7 +3,7 @@ package com.github.devcyntrix.deathchest;
 import com.github.devcyntrix.api.event.InventoryChangeSlotItemListener;
 import com.github.devcyntrix.deathchest.api.compatibility.CompatibilityLoader;
 import com.github.devcyntrix.deathchest.api.compatibility.CompatibilityManager;
-import com.github.devcyntrix.deathchest.api.storage.DeathChestStore;
+import com.github.devcyntrix.deathchest.api.DeathChestStore;
 import com.github.devcyntrix.deathchest.command.CommandRegistry;
 import com.github.devcyntrix.deathchest.config.*;
 import com.github.devcyntrix.deathchest.feature.animation.AnimationService;

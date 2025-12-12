@@ -1,7 +1,7 @@
 package com.github.devcyntrix.deathchest.feature.chest.store;
 
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
-import com.github.devcyntrix.deathchest.api.storage.DeathChestStore;
+import com.github.devcyntrix.deathchest.api.DeathChestStore;
 import com.github.devcyntrix.deathchest.feature.chest.DeathChestModel;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;

@@ -1,4 +1,4 @@
-package com.github.devcyntrix.deathchest.api.storage;
+package com.github.devcyntrix.deathchest.api;
 
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
 import com.github.devcyntrix.deathchest.feature.chest.DeathChestModel;

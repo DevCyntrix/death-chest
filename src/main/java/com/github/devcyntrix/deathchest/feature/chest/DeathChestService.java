@@ -6,7 +6,7 @@ import com.github.devcyntrix.deathchest.api.audit.AuditAction;
 import com.github.devcyntrix.deathchest.api.audit.AuditItem;
 import com.github.devcyntrix.deathchest.api.audit.info.CreateChestInfo;
 import com.github.devcyntrix.deathchest.api.event.DeathChestDestroyEvent;
-import com.github.devcyntrix.deathchest.api.storage.DeathChestStore;
+import com.github.devcyntrix.deathchest.api.DeathChestStore;
 import com.github.devcyntrix.deathchest.config.DeathChestConfig;
 import com.github.devcyntrix.deathchest.config.InventoryOptions;
 import com.github.devcyntrix.deathchest.config.ThiefProtectionOptions;
