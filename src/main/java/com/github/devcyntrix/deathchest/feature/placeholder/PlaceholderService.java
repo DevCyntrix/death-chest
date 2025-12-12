@@ -2,7 +2,7 @@ package com.github.devcyntrix.deathchest.feature.placeholder;
 
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
 import com.github.devcyntrix.deathchest.config.DeathChestConfig;
-import com.github.devcyntrix.deathchest.feature.chest.DeathChestController;
+import com.github.devcyntrix.deathchest.feature.chest.DeathChestService;
 import com.github.devcyntrix.deathchest.feature.chest.DeathChestModel;
 import com.github.devcyntrix.deathchest.util.ChestModelStringLookup;
 import com.github.devcyntrix.deathchest.util.DurationFormatter;
@@ -14,10 +14,10 @@ import org.apache.commons.text.StringSubstitutor;
 public class PlaceholderService {
 
     private final DeathChestConfig config;
-    private final DeathChestController controller;
+    private final DeathChestService controller;
     private final DurationFormatter durationFormatter;
 
-    public PlaceholderService(DeathChestConfig config, DeathChestController controller) {
+    public PlaceholderService(DeathChestConfig config, DeathChestService controller) {
         this.config = config;
         this.controller = controller;
         this.durationFormatter = new DurationFormatter(config.durationFormat());

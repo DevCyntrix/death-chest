@@ -56,8 +56,7 @@ public class LastDeathChestLocationExpansion extends PlaceholderExpansion {
 
     @Override
     public @Nullable String onPlaceholderRequest(Player player, @NotNull String params) {
-        if (player == null)
-            return null;
+        if (player == null) return null;
 
         DeathChestModel deathChest = plugin.getLastChest(player);
         if (deathChest == null) {
@@ -66,10 +65,7 @@ public class LastDeathChestLocationExpansion extends PlaceholderExpansion {
 
         if (params.equalsIgnoreCase("last_location")) {
             Location location = deathChest.getLocation();
-            String locationFormat = this.locationFormat
-                    .replace("<x>", String.valueOf(location.getBlockX()))
-                    .replace("<y>", String.valueOf(location.getBlockY()))
-                    .replace("<z>", String.valueOf(location.getBlockZ()));
+            String locationFormat = this.locationFormat.replace("<x>", String.valueOf(location.getBlockX())).replace("<y>", String.valueOf(location.getBlockY())).replace("<z>", String.valueOf(location.getBlockZ()));
             if (location.getWorld() != null) {
                 DeathChestConfig config = plugin.getDeathChestConfig();
                 locationFormat = locationFormat.replace("<world>", config.worldAlias().getAlias(location.getWorld().getName()));

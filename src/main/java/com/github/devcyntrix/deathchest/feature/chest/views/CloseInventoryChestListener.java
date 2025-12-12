@@ -1,6 +1,6 @@
 package com.github.devcyntrix.deathchest.feature.chest.views;
 
-import com.github.devcyntrix.deathchest.api.ChestView;
+import com.github.devcyntrix.deathchest.api.ChestListener;
 import com.github.devcyntrix.deathchest.feature.chest.DeathChestModel;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -9,11 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
-public class CloseInventoryView implements ChestView {
+public class CloseInventoryChestListener implements ChestListener {
 
     private final JavaPlugin plugin;
 
-    public CloseInventoryView(JavaPlugin plugin) {
+    public CloseInventoryChestListener(JavaPlugin plugin) {
         this.plugin = plugin;
     }
 

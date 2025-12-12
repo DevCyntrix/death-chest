@@ -1,21 +1,21 @@
 package com.github.devcyntrix.deathchest.feature.particle;
 
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
-import com.github.devcyntrix.deathchest.api.ChestView;
+import com.github.devcyntrix.deathchest.api.ChestListener;
 import com.github.devcyntrix.deathchest.config.ParticleOptions;
 import com.github.devcyntrix.deathchest.feature.chest.DeathChestModel;
 import com.github.devcyntrix.deathchest.util.ParticleUtils;
 import org.bukkit.*;
 import org.bukkit.scheduler.BukkitTask;
 
-public class ParticleView implements ChestView {
+public class ParticleChestListener implements ChestListener {
 
     private final DeathChestPlugin plugin;
     private final ParticleOptions options;
 
     private final Particle dustParticle;
 
-    public ParticleView(DeathChestPlugin plugin, ParticleOptions options) {
+    public ParticleChestListener(DeathChestPlugin plugin, ParticleOptions options) {
         this.plugin = plugin;
         this.options = options;
         this.dustParticle = ParticleUtils.findParticle("DUST", "REDSTONE");

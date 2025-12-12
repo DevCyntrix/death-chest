@@ -38,10 +38,9 @@ public class ChestInteractionListener implements Listener {
         if (event.isBlockInHand() && player.isSneaking()) // That maintains the natural minecraft feeling
             return;
 
-        DeathChestController controller = plugin.getDeathChestController();
+        DeathChestService controller = plugin.getDeathChestService();
         DeathChestModel model = controller.getChest(block.getLocation());
-        if (model == null)
-            return;
+        if (model == null) return;
 
         event.setCancelled(true);
 

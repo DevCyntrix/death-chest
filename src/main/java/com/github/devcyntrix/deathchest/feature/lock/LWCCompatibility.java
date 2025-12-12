@@ -2,7 +2,7 @@ package com.github.devcyntrix.deathchest.feature.lock;
 
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
 import com.github.devcyntrix.deathchest.api.compatibility.Compatibility;
-import com.github.devcyntrix.deathchest.feature.chest.DeathChestController;
+import com.github.devcyntrix.deathchest.feature.chest.DeathChestService;
 import com.griefcraft.lwc.LWC;
 import com.griefcraft.scripting.JavaModule;
 import com.griefcraft.scripting.event.LWCProtectionRegisterEvent;
@@ -41,7 +41,7 @@ public class LWCCompatibility extends Compatibility {
 
         @Override
         public void onRegisterProtection(LWCProtectionRegisterEvent event) {
-            DeathChestController controller = plugin.getDeathChestController();
+            DeathChestService controller = plugin.getDeathChestService();
             if (controller.getChest(event.getBlock().getLocation()) != null) {
                 event.setCancelled(true);
                 event.getPlayer().sendMessage(plugin.getPrefix() + "§cYou cannot lock this chest.");

@@ -1,7 +1,8 @@
-package com.github.devcyntrix.deathchest.feature.chest;
+package com.github.devcyntrix.deathchest.feature.chest.store;
 
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
-import com.github.devcyntrix.deathchest.api.storage.DeathChestStorage;
+import com.github.devcyntrix.deathchest.api.storage.DeathChestStore;
+import com.github.devcyntrix.deathchest.feature.chest.DeathChestModel;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import org.bukkit.World;
@@ -14,7 +15,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-public class MemoryStorage implements DeathChestStorage {
+public class MemoryStore implements DeathChestStore {
 
     private final Multimap<World, DeathChestModel> deathChestsCache = HashMultimap.create();
 

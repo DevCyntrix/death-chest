@@ -1,15 +1,15 @@
 package com.github.devcyntrix.deathchest.feature.expiration;
 
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
-import com.github.devcyntrix.deathchest.api.ChestView;
+import com.github.devcyntrix.deathchest.api.ChestListener;
 import com.github.devcyntrix.deathchest.feature.chest.DeathChestModel;
 import org.bukkit.scheduler.BukkitTask;
 
-public class ExpirationView implements ChestView {
+public class ExpirationChestListener implements ChestListener {
 
     private final DeathChestPlugin plugin;
 
-    public ExpirationView(DeathChestPlugin plugin) {
+    public ExpirationChestListener(DeathChestPlugin plugin) {
         this.plugin = plugin;
     }
 

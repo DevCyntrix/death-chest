@@ -1,7 +1,7 @@
 package com.github.devcyntrix.deathchest.feature.animation;
 
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
-import com.github.devcyntrix.deathchest.api.ChestView;
+import com.github.devcyntrix.deathchest.api.ChestListener;
 import com.github.devcyntrix.deathchest.config.BreakAnimationOptions;
 import com.github.devcyntrix.deathchest.feature.chest.DeathChestModel;
 import com.github.devcyntrix.deathchest.util.EntityIdHelper;
@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 
-public class BreakAnimationView implements ChestView {
+public class BreakAnimationChestListener implements ChestListener {
 
     @NotNull
     private final DeathChestPlugin plugin;
@@ -24,7 +24,7 @@ public class BreakAnimationView implements ChestView {
     @NotNull
     private final BreakAnimationOptions options;
 
-    public BreakAnimationView(@NotNull DeathChestPlugin plugin, @Nullable AnimationService animationService, @NotNull BreakAnimationOptions options) {
+    public BreakAnimationChestListener(@NotNull DeathChestPlugin plugin, @Nullable AnimationService animationService, @NotNull BreakAnimationOptions options) {
         this.plugin = plugin;
         this.animationService = animationService;
         this.options = options;

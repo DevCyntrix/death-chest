@@ -1,7 +1,7 @@
 package com.github.devcyntrix.deathchest.feature.chest.views;
 
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
-import com.github.devcyntrix.deathchest.api.ChestView;
+import com.github.devcyntrix.deathchest.api.ChestListener;
 import com.github.devcyntrix.deathchest.feature.chest.DeathChestModel;
 import com.github.devcyntrix.deathchest.util.ParticleUtils;
 import org.bukkit.Location;
@@ -16,12 +16,12 @@ import org.bukkit.scheduler.BukkitTask;
 
 import java.util.logging.Level;
 
-public class BlockView implements ChestView, Listener {
+public class BlockCreationChestListener implements ChestListener, Listener {
 
     private final DeathChestPlugin plugin;
     private final Particle blockCrackParticle;
 
-    public BlockView(DeathChestPlugin plugin) {
+    public BlockCreationChestListener(DeathChestPlugin plugin) {
         this.plugin = plugin;
         this.blockCrackParticle = ParticleUtils.findParticle("BLOCK", "BLOCK_CRACK");
     }
@@ -37,8 +37,6 @@ public class BlockView implements ChestView, Listener {
                 BlockState state = location.getBlock().getState();
                 model.setPrevious(state);
                 location.getBlock().setType(Material.CHEST);
-
-
 
 
             }

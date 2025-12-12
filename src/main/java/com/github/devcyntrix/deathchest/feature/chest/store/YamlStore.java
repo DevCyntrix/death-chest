@@ -1,7 +1,8 @@
-package com.github.devcyntrix.deathchest.feature.chest;
+package com.github.devcyntrix.deathchest.feature.chest.store;
 
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
-import com.github.devcyntrix.deathchest.api.storage.DeathChestStorage;
+import com.github.devcyntrix.deathchest.api.storage.DeathChestStore;
+import com.github.devcyntrix.deathchest.feature.chest.DeathChestModel;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
 /**
  * Currently not used but will be implemented soon.
  */
-public class YamlStorage implements DeathChestStorage {
+public class YamlStore implements DeathChestStore {
 
     private final Multimap<World, DeathChestModel> deathChestsCache = HashMultimap.create();
 

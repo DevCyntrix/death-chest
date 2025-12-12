@@ -70,7 +70,7 @@ public class ChestDestroyListener implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                plugin.getDeathChestController().destroyChest(model);
+                plugin.getDeathChestService().destroyChest(model);
             }
         }.runTask(plugin);
 
@@ -85,14 +85,14 @@ public class ChestDestroyListener implements Listener {
     public void onBlockBreak(BlockBreakEvent event) {
         Block block = event.getBlock();
 
-        DeathChestModel model = this.plugin.getDeathChestController().getChest(block.getLocation());
+        DeathChestModel model = this.plugin.getDeathChestService().getChest(block.getLocation());
         if (model == null)
             return;
         Player player = event.getPlayer();
 
         event.setCancelled(true);
 
-        if (!plugin.getDeathChestController().isAccessibleBy(model, player)) {
+        if (!plugin.getDeathChestService().isAccessibleBy(model, player)) {
             ThiefProtectionOptions protectionOptions = plugin.getDeathChestConfig().chestOptions().thiefProtectionOptions();
             protectionOptions.playSound(player, block.getLocation());
             protectionOptions.notify(player);
@@ -106,7 +106,7 @@ public class ChestDestroyListener implements Listener {
         this.plugin.getAuditService().log(new AuditItem(new Date(), AuditAction.DESTROY_CHEST, new DestroyChestInfo(model, DestroyReason.BREAK, Map.of("player", player))));
         model.getInventory().clear();
 
-        plugin.getDeathChestController().destroyChest(model);
+        plugin.getDeathChestService().destroyChest(model);
     }
 
     /**
@@ -121,7 +121,7 @@ public class ChestDestroyListener implements Listener {
         while (iterator.hasNext()) {
             Block next = iterator.next();
 
-            DeathChestModel model = this.plugin.getDeathChestController().getChest(next.getLocation());
+            DeathChestModel model = this.plugin.getDeathChestService().getChest(next.getLocation());
             if (model == null)
                 continue;
             if (plugin.getDeathChestConfig().chestOptions().blastProtection()) {
@@ -137,7 +137,7 @@ public class ChestDestroyListener implements Listener {
 
             Block block = event.getBlock();
             this.plugin.getAuditService().log(new AuditItem(new Date(), AuditAction.DESTROY_CHEST, new DestroyChestInfo(model, DestroyReason.BLOCK_EXPLOSION, Map.of("block", block))));
-            this.plugin.getDeathChestController().destroyChest(model);
+            this.plugin.getDeathChestService().destroyChest(model);
         }
 
     }
@@ -155,7 +155,7 @@ public class ChestDestroyListener implements Listener {
         while (iterator.hasNext()) {
             Block next = iterator.next();
 
-            DeathChestModel model = this.plugin.getDeathChestController().getChest(next.getLocation());
+            DeathChestModel model = this.plugin.getDeathChestService().getChest(next.getLocation());
             if (model == null)
                 continue;
             if (this.plugin.getDeathChestConfig().chestOptions().blastProtection()) {
@@ -171,7 +171,7 @@ public class ChestDestroyListener implements Listener {
 
             Entity entity = event.getEntity();
             this.plugin.getAuditService().log(new AuditItem(new Date(), AuditAction.DESTROY_CHEST, new DestroyChestInfo(model, DestroyReason.ENTITY_EXPLOSION, Map.of("entity", entity))));
-            this.plugin.getDeathChestController().destroyChest(model);
+            this.plugin.getDeathChestService().destroyChest(model);
         }
     }
 
@@ -185,7 +185,7 @@ public class ChestDestroyListener implements Listener {
 
         Block next = event.getBlock();
 
-        DeathChestModel model = this.plugin.getDeathChestController().getChest(next.getLocation());
+        DeathChestModel model = this.plugin.getDeathChestService().getChest(next.getLocation());
         if (model == null)
             return;
 

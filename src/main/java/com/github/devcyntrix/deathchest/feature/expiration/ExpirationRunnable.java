@@ -38,6 +38,6 @@ public class ExpirationRunnable extends BukkitRunnable {
         }
         if (auditService != null)
             auditService.log(new AuditItem(new Date(), AuditAction.DESTROY_CHEST, new DestroyChestInfo(chest, DestroyReason.EXPIRATION, Map.of("item-drops", dropItemsAfterExpiration))));
-        this.plugin.getDeathChestController().destroyChest(chest);
+        this.plugin.getDeathChestService().destroyChest(chest);
     }
 }

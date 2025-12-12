@@ -76,7 +76,7 @@ public class ChestHologramTest {
         World world = model.getWorld();
         Assertions.assertNotNull(world);
 
-        plugin.getDeathChestController().destroyChest(model);
+        plugin.getDeathChestService().destroyChest(model);
 
         Collection<ArmorStand> armorStands = world.getEntitiesByClass(ArmorStand.class);
         Assertions.assertTrue(armorStands.isEmpty());

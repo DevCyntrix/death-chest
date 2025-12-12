@@ -48,7 +48,7 @@ public class DeleteinworldCommandProvider implements CommandProvider {
     }
 
     private boolean deleteChest(CommandContext<CommandSender> commandContext, DeathChestModel deathChest) {
-        plugin.getDeathChestController().destroyChest(deathChest);
+        plugin.getDeathChestService().destroyChest(deathChest);
 
         plugin.getAuditService().log(new AuditItem(new Date(), AuditAction.DESTROY_CHEST, new DestroyChestInfo(
                 deathChest,

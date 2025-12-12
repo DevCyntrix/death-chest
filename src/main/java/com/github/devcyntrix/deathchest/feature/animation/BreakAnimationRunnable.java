@@ -40,7 +40,7 @@ public class BreakAnimationRunnable extends BukkitRunnable {
         double process = (double) (System.currentTimeMillis() - chest.getCreatedAt()) / (chest.getExpireAt() - chest.getCreatedAt());
 
         try {
-            if(!plugin.isTest()) {
+            if (!plugin.isTest()) {
                 Stream<Player> playerStream = Bukkit.getScheduler().callSyncMethod(plugin, () -> world.getNearbyEntities(chest.getLocation(), options.viewDistance(), options.viewDistance(), options.viewDistance(), entity -> entity.getType() == EntityType.PLAYER).stream().map(entity -> (Player) entity)).get(1, TimeUnit.SECONDS);
                 animationService.spawnBlockBreakAnimation(entityId, chest.getLocation().toVector(), (int) (9 * process), playerStream);
             }

@@ -1,7 +1,7 @@
 package com.github.devcyntrix.deathchest.util;
 
 import com.github.devcyntrix.deathchest.config.DeathChestConfig;
-import com.github.devcyntrix.deathchest.feature.chest.DeathChestController;
+import com.github.devcyntrix.deathchest.feature.chest.DeathChestService;
 import com.github.devcyntrix.deathchest.feature.chest.DeathChestModel;
 import org.apache.commons.text.lookup.StringLookup;
 import org.bukkit.Location;
@@ -11,14 +11,14 @@ import org.jetbrains.annotations.NotNull;
 
 public class ChestModelStringLookup implements StringLookup {
 
-    private final DeathChestController controller;
+    private final DeathChestService controller;
     private final DeathChestConfig config;
     @NotNull
     private final DeathChestModel model;
     @NotNull
     private final DurationFormatter durationFormatter;
 
-    public ChestModelStringLookup(@NotNull DeathChestController controller, @NotNull DeathChestConfig config, @NotNull DeathChestModel model, @NotNull DurationFormatter durationFormatter) {
+    public ChestModelStringLookup(@NotNull DeathChestService controller, @NotNull DeathChestConfig config, @NotNull DeathChestModel model, @NotNull DurationFormatter durationFormatter) {
         this.controller = controller;
         this.config = config;
         this.model = model;

@@ -39,7 +39,7 @@ public final class LocketteXCompatibility extends Compatibility {
             Bukkit.getPluginManager().registerEvent(subclass, instance, EventPriority.NORMAL, (listener, event) -> {
                 try {
                     Location location = (Location) subclass.getMethod("getLocation").invoke(event);
-                    if (plugin.getDeathChestController().getChest(location) != null) {
+                    if (plugin.getDeathChestService().getChest(location) != null) {
                         subclass.getMethod("setCancelled", boolean.class).invoke(event, true);
 
                         Player player = (Player) subclass.getMethod("getPlayer").invoke(event);

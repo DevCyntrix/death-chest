@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Set;
 
-public interface DeathChestStorage extends Closeable {
+public interface DeathChestStore extends Closeable {
 
     ConfigurationSection getDefaultOptions();
 

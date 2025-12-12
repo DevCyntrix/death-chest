@@ -1,12 +1,12 @@
 package com.github.devcyntrix.deathchest.feature.chest;
 
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
-import com.github.devcyntrix.deathchest.api.ChestView;
+import com.github.devcyntrix.deathchest.api.ChestListener;
 import com.github.devcyntrix.deathchest.api.audit.AuditAction;
 import com.github.devcyntrix.deathchest.api.audit.AuditItem;
 import com.github.devcyntrix.deathchest.api.audit.info.CreateChestInfo;
 import com.github.devcyntrix.deathchest.api.event.DeathChestDestroyEvent;
-import com.github.devcyntrix.deathchest.api.storage.DeathChestStorage;
+import com.github.devcyntrix.deathchest.api.storage.DeathChestStore;
 import com.github.devcyntrix.deathchest.config.DeathChestConfig;
 import com.github.devcyntrix.deathchest.config.InventoryOptions;
 import com.github.devcyntrix.deathchest.config.ThiefProtectionOptions;
@@ -34,20 +34,20 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 @Singleton
-public class DeathChestController implements Closeable {
+public class DeathChestService implements Closeable {
 
     private final DeathChestPlugin plugin;
     private final Logger logger;
     private final AuditService auditService;
-    private final DeathChestStorage storage;
+    private final DeathChestStore storage;
 
-    private final Set<ChestView> listeners = new HashSet<>();
+    private final Set<ChestListener> listeners = new HashSet<>();
 
     protected final Table<World, Location, DeathChestModel> loadedChests = HashBasedTable.create();
 
     private final DurationFormatter durationFormatter;
 
-    public DeathChestController(DeathChestPlugin plugin, Logger logger, AuditService auditService, DeathChestStorage storage) {
+    public DeathChestService(DeathChestPlugin plugin, Logger logger, AuditService auditService, DeathChestStore storage) {
         this.plugin = plugin;
         this.logger = logger;
         this.auditService = auditService;
@@ -56,7 +56,7 @@ public class DeathChestController implements Closeable {
         this.durationFormatter = new DurationFormatter(getConfig().durationFormat());
     }
 
-    public void registerAdapter(ChestView adapter) {
+    public void registerAdapter(ChestListener adapter) {
         this.listeners.add(adapter);
     }
 
@@ -68,7 +68,7 @@ public class DeathChestController implements Closeable {
     public void loadChests(World world) {
         this.storage.getChests(world)
                 .forEach(model -> {
-                    for (ChestView listener : listeners) {
+                    for (ChestListener listener : listeners) {
                         listener.onLoad(model);
                     }
                     this.loadedChests.put(model.getWorld(), model.getLocation(), model);
@@ -98,7 +98,7 @@ public class DeathChestController implements Closeable {
             return title;
         }, items));
 
-        for (ChestView listener : listeners) {
+        for (ChestListener listener : listeners) {
             listener.onCreate(model);
         }
 
@@ -169,7 +169,7 @@ public class DeathChestController implements Closeable {
         model.setDeleting(true);
 
         model.cancelTasks();
-        for (ChestView listener : this.listeners) {
+        for (ChestListener listener : this.listeners) {
             listener.onDestroy(model);
         }
 
