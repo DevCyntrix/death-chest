@@ -3,6 +3,7 @@ package com.github.devcyntrix.deathchest.feature.chest.views;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
 import com.github.devcyntrix.deathchest.api.ChestView;
 import com.github.devcyntrix.deathchest.feature.chest.DeathChestModel;
+import com.github.devcyntrix.deathchest.util.ParticleUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -18,12 +19,12 @@ import java.util.logging.Level;
 public class BlockView implements ChestView, Listener {
 
     private final DeathChestPlugin plugin;
+    private final Particle blockCrackParticle;
 
     public BlockView(DeathChestPlugin plugin) {
         this.plugin = plugin;
+        this.blockCrackParticle = ParticleUtils.findParticle("BLOCK", "BLOCK_CRACK");
     }
-
-
 
     @Override
     public void onCreate(DeathChestModel model) {
@@ -55,7 +56,7 @@ public class BlockView implements ChestView, Listener {
                 Location location = model.getLocation();
                 Block block = location.getBlock();
                 if (!plugin.isTest())
-                    world.spawnParticle(Particle.BLOCK_CRACK, location.clone().add(0.5, 0.5, 0.5), 10, block.getBlockData());
+                    world.spawnParticle(blockCrackParticle, location.clone().add(0.5, 0.5, 0.5), 10, block.getBlockData());
             }
         } catch (Exception e) {
             plugin.getLogger().log(Level.WARNING, "Failed to play block crack particle", e);

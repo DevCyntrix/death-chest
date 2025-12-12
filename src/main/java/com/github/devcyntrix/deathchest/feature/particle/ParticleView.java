@@ -4,17 +4,22 @@ import com.github.devcyntrix.deathchest.DeathChestPlugin;
 import com.github.devcyntrix.deathchest.api.ChestView;
 import com.github.devcyntrix.deathchest.config.ParticleOptions;
 import com.github.devcyntrix.deathchest.feature.chest.DeathChestModel;
+import com.github.devcyntrix.deathchest.util.ParticleUtils;
 import org.bukkit.*;
 import org.bukkit.scheduler.BukkitTask;
+import org.jetbrains.annotations.NotNull;
 
 public class ParticleView implements ChestView {
 
     private final DeathChestPlugin plugin;
     private final ParticleOptions options;
 
+    private final Particle dustParticle;
+
     public ParticleView(DeathChestPlugin plugin, ParticleOptions options) {
         this.plugin = plugin;
         this.options = options;
+        this.dustParticle = ParticleUtils.findParticle("DUST", "REDSTONE");
     }
 
     @Override
@@ -32,11 +37,13 @@ public class ParticleView implements ChestView {
         BukkitTask bukkitTask = new ParticleRunnable(model.getLocation(), options.count(), options.radius(), particleLocation -> {
             // Orange dust
             Location orangeDust = particleLocation.clone().add(0.5, 0.5, 0.5); // Center the particle location
-            Bukkit.getScheduler().runTask(plugin, () -> world.spawnParticle(Particle.REDSTONE, orangeDust, 1, orangeDustOptions));
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                world.spawnParticle(dustParticle, orangeDust, 1, orangeDustOptions);
+            });
 
             // Aqua dust
             Location aquaDust = orangeDust.clone().subtract(0, 0.1, 0);
-            Bukkit.getScheduler().runTask(plugin, () -> world.spawnParticle(Particle.REDSTONE, aquaDust, 1, aquaDustOptions));
+            Bukkit.getScheduler().runTask(plugin, () -> world.spawnParticle(dustParticle, aquaDust, 1, aquaDustOptions));
 
         }).runTaskTimerAsynchronously(this.plugin, 0, (long) (20 / options.speed()));
         model.getTasks().add(bukkitTask::cancel);
