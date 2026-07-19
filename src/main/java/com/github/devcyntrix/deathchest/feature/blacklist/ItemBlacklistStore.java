@@ -1,6 +1,5 @@
 package com.github.devcyntrix.deathchest.feature.blacklist;
 
-import lombok.Getter;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 
@@ -11,9 +10,7 @@ import java.util.*;
 
 public class ItemBlacklistStore implements Closeable {
 
-
     private final File file;
-    @Getter
     private final Set<ItemStack> list = new HashSet<>();
 
     public ItemBlacklistStore(File file) {
@@ -23,6 +20,10 @@ public class ItemBlacklistStore implements Closeable {
             this.list.addAll((Collection<? extends ItemStack>) yamlConfiguration.getList("blacklist", new ArrayList<>()));
         }
         this.list.removeIf(Objects::isNull);
+    }
+
+    public Set<ItemStack> getList() {
+        return list;
     }
 
     public void save() throws IOException {

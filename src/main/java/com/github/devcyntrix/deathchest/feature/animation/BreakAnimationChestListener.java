@@ -35,7 +35,7 @@ public class BreakAnimationChestListener implements ChestListener {
         if (animationService == null)
             return;
 
-        model.setBreakingEntityId(EntityIdHelper.increaseAndGet());
+        model.setBreakingEntityId(EntityIdHelper.increaseAndGet(model.getWorld()));
         plugin.debug(0, "Starting block break animation using entity id %d".formatted(model.getBreakingEntityId()));
         BukkitTask bukkitTask = new BreakAnimationRunnable(plugin, model, animationService, options).runTaskTimerAsynchronously(plugin, 20, 20);
         model.getTasks().add(bukkitTask::cancel);

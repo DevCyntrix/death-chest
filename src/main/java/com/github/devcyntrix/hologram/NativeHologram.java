@@ -4,7 +4,6 @@ import com.github.devcyntrix.hologram.api.Hologram;
 import com.github.devcyntrix.hologram.api.HologramService;
 import com.github.devcyntrix.hologram.api.HologramTextLine;
 import com.google.common.base.Preconditions;
-import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -17,7 +16,6 @@ public class NativeHologram implements Hologram {
     @NotNull
     private final JavaPlugin plugin;
     @NotNull
-    @Getter
     private final HologramService service;
     private final double lineHeight;
     @NotNull
@@ -34,6 +32,11 @@ public class NativeHologram implements Hologram {
         this.service = service;
         this.location = location;
         this.lineHeight = lineHeight;
+    }
+
+    @Override
+    public @NotNull HologramService getService() {
+        return service;
     }
 
     @NotNull

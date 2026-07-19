@@ -1,8 +1,8 @@
 package com.github.devcyntrix.deathchest;
 
-import be.seeseemelk.mockbukkit.MockBukkit;
-import be.seeseemelk.mockbukkit.ServerMock;
-import be.seeseemelk.mockbukkit.entity.PlayerMock;
+import org.mockbukkit.mockbukkit.MockBukkit;
+import org.mockbukkit.mockbukkit.ServerMock;
+import org.mockbukkit.mockbukkit.entity.PlayerMock;
 import com.github.devcyntrix.deathchest.config.DeathChestConfig;
 import com.github.devcyntrix.deathchest.config.NoExpirationPermission;
 import com.github.devcyntrix.deathchest.feature.chest.DeathChestModel;
@@ -29,6 +29,8 @@ public class NoExpirationChestPermissionTest {
 
     @BeforeEach
     public void setUp() {
+        this.server = MockBukkit.getOrCreateMock();
+
         InputStream stream = getClass().getClassLoader().getResourceAsStream("no-expiration-chest-permission-config.yml");
         if (stream == null)
             throw new IllegalStateException("Missing config");
@@ -39,8 +41,8 @@ public class NoExpirationChestPermissionTest {
             throw new RuntimeException(e);
         }
 
-        this.server = MockBukkit.getOrCreateMock();
-        this.plugin = MockBukkit.load(DeathChestPlugin.class, true, config);
+        DeathChestPlugin.setTest(true);
+        this.plugin = MockBukkit.load(DeathChestPlugin.class, config);
 
         this.player = server.addPlayer();
         this.content = new ArrayList<>(List.of(new ItemStack(Material.OAK_LOG)));

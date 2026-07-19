@@ -3,6 +3,7 @@ package com.github.devcyntrix.deathchest.config;
 import com.google.gson.annotations.SerializedName;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Registry;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -42,7 +43,7 @@ public record ThiefProtectionOptions(
         float pitch = 1.0F;
         if (soundString != null) {
             String[] soundArray = soundString.split(";", 3);
-            sound = Sound.valueOf(soundArray[0].toUpperCase());
+            sound = Registry.SOUNDS.match(soundArray[0]);
             volume = Float.parseFloat(soundArray[1]);
             pitch = Float.parseFloat(soundArray[2]);
         }

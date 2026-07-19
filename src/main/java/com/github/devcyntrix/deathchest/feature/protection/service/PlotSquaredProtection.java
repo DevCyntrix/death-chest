@@ -11,7 +11,6 @@ import com.plotsquared.core.plot.PlotArea;
 import com.plotsquared.core.plot.flag.implementations.DoneFlag;
 import com.plotsquared.core.plot.flag.implementations.PlaceFlag;
 import com.plotsquared.core.plot.flag.types.BlockTypeWrapper;
-import com.plotsquared.core.util.Permissions;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -40,22 +39,21 @@ public class PlotSquaredProtection implements ProtectionService {
         Plot plot = area.getPlot(location);
         if (plot != null) {
             if ((location.getY() >= area.getMaxBuildHeight() || location.getY() < area
-                    .getMinBuildHeight()) && !Permissions
-                    .hasPermission(pp, Permission.PERMISSION_ADMIN_BUILD_HEIGHT_LIMIT)) {
+                    .getMinBuildHeight()) && !pp.hasPermission(Permission.PERMISSION_ADMIN_BUILD_HEIGHT_LIMIT)) {
                 return false;
             }
             if (!plot.hasOwner()) {
-                return Permissions.hasPermission(pp, Permission.PERMISSION_ADMIN_BUILD_UNOWNED);
+                return pp.hasPermission(Permission.PERMISSION_ADMIN_BUILD_UNOWNED);
             } else if (!plot.isAdded(pp.getUUID())) {
                 List<BlockTypeWrapper> place = plot.getFlag(PlaceFlag.class);
                 if (place.contains(BlockTypeWrapper.get(BukkitAdapter.asBlockType(material)))) {
                     return true;
                 }
-                return Permissions.hasPermission(pp, Permission.PERMISSION_ADMIN_BUILD_OTHER);
+                return pp.hasPermission(Permission.PERMISSION_ADMIN_BUILD_OTHER);
             } else if (Settings.Done.RESTRICT_BUILDING && DoneFlag.isDone(plot)) {
-                return Permissions.hasPermission(pp, Permission.PERMISSION_ADMIN_BUILD_OTHER);
+                return pp.hasPermission(Permission.PERMISSION_ADMIN_BUILD_OTHER);
             }
-        } else return Permissions.hasPermission(pp, Permission.PERMISSION_ADMIN_BUILD_ROAD);
+        } else return pp.hasPermission(Permission.PERMISSION_ADMIN_BUILD_ROAD);
         return true;
     }
 }

@@ -6,7 +6,6 @@ import com.github.devcyntrix.deathchest.util.update.HangarUpdateChecker;
 import com.github.devcyntrix.deathchest.util.update.UpdateChecker;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
@@ -20,7 +19,6 @@ import java.util.logging.Level;
 /**
  * Checks for the newest version by using the SpigotMC API
  */
-@Getter
 @Singleton
 public class UpdateService implements Closeable {
 
@@ -81,6 +79,26 @@ public class UpdateService implements Closeable {
 
     public void subscribe(@NotNull Consumer<NewUpdate> subscriber) {
         subscriberList.add(subscriber);
+    }
+
+    public DeathChestPlugin getPlugin() {
+        return plugin;
+    }
+
+    public UpdateChecker getUpdateChecker() {
+        return updateChecker;
+    }
+
+    public BukkitTask getUpdateScheduler() {
+        return updateScheduler;
+    }
+
+    public List<Consumer<NewUpdate>> getSubscriberList() {
+        return subscriberList;
+    }
+
+    public NewUpdate getNewestVersion() {
+        return newestVersion;
     }
 
     @Override

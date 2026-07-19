@@ -1,10 +1,8 @@
 package com.github.devcyntrix.deathchest.api.compatibility;
 
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
-import lombok.Getter;
 import org.bukkit.Server;
 
-@Getter
 public abstract class Compatibility {
 
     private boolean enabled;
@@ -44,5 +42,9 @@ public abstract class Compatibility {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
     }
 }

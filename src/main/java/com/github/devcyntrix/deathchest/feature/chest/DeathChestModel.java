@@ -3,12 +3,8 @@ package com.github.devcyntrix.deathchest.feature.chest;
 import com.github.devcyntrix.deathchest.config.InventoryOptions;
 import com.github.devcyntrix.deathchest.feature.placeholder.PlaceholderService;
 import com.github.devcyntrix.hologram.api.Hologram;
-import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.gson.annotations.Expose;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -19,14 +15,12 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.*;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public final class DeathChestModel implements InventoryHolder {
 
     @Expose
@@ -50,12 +44,29 @@ public final class DeathChestModel implements InventoryHolder {
 
     private transient Set<Closeable> tasks = new HashSet<>();
 
+    public DeathChestModel() {
+    }
+
     public DeathChestModel(Location location, long createdAt, long expireAt, @Nullable OfflinePlayer owner, boolean isProtected) {
         this.location = location;
         this.createdAt = createdAt;
         this.expireAt = expireAt;
         this.owner = owner;
         this.isProtected = isProtected;
+    }
+
+    public DeathChestModel(Location location, long createdAt, long expireAt, @Nullable OfflinePlayer owner, boolean isProtected, Inventory inventory, BlockState previous, Hologram hologram, Integer breakingEntityId, boolean isDeleting, Set<Closeable> tasks) {
+        this.location = location;
+        this.createdAt = createdAt;
+        this.expireAt = expireAt;
+        this.owner = owner;
+        this.isProtected = isProtected;
+        this.inventory = inventory;
+        this.previous = previous;
+        this.hologram = hologram;
+        this.breakingEntityId = breakingEntityId;
+        this.isDeleting = isDeleting;
+        this.tasks = tasks;
     }
 
     @Nullable
@@ -95,19 +106,6 @@ public final class DeathChestModel implements InventoryHolder {
             location.getWorld().dropItemNaturally(location, itemStack); // World won't be null
         }
         inventory.clear();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        DeathChestModel that = (DeathChestModel) o;
-        return createdAt == that.createdAt && Objects.equal(location, that.location) && Objects.equal(owner, that.owner);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(location, createdAt, owner);
     }
 
     @NotNull
@@ -152,4 +150,121 @@ public final class DeathChestModel implements InventoryHolder {
         return model;
     }
 
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
+    public long getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(long createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public long getExpireAt() {
+        return expireAt;
+    }
+
+    public void setExpireAt(long expireAt) {
+        this.expireAt = expireAt;
+    }
+
+    public @Nullable OfflinePlayer getOwner() {
+        return owner;
+    }
+
+    public void setOwner(@Nullable OfflinePlayer owner) {
+        this.owner = owner;
+    }
+
+    public boolean isProtected() {
+        return isProtected;
+    }
+
+    public void setProtected(boolean aProtected) {
+        isProtected = aProtected;
+    }
+
+    @Override
+    public @NonNull Inventory getInventory() {
+        return inventory;
+    }
+
+    public void setInventory(Inventory inventory) {
+        this.inventory = inventory;
+    }
+
+    public BlockState getPrevious() {
+        return previous;
+    }
+
+    public void setPrevious(BlockState previous) {
+        this.previous = previous;
+    }
+
+    public Hologram getHologram() {
+        return hologram;
+    }
+
+    public void setHologram(Hologram hologram) {
+        this.hologram = hologram;
+    }
+
+    public Integer getBreakingEntityId() {
+        return breakingEntityId;
+    }
+
+    public void setBreakingEntityId(Integer breakingEntityId) {
+        this.breakingEntityId = breakingEntityId;
+    }
+
+    public boolean isDeleting() {
+        return isDeleting;
+    }
+
+    public void setDeleting(boolean deleting) {
+        isDeleting = deleting;
+    }
+
+    public Set<Closeable> getTasks() {
+        return tasks;
+    }
+
+    public void setTasks(Set<Closeable> tasks) {
+        this.tasks = tasks;
+    }
+
+    @Override
+    public String toString() {
+        return "DeathChestModel{" +
+                "location=" + location +
+                ", createdAt=" + createdAt +
+                ", expireAt=" + expireAt +
+                ", owner=" + owner +
+                ", isProtected=" + isProtected +
+                ", inventory=" + inventory +
+                ", previous=" + previous +
+                ", hologram=" + hologram +
+                ", breakingEntityId=" + breakingEntityId +
+                ", isDeleting=" + isDeleting +
+                ", tasks=" + tasks +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        DeathChestModel that = (DeathChestModel) o;
+        return createdAt == that.createdAt && expireAt == that.expireAt && isProtected == that.isProtected && isDeleting == that.isDeleting && Objects.equals(location, that.location) && Objects.equals(owner, that.owner) && Objects.equals(inventory, that.inventory) && Objects.equals(previous, that.previous) && Objects.equals(hologram, that.hologram) && Objects.equals(breakingEntityId, that.breakingEntityId) && Objects.equals(tasks, that.tasks);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(location, createdAt, expireAt, owner, isProtected, inventory, previous, hologram, breakingEntityId, isDeleting, tasks);
+    }
 }

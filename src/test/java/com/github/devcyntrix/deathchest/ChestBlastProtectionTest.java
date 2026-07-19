@@ -1,11 +1,12 @@
 package com.github.devcyntrix.deathchest;
 
-import be.seeseemelk.mockbukkit.MockBukkit;
-import be.seeseemelk.mockbukkit.ServerMock;
-import be.seeseemelk.mockbukkit.WorldMock;
-import be.seeseemelk.mockbukkit.entity.PlayerMock;
+import org.mockbukkit.mockbukkit.MockBukkit;
+import org.mockbukkit.mockbukkit.ServerMock;
+import org.mockbukkit.mockbukkit.world.WorldMock;
+import org.mockbukkit.mockbukkit.entity.PlayerMock;
 import com.github.devcyntrix.deathchest.config.DeathChestConfig;
 import com.github.devcyntrix.deathchest.feature.chest.DeathChestModel;
+import org.bukkit.ExplosionResult;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -32,6 +33,8 @@ public class ChestBlastProtectionTest {
 
     @BeforeEach
     public void setUp() {
+        this.server = MockBukkit.getOrCreateMock();
+
         InputStream stream = getClass().getClassLoader().getResourceAsStream("chest-blast-protection.yml");
         if (stream == null)
             throw new IllegalStateException("Missing config");
@@ -42,8 +45,8 @@ public class ChestBlastProtectionTest {
             throw new RuntimeException(e);
         }
 
-        this.server = MockBukkit.getOrCreateMock();
-        DeathChestPlugin plugin = MockBukkit.load(DeathChestPlugin.class, true, config);
+        DeathChestPlugin.setTest(true);
+        DeathChestPlugin plugin = MockBukkit.load(DeathChestPlugin.class, config);
 
         this.player = server.addPlayer();
         List<ItemStack> content = new ArrayList<>(List.of(new ItemStack(Material.OAK_LOG)));
@@ -66,7 +69,7 @@ public class ChestBlastProtectionTest {
 
         System.out.println("Creating entity explosion...");
         Creeper spawn = mock.spawn(block.getLocation(), Creeper.class);
-        EntityExplodeEvent event = new EntityExplodeEvent(spawn, model.getLocation(), new ArrayList<>(List.of(block)), 2.0F);
+        EntityExplodeEvent event = new EntityExplodeEvent(spawn, model.getLocation(), new ArrayList<>(List.of(block)), 2.0F, ExplosionResult.DESTROY);
         server.getPluginManager().callEvent(event);
         Assertions.assertFalse(event.isCancelled());
 
@@ -83,7 +86,7 @@ public class ChestBlastProtectionTest {
         Block block = model.getLocation().getBlock();
 
         System.out.println("Creating block explosion...");
-        BlockExplodeEvent event = new BlockExplodeEvent(block, new ArrayList<>(List.of(block)), 2.0F, null);
+        BlockExplodeEvent event = new BlockExplodeEvent(block, block.getState(), new ArrayList<>(List.of(block)), 2.0F, ExplosionResult.DESTROY);
         server.getPluginManager().callEvent(event);
         Assertions.assertFalse(event.isCancelled());
         Assertions.assertFalse(block.isEmpty());

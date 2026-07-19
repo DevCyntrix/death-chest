@@ -1,11 +1,12 @@
 package com.github.devcyntrix.deathchest;
 
-import be.seeseemelk.mockbukkit.MockBukkit;
-import be.seeseemelk.mockbukkit.ServerMock;
-import be.seeseemelk.mockbukkit.WorldMock;
-import be.seeseemelk.mockbukkit.entity.PlayerMock;
+import org.mockbukkit.mockbukkit.MockBukkit;
+import org.mockbukkit.mockbukkit.ServerMock;
+import org.mockbukkit.mockbukkit.world.WorldMock;
+import org.mockbukkit.mockbukkit.entity.PlayerMock;
 import com.github.devcyntrix.deathchest.config.DeathChestConfig;
 import com.github.devcyntrix.deathchest.feature.chest.DeathChestModel;
+import org.bukkit.ExplosionResult;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -35,6 +36,8 @@ public class ChestBreakTest {
 
     @BeforeEach
     public void setUp() {
+        this.server = MockBukkit.getOrCreateMock();
+
         InputStream stream = getClass().getClassLoader().getResourceAsStream("default-config.yml");
         if (stream == null)
             throw new IllegalStateException("Missing config");
@@ -45,8 +48,8 @@ public class ChestBreakTest {
             throw new RuntimeException(e);
         }
 
-        this.server = MockBukkit.getOrCreateMock();
-        DeathChestPlugin plugin = MockBukkit.load(DeathChestPlugin.class, true, config);
+        DeathChestPlugin.setTest(true);
+        DeathChestPlugin plugin = MockBukkit.load(DeathChestPlugin.class, config);
 
         this.player = server.addPlayer();
         this.content = new ArrayList<>(List.of(new ItemStack(Material.OAK_LOG)));
@@ -87,7 +90,7 @@ public class ChestBreakTest {
 
         System.out.println("Creating entity explosion...");
         Creeper spawn = mock.spawn(block.getLocation(), Creeper.class);
-        EntityExplodeEvent event = new EntityExplodeEvent(spawn, model.getLocation(), new ArrayList<>(List.of(block)), 2.0F);
+        EntityExplodeEvent event = new EntityExplodeEvent(spawn, model.getLocation(), new ArrayList<>(List.of(block)), 2.0F, ExplosionResult.DESTROY);
         server.getPluginManager().callEvent(event);
         Assertions.assertFalse(event.isCancelled());
         Assertions.assertTrue(block.isEmpty());
@@ -104,7 +107,7 @@ public class ChestBreakTest {
         Block block = model.getLocation().getBlock();
 
         System.out.println("Creating block explosion...");
-        BlockExplodeEvent event = new BlockExplodeEvent(block, new ArrayList<>(List.of(block)), 2.0F, null);
+        BlockExplodeEvent event = new BlockExplodeEvent(block, block.getState(), new ArrayList<>(List.of(block)), 2.0F, ExplosionResult.DESTROY);
         server.getPluginManager().callEvent(event);
         Assertions.assertFalse(event.isCancelled());
         Assertions.assertTrue(block.isEmpty());

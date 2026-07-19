@@ -1,8 +1,6 @@
 package com.github.devcyntrix.deathchest.feature.blacklist;
 
 import com.google.inject.Singleton;
-import lombok.Getter;
-import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
@@ -57,8 +55,6 @@ public class ItemBlacklist implements InventoryHolder {
     private final ItemBlacklistService blacklistService;
     private final Inventory inventory;
 
-    @Getter
-    @Setter
     private int page;
 
     public ItemBlacklist(ItemBlacklistService blacklistService) {
@@ -163,4 +159,11 @@ public class ItemBlacklist implements InventoryHolder {
         return inventory;
     }
 
+    public int getPage() {
+        return page;
+    }
+
+    public void setPage(int page) {
+        this.page = page;
+    }
 }

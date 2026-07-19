@@ -3,7 +3,6 @@ package com.github.devcyntrix.deathchest.feature.animation;
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
 import com.github.devcyntrix.deathchest.config.BreakAnimationOptions;
 import com.github.devcyntrix.deathchest.feature.chest.DeathChestModel;
-import lombok.AllArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
@@ -15,13 +14,19 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Stream;
 
-@AllArgsConstructor
 public class BreakAnimationRunnable extends BukkitRunnable {
 
     private final DeathChestPlugin plugin;
     private final DeathChestModel chest;
     private final AnimationService animationService;
     private final BreakAnimationOptions options;
+
+    public BreakAnimationRunnable(DeathChestPlugin plugin, DeathChestModel chest, AnimationService animationService, BreakAnimationOptions options) {
+        this.plugin = plugin;
+        this.chest = chest;
+        this.animationService = animationService;
+        this.options = options;
+    }
 
     @Override
     public void run() {

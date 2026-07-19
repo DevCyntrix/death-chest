@@ -1,7 +1,6 @@
 package com.github.devcyntrix.deathchest.api.compatibility;
 
 import com.github.devcyntrix.deathchest.DeathChestPlugin;
-import lombok.RequiredArgsConstructor;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -9,7 +8,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-@RequiredArgsConstructor
 public class CompatibilityManager {
 
     private final Set<Class<? extends Compatibility>> registeredCompatibilities = new HashSet<>();
@@ -17,6 +15,11 @@ public class CompatibilityManager {
 
     private final DeathChestPlugin plugin;
     private final CompatibilityLoader loader;
+
+    public CompatibilityManager(DeathChestPlugin plugin, CompatibilityLoader loader) {
+        this.plugin = plugin;
+        this.loader = loader;
+    }
 
     public boolean registerCompatibility(Class<? extends Compatibility> clazz) {
         return this.registeredCompatibilities.add(clazz);

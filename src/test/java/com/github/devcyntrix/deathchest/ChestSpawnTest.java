@@ -1,9 +1,9 @@
 package com.github.devcyntrix.deathchest;
 
-import be.seeseemelk.mockbukkit.MockBukkit;
-import be.seeseemelk.mockbukkit.ServerMock;
-import be.seeseemelk.mockbukkit.WorldMock;
-import be.seeseemelk.mockbukkit.entity.PlayerMock;
+import org.mockbukkit.mockbukkit.MockBukkit;
+import org.mockbukkit.mockbukkit.ServerMock;
+import org.mockbukkit.mockbukkit.world.WorldMock;
+import org.mockbukkit.mockbukkit.entity.PlayerMock;
 import com.github.devcyntrix.deathchest.config.DeathChestConfig;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -29,6 +29,9 @@ public class ChestSpawnTest {
 
     @BeforeEach
     public void setUp() {
+        this.server = MockBukkit.getOrCreateMock();
+        this.server.setSpawnRadius(0);
+
         InputStream stream = getClass().getClassLoader().getResourceAsStream("default-config.yml");
         if (stream == null)
             throw new IllegalStateException("Missing config");
@@ -39,9 +42,8 @@ public class ChestSpawnTest {
             throw new RuntimeException(e);
         }
 
-        this.server = MockBukkit.getOrCreateMock();
-        this.server.setSpawnRadius(0);
-        MockBukkit.load(DeathChestPlugin.class, true, config);
+        DeathChestPlugin.setTest(true);
+        MockBukkit.load(DeathChestPlugin.class, config);
     }
 
     @AfterEach

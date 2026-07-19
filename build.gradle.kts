@@ -2,16 +2,17 @@ import io.papermc.hangarpublishplugin.model.Platforms
 
 plugins {
     java
-    id("xyz.jpenilla.run-paper") version "2.3.0"
-    id("com.github.johnrengelman.shadow") version "8.1.1"
-    id("io.papermc.hangar-publish-plugin") version "0.1.2"
+    id("xyz.jpenilla.run-paper") version "3.0.2"
+    id("com.gradleup.shadow") version "9.6.0"
+    id("io.papermc.hangar-publish-plugin") version "0.1.4"
 }
 
 group = "com.github.devcyntrix"
-version = "2.2.9"
+version = "3.0.0"
 
 repositories {
     mavenCentral()
+    maven("https://libraries.minecraft.net")
     maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
     maven("https://maven.enginehub.org/repo/")
@@ -27,26 +28,28 @@ repositories {
 }
 
 dependencies {
+    compileOnly("com.mojang:brigadier:1.0.18")
     compileOnly("com.google.inject:guice:7.0.0")
-    compileOnly("org.spigotmc:spigot-api:1.20-R0.1-SNAPSHOT")
-    compileOnly("net.kyori:adventure-platform-bukkit:4.3.0")
-    compileOnly("net.kyori:adventure-text-minimessage:4.14.0")
-    compileOnly("net.kyori:adventure-text-serializer-legacy:4.14.0")
+    compileOnly("org.spigotmc:spigot-api:1.21-R0.1-SNAPSHOT")
+    compileOnly("net.kyori:adventure-platform-bukkit:4.4.1")
 
     // Command library
-    compileOnly("cloud.commandframework:cloud-core:1.7.1")
-    compileOnly("cloud.commandframework:cloud-bukkit:1.7.1")
+    compileOnly("cloud.commandframework:cloud-core:1.8.4")
+    compileOnly("cloud.commandframework:cloud-bukkit:1.8.4")
 
-    implementation("org.bstats:bstats-bukkit:3.0.2")
+    implementation("org.bstats:bstats-bukkit:3.2.1")
 
     // Protection Support
-    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.7")
-    compileOnly("com.plotsquared:PlotSquared-Core:6.8.1") { isTransitive = false }
-    compileOnly("com.plotsquared:PlotSquared-Bukkit:6.8.1") { isTransitive = false }
-    compileOnly("com.github.TechFortress:GriefPrevention:16.18") { isTransitive = false }
-    compileOnly("br.net.fabiozumbi12.RedProtect:RedProtect-Core:7.7.3") { isTransitive = false }
-    compileOnly("br.net.fabiozumbi12.RedProtect:RedProtect-Spigot:7.7.3") { isTransitive = false }
-    compileOnly("pl.minecodes.plots:plugin-api:4.0.0")
+    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.9")
+
+    implementation(platform("com.intellectualsites.bom:bom-newest:1.56"))
+    compileOnly("com.intellectualsites.plotsquared:plotsquared-core")
+    compileOnly("com.intellectualsites.plotsquared:plotsquared-bukkit") { isTransitive = false }
+
+    compileOnly("com.github.TechFortress:GriefPrevention:16.18.7") { isTransitive = false }
+    compileOnly("io.github.fabiozumbi12.RedProtect:RedProtect-Core:8.1.2") { isTransitive = false }
+    compileOnly("io.github.fabiozumbi12.RedProtect:RedProtect-Spigot:8.1.2") { isTransitive = false }
+    compileOnly("pl.minecodes.plots:plugin-api:4.6.2")
 
     // Animation Support
     compileOnly("com.comphenix.protocol:ProtocolLib:5.3.0") { isTransitive = false }
@@ -57,35 +60,37 @@ dependencies {
     // Lock
     compileOnly("com.griefcraft:lwc:2.3.2-dev")
 
-    compileOnly("org.apache.commons:commons-text:1.10.0")
+    compileOnly("org.apache.commons:commons-text:1.15.0")
     compileOnly("org.jetbrains:annotations:23.0.0")
 
+    // TESTING
 
-    compileOnly("org.projectlombok:lombok:1.18.32")
-    annotationProcessor("org.projectlombok:lombok:1.18.32")
-
-    testImplementation("org.junit.jupiter:junit-jupiter:5.7.1")
+    testImplementation("org.junit.jupiter:junit-jupiter:6.1.1")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-    testImplementation("com.github.seeseemelk:MockBukkit-v1.20:3.71.0")
+    testImplementation("org.mockbukkit.mockbukkit:mockbukkit-v26.1.2:4.114.0")
+    testImplementation("io.papermc.paper:paper-api:26.1.2.build.+")
+
+    // Adventure
     testImplementation("net.kyori:adventure-platform-bukkit:4.3.0")
     testImplementation("net.kyori:adventure-text-minimessage:4.14.0")
-    testImplementation("net.kyori:adventure-text-serializer-legacy:4.14.0")
-    testImplementation("me.clip:placeholderapi:2.11.6") { isTransitive = false }
-    testImplementation("org.apache.commons:commons-text:1.10.0")
-    testImplementation("cloud.commandframework:cloud-core:1.7.1")
-    testImplementation("cloud.commandframework:cloud-bukkit:1.7.1")
-    testImplementation("org.bstats:bstats-bukkit:3.0.2")
-    testImplementation("ch.qos.logback:logback-classic:1.4.14")
 
-    testCompileOnly("org.projectlombok:lombok:1.18.32")
-    testAnnotationProcessor("org.projectlombok:lombok:1.18.32")
+    // Text
+    testImplementation("org.apache.commons:commons-text:1.15.0")
+
+    // Command
+    testImplementation("cloud.commandframework:cloud-core:1.8.4")
+    testImplementation("cloud.commandframework:cloud-bukkit:1.8.4")
+
+    // Logging
+    testImplementation("ch.qos.logback:logback-classic:1.5.38")
+
 }
 
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
-    targetCompatibility = JavaVersion.VERSION_17
-    sourceCompatibility = JavaVersion.VERSION_17
+    toolchain.languageVersion.set(JavaLanguageVersion.of(25))
+    targetCompatibility = JavaVersion.VERSION_25
+    sourceCompatibility = JavaVersion.VERSION_25
 }
 
 tasks {
@@ -97,7 +102,7 @@ tasks {
     }
     compileJava {
         options.encoding = Charsets.UTF_8.name()
-        options.release.set(17)
+        options.release.set(25)
     }
     javadoc {
         options.encoding = Charsets.UTF_8.name()
@@ -119,7 +124,7 @@ tasks {
         }
     }
     runServer {
-        minecraftVersion("1.21.8")
+        minecraftVersion("26.2")
 
     }
     shadowJar {
@@ -148,7 +153,7 @@ hangarPublish {
                 jar = tasks.shadowJar.flatMap { it.archiveFile }
                 println(jar.get().asFile)
                 println(version)
-                platformVersions.set(listOf("1.17-1.21.5"))
+                platformVersions.set(listOf("26.1-26.2"))
                 dependencies.url("ProtocolLib", "https://www.spigotmc.org/resources/protocollib.1997/") {
                     required.set(false)
                 }

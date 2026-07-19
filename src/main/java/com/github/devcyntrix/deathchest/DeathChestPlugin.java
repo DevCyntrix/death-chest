@@ -44,8 +44,6 @@ import com.github.devcyntrix.deathchest.util.adapter.DurationAdapter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.inject.Singleton;
-import lombok.Getter;
-import lombok.SneakyThrows;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
@@ -62,6 +60,7 @@ import org.bukkit.plugin.ServicesManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -76,12 +75,11 @@ import static com.github.devcyntrix.deathchest.api.report.ReportStore.DATE_FORMA
  * You can download this plugin on SpigotMC: <a href="https://www.spigotmc.org/resources/death-chest.101066/">https://www.spigotmc.org/resources/death-chest.101066/</a>
  * You are welcome to contribute to this plugin!
  */
-@Getter
 @Singleton
 public class DeathChestPlugin extends JavaPlugin implements com.github.devcyntrix.deathchest.api.DeathChestService {
 
-    @Getter
     private static boolean placeholderAPIEnabled;
+    private static boolean test;
 
     private DeathChestConfig deathChestConfig;
 
@@ -96,16 +94,13 @@ public class DeathChestPlugin extends JavaPlugin implements com.github.devcyntri
     private ItemBlacklistService blacklistService;
     private ItemBlacklist blacklist;
 
-    @Getter
     private LastDeathChestService lastDeathChestService;
 
     @Nullable
     private UpdateService updateService;
 
-    @Getter
     private PlaceholderService placeHolderService;
 
-    @Getter
     private HologramService hologramService;
 
     private DeathChestStore deathChestStore;
@@ -113,21 +108,18 @@ public class DeathChestPlugin extends JavaPlugin implements com.github.devcyntri
 
     private LastSafeLocationService lastSafeLocationService;
 
-    @Getter
     private BukkitAudiences audiences;
 
     private CompatibilityManager compatibilityManager;
 
-    private final boolean test;
+    // Necessary for plugin initialization for the bukkit plugin manager
+    public DeathChestPlugin() {
+    }
 
-    public DeathChestPlugin(Boolean test, DeathChestConfig config) {
-        this.test = test;
+    public DeathChestPlugin(DeathChestConfig config) {
         this.deathChestConfig = config;
     }
 
-    public DeathChestPlugin() {
-        this.test = false;
-    }
 
     /**
      * This method cleans the whole plugin up
@@ -242,7 +234,6 @@ public class DeathChestPlugin extends JavaPlugin implements com.github.devcyntri
         servicesManager.register(com.github.devcyntrix.deathchest.api.DeathChestService.class, this, this, ServicePriority.Normal);
     }
 
-    @SneakyThrows
     @Override
     public void onEnable() {
         debug(0, "Loading configuration file...");
@@ -252,7 +243,11 @@ public class DeathChestPlugin extends JavaPlugin implements com.github.devcyntri
         initializeServices();
 
         debug(0, "Registering commands...");
-        CommandRegistry.create(this).registerCommands(this);
+        try {
+            CommandRegistry.create(this).registerCommands(this);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
         if (!test) {
             debug(0, "Starting metrics...");
@@ -506,6 +501,89 @@ public class DeathChestPlugin extends JavaPlugin implements com.github.devcyntri
     @Override
     public File getFile() {
         return super.getFile();
+    }
+
+    public static boolean isPlaceholderAPIEnabled() {
+        return placeholderAPIEnabled;
+    }
+
+    public DeathChestConfig getDeathChestConfig() {
+        return deathChestConfig;
+    }
+
+    @Override
+    public @org.jspecify.annotations.Nullable AnimationService getAnimationService() {
+        return animationService;
+    }
+
+    @Override
+    public @NonNull ProtectionService getProtectionService() {
+        return protectionService;
+    }
+
+    public ReportService getReportService() {
+        return reportService;
+    }
+
+    public AuditService getAuditService() {
+        return auditService;
+    }
+
+    public ItemBlacklistStore getBlacklistStore() {
+        return blacklistStore;
+    }
+
+    public ItemBlacklistService getBlacklistService() {
+        return blacklistService;
+    }
+
+    public ItemBlacklist getBlacklist() {
+        return blacklist;
+    }
+
+    public LastDeathChestService getLastDeathChestService() {
+        return lastDeathChestService;
+    }
+
+    public @Nullable UpdateService getUpdateService() {
+        return updateService;
+    }
+
+    public PlaceholderService getPlaceHolderService() {
+        return placeHolderService;
+    }
+
+    @Override
+    public @org.jspecify.annotations.Nullable HologramService getHologramService() {
+        return hologramService;
+    }
+
+    public DeathChestStore getDeathChestStore() {
+        return deathChestStore;
+    }
+
+    public DeathChestService getDeathChestService() {
+        return deathChestService;
+    }
+
+    public LastSafeLocationService getLastSafeLocationService() {
+        return lastSafeLocationService;
+    }
+
+    public BukkitAudiences getAudiences() {
+        return audiences;
+    }
+
+    public CompatibilityManager getCompatibilityManager() {
+        return compatibilityManager;
+    }
+
+    public static boolean isTest() {
+        return test;
+    }
+
+    public static void setTest(boolean test) {
+        DeathChestPlugin.test = test;
     }
 
     // DO NOT TOUCH THIS

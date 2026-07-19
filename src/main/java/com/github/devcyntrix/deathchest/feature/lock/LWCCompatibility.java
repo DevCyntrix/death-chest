@@ -6,7 +6,6 @@ import com.github.devcyntrix.deathchest.feature.chest.DeathChestService;
 import com.griefcraft.lwc.LWC;
 import com.griefcraft.scripting.JavaModule;
 import com.griefcraft.scripting.event.LWCProtectionRegisterEvent;
-import lombok.AllArgsConstructor;
 import org.bukkit.Server;
 
 public class LWCCompatibility extends Compatibility {
@@ -34,10 +33,13 @@ public class LWCCompatibility extends Compatibility {
         }
     }
 
-    @AllArgsConstructor
     public static class LWCModule extends JavaModule {
 
         private final DeathChestPlugin plugin;
+
+        public LWCModule(DeathChestPlugin plugin) {
+            this.plugin = plugin;
+        }
 
         @Override
         public void onRegisterProtection(LWCProtectionRegisterEvent event) {
