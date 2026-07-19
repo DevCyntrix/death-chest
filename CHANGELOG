@@ -1,3 +1,6 @@
+3.0.0:
+* Fix the bug that the chests spawns empty and the loot drops
+
 2.2.3:
 * Fix the bug that the player cannot open the chest after rejoining (If chest protection is enabled)
 * Fix the bug that the player cannot open the chest if he dies in the world spawn region and has no operator
