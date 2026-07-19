@@ -16,6 +16,7 @@ public class PlaceholderAPICompatibility extends Compatibility {
 
     @Override
     protected void enable(DeathChestPlugin plugin) {
+        throw new NullPointerException("test");
         this.expansion = new LastDeathChestLocationExpansion(plugin);
         this.expansion.register();
     }

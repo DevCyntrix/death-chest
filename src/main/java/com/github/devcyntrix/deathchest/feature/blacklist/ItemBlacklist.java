@@ -10,6 +10,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -34,7 +35,7 @@ public class ItemBlacklist implements InventoryHolder {
 
         itemMeta = FORCE_ADD_ITEM.getItemMeta();
         itemMeta.setDisplayName("§rForce add item");
-        itemMeta.setLore(Arrays.asList("§7This will remove all items from the blacklist which falls into the scheme."));
+        itemMeta.setLore(List.of("§7This will remove all items from the blacklist which falls into the scheme."));
         FORCE_ADD_ITEM.setItemMeta(itemMeta);
 
         itemMeta = DENY_ITEM.getItemMeta();
@@ -138,9 +139,7 @@ public class ItemBlacklist implements InventoryHolder {
         items.stream()
                 .skip((this.inventory.getSize() - 9L) * page)
                 .limit(this.inventory.getSize() - 9L)
-                .forEach(stack -> {
-                    inventory.setItem(i.getAndIncrement(), stack);
-                });
+                .forEach(stack -> inventory.setItem(i.getAndIncrement(), stack));
 
 
         if (items.size() > (9 * 5 + 1) * (page + 1)) {

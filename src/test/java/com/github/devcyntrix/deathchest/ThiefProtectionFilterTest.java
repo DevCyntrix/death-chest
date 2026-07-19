@@ -27,8 +27,6 @@ public class ThiefProtectionFilterTest {
     private ServerMock server;
     private DeathChestPlugin plugin;
 
-    private List<ItemStack> content;
-
     @BeforeEach
     public void setUp() {
         this.server = MockBukkit.getOrCreateMock();
@@ -46,38 +44,12 @@ public class ThiefProtectionFilterTest {
 
         DeathChestPlugin.setTest(true);
         this.plugin = MockBukkit.load(DeathChestPlugin.class, config);
-        this.content = new ArrayList<>(List.of(new ItemStack(Material.OAK_LOG)));
+        List<ItemStack> content = new ArrayList<>(List.of(new ItemStack(Material.OAK_LOG)));
     }
 
     @AfterEach
     public void tearDown() {
         MockBukkit.unmock();
-    }
-
-    private DeathChestModel createChest(PlayerMock player) {
-
-        World world = player.getWorld();
-        Location location = player.getLocation();
-        Block block = location.getBlock();
-        Assertions.assertFalse(block.isEmpty());
-        return plugin.getChests(world).filter(deathChestModel -> player.equals(deathChestModel.getOwner())).findFirst().orElse(null);
-
-//        DeathChestConfig config = plugin.getDeathChestConfig();
-//        Duration expiration = config.chestOptions().expiration();
-//        if (expiration == null)
-//            expiration = Duration.ofSeconds(-1);
-//
-//        plugin.debug(1, "Checking no expiration permission...");
-//        NoExpirationPermission permission = config.chestOptions().noExpirationPermission();
-//        boolean expires = permission == null || !permission.enabled() || !player.hasPermission(permission.permission());
-//        long createdAt = System.currentTimeMillis();
-//        long expireAt = !expiration.isNegative() && !expiration.isZero() && expires ? createdAt + expiration.toMillis() : -1;
-//
-//        DeathChestModel model = plugin.createDeathChest(player.getLocation(), createdAt, expireAt, player, content.toArray(ItemStack[]::new));
-//        server.getScheduler().performOneTick();
-//
-//        Assertions.assertFalse(model.getLocation().getBlock().isEmpty());
-//        return model;
     }
 
     @Test

@@ -30,7 +30,7 @@ repositories {
 dependencies {
     compileOnly("com.mojang:brigadier:1.0.18")
     compileOnly("com.google.inject:guice:7.0.0")
-    compileOnly("org.spigotmc:spigot-api:1.21-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:26.1-R0.1-SNAPSHOT")
     compileOnly("net.kyori:adventure-platform-bukkit:4.4.1")
 
     // Command library
@@ -69,6 +69,7 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     testImplementation("org.mockbukkit.mockbukkit:mockbukkit-v26.1.2:4.114.0")
+    // Paper is necessary for the mockbukkit library
     testImplementation("io.papermc.paper:paper-api:26.1.2.build.+")
 
     // Adventure

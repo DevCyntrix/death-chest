@@ -26,10 +26,6 @@ public class HologramRunnable extends BukkitRunnable {
     @Override
     public void run() {
         // Updates the hologram lines
-        Bukkit.getScheduler().runTask(plugin, () -> {
-            blueprints.forEach((line, text) -> {
-                line.rename(controller.replace(chest, text));
-            });
-        });
+        Bukkit.getScheduler().runTask(plugin, () -> blueprints.forEach((line, text) -> line.rename(controller.replace(chest, text))));
     }
 }

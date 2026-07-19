@@ -73,6 +73,7 @@ public class ExpireChestTest {
         System.out.printf("Skipping %d seconds%n", remainingSeconds);
         server.getScheduler().performTicks(remainingSeconds * 20 + 10);
         Assertions.assertTrue(model.getLocation().getBlock().isEmpty(), "Chest not removed after %d seconds".formatted(remainingSeconds));
+        Assertions.assertNotNull(model.getWorld());
         Assertions.assertTrue(model.getWorld().getEntitiesByClass(Item.class).isEmpty(), "Shouldn't drop items");
     }
 
