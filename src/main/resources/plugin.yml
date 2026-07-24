@@ -6,14 +6,13 @@ website: 'https://www.spigotmc.org/resources/death-chest.101066/'
 softdepend: [ 'WorldGuard', 'ProtocolLib', 'GriefPrevention', 'GriefDefender', 'PlaceholderAPI', 'RedProtect', 'minePlots', 'LocketteX', "LWC" ]
 api-version: 1.17
 libraries:
-  - 'org.apache.commons:commons-text:1.10.0'
+  - 'org.apache.commons:commons-text:1.15.0'
   - 'com.google.inject:guice:7.0.0'
-  - 'cloud.commandframework:cloud-core:1.7.1'
-  - 'cloud.commandframework:cloud-bukkit:1.7.1'
-  - 'net.kyori:adventure-platform-bukkit:4.3.0'
-  - 'net.kyori:adventure-text-minimessage:4.14.0'
-  - 'net.kyori:adventure-text-serializer-legacy:4.14.0'
-  - 'org.bstats:bstats-bukkit:3.0.2'
+  - 'cloud.commandframework:cloud-core:1.8.4'
+  - 'cloud.commandframework:cloud-bukkit:1.8.4'
+  - 'net.kyori:adventure-platform-bukkit:4.4.1'
+  - 'net.kyori:adventure-text-minimessage:5.2.0'
+  - 'net.kyori:adventure-text-serializer-legacy:5.2.0'
 
 #commands:
 #  deathchest:

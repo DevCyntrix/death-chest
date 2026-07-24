@@ -30,26 +30,27 @@ repositories {
 dependencies {
     compileOnly("com.mojang:brigadier:1.0.18")
     compileOnly("com.google.inject:guice:7.0.0")
-    compileOnly("org.spigotmc:spigot-api:26.1-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.20-R0.1-SNAPSHOT")
     compileOnly("net.kyori:adventure-platform-bukkit:4.4.1")
 
     // Command library
     compileOnly("cloud.commandframework:cloud-core:1.8.4")
     compileOnly("cloud.commandframework:cloud-bukkit:1.8.4")
 
+    // bStats
     implementation("org.bstats:bstats-bukkit:3.2.1")
 
     // Protection Support
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.9")
 
-    implementation(platform("com.intellectualsites.bom:bom-newest:1.56"))
-    compileOnly("com.intellectualsites.plotsquared:plotsquared-core")
-    compileOnly("com.intellectualsites.plotsquared:plotsquared-bukkit") { isTransitive = false }
+    //implementation(platform("com.intellectualsites.bom:bom-newest"))
+    compileOnly("com.intellectualsites.plotsquared:plotsquared-core:7.2.1")
+    compileOnly("com.intellectualsites.plotsquared:plotsquared-bukkit:7.2.1") { isTransitive = false }
 
-    compileOnly("com.github.TechFortress:GriefPrevention:16.18.7") { isTransitive = false }
+    compileOnly("com.github.TechFortress:GriefPrevention:16.18.4") { isTransitive = false }
     compileOnly("io.github.fabiozumbi12.RedProtect:RedProtect-Core:8.1.2") { isTransitive = false }
     compileOnly("io.github.fabiozumbi12.RedProtect:RedProtect-Spigot:8.1.2") { isTransitive = false }
-    compileOnly("pl.minecodes.plots:plugin-api:4.6.2")
+    compileOnly("pl.minecodes.plots:plugin-api:4.6.1")
 
     // Animation Support
     compileOnly("com.comphenix.protocol:ProtocolLib:5.3.0") { isTransitive = false }
@@ -68,9 +69,9 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:6.1.1")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-    testImplementation("org.mockbukkit.mockbukkit:mockbukkit-v26.1.2:4.114.0")
+    testImplementation("org.mockbukkit.mockbukkit:mockbukkit-v1.21:4.110.0")
     // Paper is necessary for the mockbukkit library
-    testImplementation("io.papermc.paper:paper-api:26.1.2.build.+")
+    testImplementation("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
 
     // Adventure
     testImplementation("net.kyori:adventure-platform-bukkit:4.3.0")
@@ -89,9 +90,11 @@ dependencies {
 }
 
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(25))
-    targetCompatibility = JavaVersion.VERSION_25
-    sourceCompatibility = JavaVersion.VERSION_25
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+}
+
+val javaLauncherService = javaToolchains.launcherFor {
+    languageVersion.set(JavaLanguageVersion.of(25))
 }
 
 tasks {
@@ -101,19 +104,24 @@ tasks {
     assemble {
         dependsOn(shadowJar)
     }
-    compileJava {
-        options.encoding = Charsets.UTF_8.name()
-        options.release.set(25)
+
+    withType<JavaCompile>().configureEach {
+        options.encoding = "UTF-8"
+        options.release.set(17)
     }
+
     javadoc {
-        options.encoding = Charsets.UTF_8.name()
+        options.encoding = "UTF-8"
     }
     processResources {
-        filteringCharset = Charsets.UTF_8.name()
+        filteringCharset = "UTF-8"
         duplicatesStrategy = DuplicatesStrategy.INCLUDE
         filesMatching("plugin.yml") {
             expand(Pair("projectVersion", project.version))
         }
+    }
+    compileTestJava {
+        options.release.set(21)
     }
     test {
         useJUnitPlatform()
@@ -126,6 +134,7 @@ tasks {
     }
     runServer {
         minecraftVersion("26.2")
+        javaLauncher = javaLauncherService
 
     }
     shadowJar {
@@ -154,7 +163,7 @@ hangarPublish {
                 jar = tasks.shadowJar.flatMap { it.archiveFile }
                 println(jar.get().asFile)
                 println(version)
-                platformVersions.set(listOf("26.1-26.2"))
+                platformVersions.set(listOf("1.20-26.2"))
                 dependencies.url("ProtocolLib", "https://www.spigotmc.org/resources/protocollib.1997/") {
                     required.set(false)
                 }

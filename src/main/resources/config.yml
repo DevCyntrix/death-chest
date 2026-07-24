@@ -37,7 +37,7 @@ chest:
     # On this website you can find a list of all sounds which is implemented in SpigotMC
     # @see https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html
     # If you want to disable the sound or the message, you can delete these options
-    sound: BLOCK_CHEST_LOCKED;1.0;1.0
+    sound: minecraft:block.chest.locked;1.0;1.0
     message: |-
       &cYou are not permitted to open this chest
 

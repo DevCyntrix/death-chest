@@ -18,36 +18,39 @@ public final class EntityIdHelper {
     private static AtomicInteger counter;
 
     static {
-        if(DeathChestPlugin.isTest()) {
+        if (DeathChestPlugin.isTest()) {
             counter = new AtomicInteger(0);
         } else {
             try {
-                // CraftBukkit
-                Class<?> craftWorldClass = Class.forName("org.bukkit.craftbukkit.CraftWorld");
-                getHandleMethod = craftWorldClass.getMethod("getHandle");
-
-                // NMS Server
-                Class<?> serverLevelClass = Class.forName("net.minecraft.server.level.ServerLevel");
-                nextEntityIdMethod = serverLevelClass.getMethod("getNextEntityId");
-
                 Class<?> entityClass = Class.forName("net.minecraft.world.entity.Entity");
                 Field entityCounter = Arrays.stream(entityClass.getDeclaredFields())
                         .filter(field -> field.getType().equals(AtomicInteger.class))
                         .findFirst()
                         .orElse(null);
-                if (entityCounter != null) {
-                    if (entityCounter.trySetAccessible()) {
-                        counter = (AtomicInteger) entityCounter.get(null);
-                    }
+                if (entityCounter != null && entityCounter.trySetAccessible()) {
+                    counter = (AtomicInteger) entityCounter.get(null);
+                }
+
+                if (entityCounter == null) {
+                    // CraftBukkit
+                    Class<?> craftWorldClass = Class.forName("org.bukkit.craftbukkit.CraftWorld");
+                    getHandleMethod = craftWorldClass.getMethod("getHandle");
+
+                    // NMS Server
+                    Class<?> serverLevelClass = Class.forName("net.minecraft.server.level.ServerLevel");
+                    nextEntityIdMethod = serverLevelClass.getMethod("getNextEntityId");
                 }
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
+                counter = new AtomicInteger();
             }
+
+
         }
     }
 
     public static int increaseAndGet(World world) {
-        if(counter != null) {
+        if (counter != null) {
             return counter.incrementAndGet();
         }
 
