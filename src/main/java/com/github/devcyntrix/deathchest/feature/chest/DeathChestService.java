@@ -173,9 +173,14 @@ public class DeathChestService implements Closeable {
             listener.onDestroy(model);
         }
 
-        model = this.loadedChests.remove(model.getWorld(), model.getLocation()); // Remove from cache
-        if (model == null)
-            throw new IllegalArgumentException("Invalid model");
+        // Remove from cache
+        // Fix: if the model is not in the cache anymore (e.g. it was already destroyed by the
+        // expiration task during server startup, before the model was added to the loaded cache),
+        // just return silently instead of throwing. Destroying a chest is idempotent.
+        if (this.loadedChests.remove(model.getWorld(), model.getLocation()) == null) {
+            model.setDeleting(false);
+            return;
+        }
 
         this.storage.remove(model); // Remove from database
 
