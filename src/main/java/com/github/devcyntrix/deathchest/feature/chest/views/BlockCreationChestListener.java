@@ -34,14 +34,52 @@ public class BlockCreationChestListener implements ChestListener, Listener {
             public void run() {
                 plugin.debug(0, "Creating death chest block...");
                 Location location = model.getLocation();
-                BlockState state = location.getBlock().getState();
-                model.setPrevious(state);
-                location.getBlock().setType(Material.CHEST);
+                World world = location.getWorld();
+                if (world == null)
+                    return;
 
+                // Fix: ensure the chunk is loaded before placing the block, retrying for a few ticks.
+                // Previously the chest block was set on a possibly unloaded chunk when the player
+                // disconnected right after dying, which silently discarded the block change and
+                // caused the items (already cleared from the world) to be lost forever.
+                int chunkX = location.getBlockX() >> 4;
+                int chunkZ = location.getBlockZ() >> 4;
+                if (!world.isChunkLoaded(chunkX, chunkZ)) {
+                    // Try to load the chunk synchronously and retry in the same run
+                    world.getChunkAt(chunkX, chunkZ);
+                }
 
+                if (!world.isChunkLoaded(chunkX, chunkZ)) {
+                    // Chunk still not loaded - retry for up to 40 ticks (2 seconds)
+                    new BukkitRunnable() {
+                        private int attempts = 0;
+                        @Override
+                        public void run() {
+                            attempts++;
+                            if (world.isChunkLoaded(chunkX, chunkZ) || attempts >= 40) {
+                                if (attempts >= 40 && !world.isChunkLoaded(chunkX, chunkZ)) {
+                                    plugin.debug(0, "Failed to load chunk for death chest at " + location.getBlockX() + ", " + location.getBlockY() + ", " + location.getBlockZ());
+                                } else {
+                                    placeChest(model, location, world);
+                                }
+                                this.cancel();
+                            }
+                        }
+                    }.runTaskTimer(plugin, 1, 1);
+                    return;
+                }
+
+                placeChest(model, location, world);
             }
         }.runTask(plugin);
         model.getTasks().add(bukkitTask::cancel);
+    }
+
+    private void placeChest(DeathChestModel model, Location location, World world) {
+        BlockState state = location.getBlock().getState();
+        model.setPrevious(state);
+        location.getBlock().setType(Material.CHEST);
+        plugin.debug(0, "Death chest block created at " + location.getBlockX() + ", " + location.getBlockY() + ", " + location.getBlockZ());
     }
 
     @Override
