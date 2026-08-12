@@ -43,7 +43,9 @@ public class BreakAnimationRunnable extends BukkitRunnable {
             return;
         }
 
-        double process = (double) (System.currentTimeMillis() - chest.getCreatedAt()) / (chest.getExpireAt() - chest.getCreatedAt());
+        // 修复 (fix3): 箱子过期后动画任务仍可能在跑（玩家挖箱过程中过期），
+        // process 会 >1.0 → state >9 → progress 非法 → sendBlockDamage 抛异常（MCSM 线上 2026-08-12 实测卡服事件）
+        double process = Math.min(1.0, Math.max(0.0, (double) (System.currentTimeMillis() - chest.getCreatedAt()) / (chest.getExpireAt() - chest.getCreatedAt())));
 
         try {
             if (!DeathChestPlugin.isTest()) {
